@@ -1,0 +1,15 @@
+/Users/sanghunsong/DEV/ALGORITHM/C#/bin/Debug/net5.0/ALGORITHM.deps.json
+/Users/sanghunsong/DEV/ALGORITHM/C#/bin/Debug/net5.0/ALGORITHM.runtimeconfig.json
+/Users/sanghunsong/DEV/ALGORITHM/C#/bin/Debug/net5.0/ALGORITHM.runtimeconfig.dev.json
+/Users/sanghunsong/DEV/ALGORITHM/C#/bin/Debug/net5.0/ALGORITHM.dll
+/Users/sanghunsong/DEV/ALGORITHM/C#/bin/Debug/net5.0/ref/ALGORITHM.dll
+/Users/sanghunsong/DEV/ALGORITHM/C#/bin/Debug/net5.0/ALGORITHM.pdb
+/Users/sanghunsong/DEV/ALGORITHM/C#/obj/Debug/net5.0/ALGORITHM.csproj.AssemblyReference.cache
+/Users/sanghunsong/DEV/ALGORITHM/C#/obj/Debug/net5.0/ALGORITHM.GeneratedMSBuildEditorConfig.editorconfig
+/Users/sanghunsong/DEV/ALGORITHM/C#/obj/Debug/net5.0/ALGORITHM.AssemblyInfoInputs.cache
+/Users/sanghunsong/DEV/ALGORITHM/C#/obj/Debug/net5.0/ALGORITHM.AssemblyInfo.cs
+/Users/sanghunsong/DEV/ALGORITHM/C#/obj/Debug/net5.0/ALGORITHM.csproj.CoreCompileInputs.cache
+/Users/sanghunsong/DEV/ALGORITHM/C#/obj/Debug/net5.0/ALGORITHM.dll
+/Users/sanghunsong/DEV/ALGORITHM/C#/obj/Debug/net5.0/ref/ALGORITHM.dll
+/Users/sanghunsong/DEV/ALGORITHM/C#/obj/Debug/net5.0/ALGORITHM.pdb
+/Users/sanghunsong/DEV/ALGORITHM/C#/obj/Debug/net5.0/ALGORITHM.genruntimeconfig.cache
