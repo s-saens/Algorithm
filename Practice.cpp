@@ -3,13 +3,12 @@
 
 using namespace std;
 
-
-int DP[1001];
-
+int DPLeft[1001];
+int DPRight[1001];
 
 int MAX(int a, int b)
 {
-    if(a > b)
+    if (a > b)
     {
         return a;
     }
@@ -19,89 +18,87 @@ int MAX(int a, int b)
     }
 }
 
-int longestBiotic(int startIndex, int last_changeCnt, int last_increment, int N, int* arr)
+int longestLeft(int startIndex, int N, int *arr) // 사실 여기서 N은 의미 없지만, 코드 헷갈리니까 그냥 넣기로 함.
 {
-    if(DP[startIndex] != -1)
+    if (DPLeft[startIndex] != -1)
     {
-        return DP[startIndex];
+        return DPLeft[startIndex];
     }
 
-    int last_lis = 1;
-
-    for(int i=startIndex+1; i<N ; ++i)
+    int lastLongest = 1;
+    for (int i = startIndex - 1; i >= 0; --i)
     {
-        // now_ : 현재 i에 대한 값
-        // last_ : 현재 함수 전체에 대한 값
-        int now_changeCnt = last_changeCnt;
-        int now_increment = last_increment;
-
-        // 감소한 경우
-        if(arr[startIndex] > arr[i])
+        // 왼쪽으로 감소해야 함
+        if (arr[startIndex] > arr[i])
         {
-            now_increment = -1;
-            // 이전에 증가하고 있었던 경우
-            if(last_increment > 0)
-            {
-                now_changeCnt++;
-            }
+            lastLongest = MAX(lastLongest, 1 + longestLeft(i, N, arr));
         }
-        // 증가한 경우
-        else if(arr[startIndex] < arr[i])
-        {
-            now_increment = 1;
-            // 이전에 감소하고 있었던 경우 : ch에 관계 없이 바이오틱 X
-            if(last_increment < 0)
-            {
-                continue;
-            }
-        }
-        // 그대로인 경우 : ch에 관계 없이 바이오틱 X
-        else
-        {
-            continue;
-        }
-
-        if(now_changeCnt > 1)
-        {
-            continue;
-        }
-
-        last_lis = MAX(last_lis, 1 + longestBiotic(i, now_changeCnt, now_increment, N, arr));
     }
 
-    DP[startIndex] = MAX(last_lis, startIndex);
-    return last_lis;
+    DPLeft[startIndex] = lastLongest;
+    return lastLongest;
 }
 
+int longestRight(int startIndex, int N, int *arr)
+{
+    if (DPRight[startIndex] != -1)
+    {
+        return DPRight[startIndex];
+    }
+
+
+    int lastLongest = 1;
+    for (int i = startIndex + 1; i < N; ++i)
+    {
+        // 왼쪽으로 감소해야 함
+        if (arr[startIndex] > arr[i])
+        {
+            lastLongest = MAX(lastLongest, 1 + longestRight(i, N, arr));
+        }
+    }
+
+    DPRight[startIndex] = lastLongest;
+    return lastLongest;
+}
+
+int longestBiotic(int midIndex, int N, int *arr)
+{
+    // 왼쪽 오른쪽 셀 때, mid도 세게 되는데, 이 때 같은 값이 두 번 더해지기 때문에, 양쪽 longest 더하고 하나 빼줌.
+    int l = longestLeft(midIndex, N, arr);
+    int r = longestRight(midIndex, N, arr);
+    int b = l + r - 1;
+    return b;
+}
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    for(int i=0 ; i<1001 ; ++i)
+    for (int i = 0; i < 1001; ++i)
     {
-        DP[i] = -1;
+        DPLeft[i] = -1;
+        DPRight[i] = -1;
     }
-    
+
     int N;
 
     cin >> N;
 
     int arr[N];
 
-    for(int i=0 ; i<N ; ++i)
+    for (int i = 0; i < N; ++i)
     {
         cin >> arr[i];
     }
 
     int longest = 0;
 
-    for(int i=0 ; i<N ; ++i)
+    for (int i = 0; i < N; ++i)
     {
-        longest = MAX(longestBiotic(i, 0, 0, N, arr), longest);
+        int a = longestBiotic(i, N, arr);
+        longest = MAX(a, longest);
     }
 
     cout << longest;
-    
 }
