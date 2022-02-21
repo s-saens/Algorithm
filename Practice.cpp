@@ -19,16 +19,16 @@ class Vector2
 
 bool compare(Vector2& v1, Vector2& v2)
 {
-    if((v1).x > (v2).x)
+    if((v1).y > (v2).y)
     {
         return false;
     }
-    else if((v1).x < (v2).x)
+    else if((v1).y < (v2).y)
     {
         return true;
     }
     // x가 같을 때
-    else if((v1).y > (v2).y)
+    else if((v1).x > (v2).x)
     {
         return false;
     }
