@@ -11,63 +11,77 @@ int MIN(int a, int b)
         return b;
 }
 
+struct Vector2
+{
+    int x;
+    int y;
+};
+
+Vector2* bigger(Vector2* v1, Vector2* v2)
+{
+    if((*v1).x > (*v2).x)
+    {
+        return v1;
+    }
+    else if((*v1).x < (*v2).x)
+    {
+        return v2;
+    }
+    else
+    {
+        if((*v1).y > (*v2).y)
+        {
+            return v1;
+        }
+        else
+        {
+            return v2;
+        }
+    }
+
+}
+
+void swapVector2(Vector2* arr, int i1, int i2)
+{
+    Vector2 temp = arr[i1];
+    arr[i1] = arr[i2];
+    arr[i2] = temp;
+
+}
+
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int N, M; // N:세로, M:가로
+    int N; // N:세로, M:가로
 
-    cin >> N >> M;
+    cin >> N;
 
-    string pieces[N];
-    for (int i = 0; i < N; ++i)
+    Vector2 pos[N];
+
+    for(int i=0 ; i<N ; ++i)
     {
-        cin >> pieces[i];
+        int x, y;
+        cin >> x >> y;
+        pos[i].x = x;
+        pos[i].y = y;
     }
-
-    int minChangeCount = 5000;
-
-    for (int i = 0; i <= N - 8; ++i)
+    
+    for(int i=0 ; i<N-1 ; ++i)
     {
-        for (int j = 0; j <= M - 8; ++j)
+        for(int j=i ; j<N-1 ; ++j)
         {
-            int changeCount_B = 0; // 맨 왼쪽 위가 Black이어야 한다고 가정할 때, 바뀌는 칸의 수
-            int changeCount_W = 0; // 맨 왼쪽 위가 White~
-
-            for (int k = 0; k < 8; ++k)
+            if(bigger(&pos[j], &pos[j+1]) == &pos[j])
             {
-                for (int l = 0; l < 8; ++l)
-                {
-                    // 맨 왼쪽 위(k+l = 0)가 B여야 할 때
-                    // k+l 더한 값이 짝수인 (0포함) 곳에서 'W'인 경우,
-                    // 홀수인 곳에서 'B'인 경우 바꿈
-                    if (pieces[i + k][j + l] == 'W' && (k + l) % 2 == 0)
-                    {
-                        changeCount_B++;
-                    }
-                    if (pieces[i + k][j + l] == 'B' && (k + l) % 2 == 1)
-                    {
-                        changeCount_B++;
-                    }
-
-                    // 맨 왼쪽 위(k+l = 0)가 W여야 할 때
-                    // k+l 더한 값이 짝수인 (0포함) 곳에서 'B'인 경우,
-                    // 홀수인 곳에서 'W'인 경우 바꿈
-                    if (pieces[i + k][j + l] == 'B' && (k + l) % 2 == 0)
-                    {
-                        changeCount_W++;
-                    }
-                    if (pieces[i + k][j + l] == 'W' && (k + l) % 2 == 1)
-                    {
-                        changeCount_W++;
-                    }
-                }
+                swapVector2(pos, j, j+1);
             }
-
-            minChangeCount = MIN(minChangeCount, MIN(changeCount_B, changeCount_W));
         }
     }
 
-    cout << minChangeCount;
+    cout << "\n";
+    for(int i=0 ; i<N ; ++i)
+    {
+        cout << pos[i].x << " " << pos[i].y << "\n";
+    }
 }
