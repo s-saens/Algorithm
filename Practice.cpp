@@ -1,39 +1,42 @@
 #include <iostream>
-#include <string>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
-int MIN(int a, int b)
+class Vector2
 {
-    if (a < b)
-        return a;
-    else
-        return b;
-}
+    public:
+    int x=0;
+    int y=0;
 
-struct Vector2
-{
-    int x;
-    int y;
+    Vector2 (int _x, int _y)
+    {
+        x = _x;
+        y = _y;
+    }
 };
 
-Vector2 *Bigger(Vector2 *v1, Vector2 *v2)
+bool compare(Vector2& v1, Vector2& v2)
 {
-    if ((*v1).x > (*v2).x)
-        return v1;
-    else if ((*v1).x < (*v2).x)
-        return v2;
-    else if ((*v1).y > (*v2).y)
-        return v1;
+    if((v1).x > (v2).x)
+    {
+        return false;
+    }
+    else if((v1).x < (v2).x)
+    {
+        return true;
+    }
+    // x가 같을 때
+    else if((v1).y > (v2).y)
+    {
+        return false;
+    }
     else
-        return v2;
-}
+    {
+        return true;
+    }
 
-void swapVector2(Vector2 *arr, int i1, int i2)
-{
-    Vector2 temp = arr[i1];
-    arr[i1] = arr[i2];
-    arr[i2] = temp;
 }
 
 int main()
@@ -45,34 +48,17 @@ int main()
 
     cin >> N;
 
-    Vector2 pos[N];
+    vector<Vector2> pos;
 
     for (int i = 0; i < N; ++i)
     {
         int x, y;
         cin >> x >> y;
-        pos[i].x = x;
-        pos[i].y = y;
+        Vector2 v = Vector2(x, y);
+        pos.push_back(v);
     }
 
-    // sort : 이중 선택 정렬
-    int cnt = 0; // 최대/최소가 정해진 횟수
-    while(cnt <= N/2)
-    {
-        for(int i=cnt ; i<N-cnt ; ++i)
-        {
-            // 맨 왼쪽거가 더 크다면 SWAP
-            if(Bigger(&pos[cnt], &pos[i]) == &pos[cnt])
-            {
-                swapVector2(pos, cnt, i);
-            }
-            if(Bigger(&pos[N-cnt-1], &pos[i]) == &pos[i])
-            {
-                swapVector2(pos, N-cnt-1, i);
-            }
-        }
-        cnt++;
-    }
+    sort(pos.begin(), pos.end(), compare);
 
     cout << "\n";
     for (int i = 0; i < N; ++i)
