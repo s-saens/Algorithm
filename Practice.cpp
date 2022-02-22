@@ -2,14 +2,23 @@
 
 using namespace std;
 
+int pow2(int a)
+{
+    return a * a;
+}
+
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int A, B;
-    while(!(cin >> A >> B).eof())
+    int psum = 0;
+    for(int i=0 ; i<5 ; ++i)
     {
-        cout << A + B << "\n";
+        int num;
+        cin >> num;
+        psum += pow2(num);
     }
+
+    cout << psum%10;
 }
