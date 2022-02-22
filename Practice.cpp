@@ -5,54 +5,35 @@
 
 using namespace std;
 
+string isPel(int n)
+{
+    string s = to_string(n);
+    int len = s.length();
+
+    for (int i = 0; i < len / 2; ++i)
+    {
+        if (s[i] != s[len - 1 - i])
+        {
+            return "no";
+        }
+    }
+
+    return "yes";
+}
+
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int n;
-    cin >> n;
+    int n = 1;
 
-    int lastNatural = 1;
-    stack<int> stack1234; // 1부터 순차적으로 쌓아올릴 친구
-    queue<int> seq;
-
-    string history;
-
-    for(int i=0 ; i<n ; ++i)
+    while (n > 0)
     {
-        int number;
-        cin >> number;
-        seq.push(number);
-    }
-
-    int whileCount = 0;
-    while(seq.empty() == false)
-    {
-        whileCount++;
-        int popped = seq.front();
-        seq.pop();
-
-        while(lastNatural <= popped)
+        cin >> n;
+        if(n > 0)
         {
-            stack1234.push(lastNatural);
-            history += "+\n";
-            lastNatural++;
-        }
-
-        int popped1234 = stack1234.top();
-
-        stack1234.pop();
-        history += "-\n";
-
-
-        if (popped1234 > popped)
-        {
-            cout << "NO";
-            return 0;
+            cout << isPel(n) << "\n";
         }
     }
-
-    cout << history;
-
 }
