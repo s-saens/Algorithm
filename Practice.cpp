@@ -1,10 +1,24 @@
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
-int pow2(int a)
+int reverseStringToInt(string n)
 {
-    return a * a;
+    reverse(n.begin(), n.end());
+    return stoi(n);
+}
+
+int max(int a, int b)
+{
+    if(a > b)
+    {
+        return a;
+    }
+    else
+    {
+        return b;
+    }
 }
 
 int main()
@@ -12,13 +26,10 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int psum = 0;
-    for(int i=0 ; i<5 ; ++i)
-    {
-        int num;
-        cin >> num;
-        psum += pow2(num);
-    }
+    string a, b;
+    cin >> a >> b;
 
-    cout << psum%10;
+    int c = max(reverseStringToInt(a), reverseStringToInt(b));
+
+    cout << c;
 }
