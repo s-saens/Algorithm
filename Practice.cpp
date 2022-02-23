@@ -1,24 +1,23 @@
 #include <iostream>
-#include <algorithm>
-#include <stack>
-#include <queue>
+#include <cmath>
 
 using namespace std;
 
-string isPel(int n)
+long long getCutLANs(long long &cutLength, long long &length)
 {
-    string s = to_string(n);
-    int len = s.length();
+    return length / cutLength;
+}
 
-    for (int i = 0; i < len / 2; ++i)
+long long MAX(long long &a, long long &b)
+{
+    if(a > b)
     {
-        if (s[i] != s[len - 1 - i])
-        {
-            return "no";
-        }
+        return a;
     }
-
-    return "yes";
+    else
+    {
+        return b;
+    }
 }
 
 int main()
@@ -26,14 +25,44 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int n = 1;
+    int K, N;
+    cin >> K >> N;
 
-    while (n > 0)
+    long long lanLengths[K];
+
+    long long max = 0;
+    for(int i=0 ; i<K ; ++i)
     {
-        cin >> n;
-        if(n > 0)
+        cin >> lanLengths[i];
+
+        max = MAX(max, lanLengths[i]);
+    }
+
+    long long left = 1;
+    long long right = max;
+
+    long long maxLength = 0;
+
+    while(left <= right)
+    {
+        long long mid = (right+left)/2;
+        long long lansCnt = 0;
+
+        for(int i=0 ; i<K ; ++i)
         {
-            cout << isPel(n) << "\n";
+            lansCnt += getCutLANs(mid, lanLengths[i]);
+        }
+
+        if(lansCnt < N) // 자른 후  랜 개수가 모자라면, 더 작게 잘라야 함 : mid 기준 왼쪽 탐색해야 함.
+        {
+            right = mid-1;
+        }
+        else
+        {
+            maxLength = MAX(maxLength, mid);
+            left = mid+1;
         }
     }
+
+    cout << maxLength;
 }
