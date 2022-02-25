@@ -3,15 +3,48 @@
 
 using namespace std;
 
-bool IsInteger(string s)
+int X, Y;
+bool lettuces[51][51];
+bool visited[51][51];
+int dx[4] = {1, -1, 0, 0};
+int dy[4] = {0, 0, 1, -1};
+
+void Initialize()
 {
-    if(s[0] >= 48 && s[0] <=57)
+    for (int y = 0; y < 51; ++y)
     {
-        return true;
+        for (int x = 0; x < 51; ++x)
+        {
+            lettuces[y][x] = 0;
+            visited[y][x] = 0;
+        }
     }
-    else
+}
+
+void Visit(int x, int y)
+{
+    if(visited[y][x] == true)
     {
-        return false;
+        return;
+    }
+    visited[y][x] = true;
+
+    int nextX, nextY;
+    
+    for(int i=0 ; i<4 ; ++i)
+    {
+        nextX = x + dx[i];
+        nextY = y + dy[i];
+
+        if(nextX < 0 || nextX >= X || nextY < 0 || nextY >= Y)
+        {
+            continue;
+        }
+
+        if(lettuces[nextY][nextX] == true)
+        {
+            Visit(nextX, nextY);
+        }
     }
 }
 
@@ -20,45 +53,39 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int N, M;
+    int T;
+    cin >> T;
 
-    cin >> N >> M;
-
-    string pocketmonsList[N+1];
-    map<string, int> pocketmonsMap;
-
-    for(int i=1 ; i<=N ; ++i)
+    for(int i=0 ; i<T ; ++i)
     {
-        string input;
-        cin >> input;
+        Initialize();
 
-        pocketmonsMap[input] = i;
-        pocketmonsList[i] = input;
-    }
-
-    string answers[M];
-
-    for(int i=0 ; i<M ; ++i)
-    {
-        string p;
-        cin >> p;
-        
-
-        if (IsInteger(p) == true) // 숫자면?
+        int K;
+        cin >> X >> Y >> K;
+    
+        for(int i=0 ; i<K ; ++i)
         {
-            int n = stoi(p);
+            int x, y;
+            cin >> x >> y;
 
-            answers[i] = pocketmonsList[n];
+            lettuces[y][x] = true;
         }
-        else // 이름이면?
+
+        int cnt = 0;
+        for(int i=0 ; i<Y ; ++i)
         {
-            answers[i] = to_string(pocketmonsMap[p]);
+            for(int j=0 ; j<X ; ++j)
+            {
+                if(lettuces[i][j] == true && visited[i][j] == false)
+                {
+                    cnt++;
+                    Visit(j, i);
+                }
+            }
         }
+        cout << cnt << "\n";
     }
 
-    for(int i=0 ; i<M ; ++i)
-    {
-        cout << answers[i] << "\n";
-    }
+    return 0;
 
 }
