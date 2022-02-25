@@ -2,52 +2,38 @@
 
 using namespace std;
 
+bool visited[1001];
+bool linked[1001][1001];
+
+void Initialize()
+{
+    for(int i=0 ; i<1001 ; ++i)
+    {
+        visited[i] = false;
+    }
+}
+
+void BFS(int N, int M, int V)
+{
+    Initialize();
+}
+
+void DFS(int N, int M, int V)
+{
+
+}
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    long long fibo[50];
-    fibo[0] = 0;
-    fibo[1] = 1;
-    fibo[2] = 1;
-    fibo[3] = 2;
-    for(int i=4 ; i<50 ; ++i)
-    {
-        fibo[i] = fibo[i-1] + fibo[i-2];
-    }
+    int N, M, V;
 
-    int T;
 
-    cin >> T;
+    for(int i=0)
 
-    int N[T];
+    BFS(N, M, V);
+    DFS(N, M, V);
 
-    for(int i=0 ; i<T ; ++i)
-    {
-        cin >> N[i];
-    }
-    for(int i=0 ; i<T ; ++i)
-    {
-        switch (N[i])
-        {
-        case 0:
-            cout << 1 << " " << 0 << "\n";
-            break;
-        case 1:
-            cout << 0 << " " << 1 << "\n";
-            break;
-        case 2:
-            cout << 1 << " " << 1 << "\n";
-            break;
-        case 3:
-            cout << 1 << " " << 2 << "\n";
-            break;
-
-        default:
-            cout << fibo[N[i]-1] << " " << fibo[N[i]] << "\n";
-            break;
-        }
-    }
 }
