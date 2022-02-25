@@ -1,26 +1,18 @@
 #include <iostream>
+#include <map>
 
 using namespace std;
 
-bool visited[1001];
-bool linked[1001][1001];
-
-void Initialize()
+bool IsInteger(string s)
 {
-    for(int i=0 ; i<1001 ; ++i)
+    if(s[0] >= 48 && s[0] <=57)
     {
-        visited[i] = false;
+        return true;
     }
-}
-
-void BFS(int N, int M, int V)
-{
-    Initialize();
-}
-
-void DFS(int N, int M, int V)
-{
-
+    else
+    {
+        return false;
+    }
 }
 
 int main()
@@ -28,12 +20,45 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int N, M, V;
+    int N, M;
 
+    cin >> N >> M;
 
-    for(int i=0)
+    string pocketmonsList[N+1];
+    map<string, int> pocketmonsMap;
 
-    BFS(N, M, V);
-    DFS(N, M, V);
+    for(int i=1 ; i<=N ; ++i)
+    {
+        string input;
+        cin >> input;
+
+        pocketmonsMap[input] = i;
+        pocketmonsList[i] = input;
+    }
+
+    string answers[M];
+
+    for(int i=0 ; i<M ; ++i)
+    {
+        string p;
+        cin >> p;
+        
+
+        if (IsInteger(p) == true) // 숫자면?
+        {
+            int n = stoi(p);
+
+            answers[i] = pocketmonsList[n];
+        }
+        else // 이름이면?
+        {
+            answers[i] = to_string(pocketmonsMap[p]);
+        }
+    }
+
+    for(int i=0 ; i<M ; ++i)
+    {
+        cout << answers[i] << "\n";
+    }
 
 }
