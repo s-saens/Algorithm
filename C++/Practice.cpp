@@ -3,48 +3,15 @@
 
 using namespace std;
 
-int X, Y;
-bool lettuces[51][51];
-bool visited[51][51];
-int dx[4] = {1, -1, 0, 0};
-int dy[4] = {0, 0, 1, -1};
-
-void Initialize()
+string IsRightTriangle(int max, int a, int b)
 {
-    for (int y = 0; y < 51; ++y)
+    if(max*max == a*a + b*b)
     {
-        for (int x = 0; x < 51; ++x)
-        {
-            lettuces[y][x] = 0;
-            visited[y][x] = 0;
-        }
+        return "right";
     }
-}
-
-void Visit(int x, int y)
-{
-    if(visited[y][x] == true)
+    else
     {
-        return;
-    }
-    visited[y][x] = true;
-
-    int nextX, nextY;
-    
-    for(int i=0 ; i<4 ; ++i)
-    {
-        nextX = x + dx[i];
-        nextY = y + dy[i];
-
-        if(nextX < 0 || nextX >= X || nextY < 0 || nextY >= Y)
-        {
-            continue;
-        }
-
-        if(lettuces[nextY][nextX] == true)
-        {
-            Visit(nextX, nextY);
-        }
+        return "wrong";
     }
 }
 
@@ -53,39 +20,33 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int T;
-    cin >> T;
-
-    for(int i=0 ; i<T ; ++i)
+    int a = 1;
+    int b = 1;
+    int c = 1;
+    while(true)
     {
-        Initialize();
-
-        int K;
-        cin >> X >> Y >> K;
-    
-        for(int i=0 ; i<K ; ++i)
+        cin >> a >> b >> c;
+        if(a==0 && b==0 && c==0)
         {
-            int x, y;
-            cin >> x >> y;
-
-            lettuces[y][x] = true;
+            return 0;
         }
 
-        int cnt = 0;
-        for(int i=0 ; i<Y ; ++i)
+        if(a > b && a > c)
         {
-            for(int j=0 ; j<X ; ++j)
-            {
-                if(lettuces[i][j] == true && visited[i][j] == false)
-                {
-                    cnt++;
-                    Visit(j, i);
-                }
-            }
+            cout << IsRightTriangle(a, b, c);
         }
-        cout << cnt << "\n";
+        else if(b > a && b > c)
+        {
+            cout << IsRightTriangle(b, a, c);
+        }
+        else if(c > a && c > b)
+        {
+            cout << IsRightTriangle(c, a, b);
+        }
+        else
+        {
+            cout << IsRightTriangle(a, b, c);
+        }
+        cout << "\n";
     }
-
-    return 0;
-
 }
