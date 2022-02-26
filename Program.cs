@@ -21,7 +21,7 @@ namespace Algorithm
             {
                 int a = random.Next(0, N-i);
                 Console.Write($"{list[a]} ");
-                list.RemoveAt(a);
+                list.RemoveAt(a); 
             }
         }
     }
