@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "O+xSXo+2uiJIcY/uAkEnnPhPOKt/WzUJGNC/IVE7CrcdYdXMrYV5AuLTyDFQBrOrMxQG/BIrZr0hQdmsq8YjxQ==",
+  "dgSpecHash": "GzIRjFoNO4TBp8jq8n6XDEUNaNsGLc8En0RAo11xkixXDAJoYXOLNyGMJDpuZKsg2f7vERc5VZDo+eVNyPTM0Q==",
   "success": true,
-  "projectFilePath": "/Users/sanghunsong/DEV/ALGORITHM/C#/ALGORITHM.csproj",
+  "projectFilePath": "/Users/sanghunsong/DEV/Algorithm/Algorithm.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

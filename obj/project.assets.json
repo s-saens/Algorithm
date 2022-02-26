@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/sanghunsong/DEV/ALGORITHM/C#/ALGORITHM.csproj",
-      "projectName": "ALGORITHM",
-      "projectPath": "/Users/sanghunsong/DEV/ALGORITHM/C#/ALGORITHM.csproj",
+      "projectUniqueName": "/Users/sanghunsong/DEV/Algorithm/Algorithm.csproj",
+      "projectName": "Algorithm",
+      "projectPath": "/Users/sanghunsong/DEV/Algorithm/Algorithm.csproj",
       "packagesPath": "/Users/sanghunsong/.nuget/packages/",
-      "outputPath": "/Users/sanghunsong/DEV/ALGORITHM/C#/obj/",
+      "outputPath": "/Users/sanghunsong/DEV/Algorithm/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/sanghunsong/.nuget/NuGet/NuGet.Config"
