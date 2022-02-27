@@ -1,6 +1,33 @@
 #include <iostream>
-
+#include <vector>
+#include <algorithm>
 using namespace std;
+
+bool cmp(string a, string b)
+{
+    int aLen = a.length();
+    int bLen = b.length();
+
+    if(aLen < bLen)
+    {
+        return true;
+    }
+    else if(aLen > bLen)
+    {
+        return false;
+    }
+
+    if(a.compare(b) > 0)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+
+}
+
 
 int main()
 {
@@ -8,23 +35,30 @@ int main()
     cin.tie(0);
     cout.tie(0);
 
-    int N, K;
-    cin >> N >> K;
-    int coin[N];
+    int N;
+
+    cin >> N;
+
+    vector<string> strings;
 
     for(int i=0 ; i<N ; ++i)
     {
-        cin >> coin[i];
+        string s;
+        cin >> s;
+        if(strings.empty() == false && *find(strings.begin(), strings.end(), s) == s)
+        {
+            continue;
+        }
+
+        strings.push_back(s);
     }
 
-    int cnt = 0;
-    for(int i=N-1 ; i>=0 ; --i)
+    sort(strings.begin(), strings.end(), cmp);
+
+    for(int i=0 ; i<strings.size() ; ++i)
     {
-        cnt += K / coin[i];
-        K %= coin[i];
+        cout << strings[i] << "\n";
     }
-
-    cout << cnt;
 
     return 0;
 }
