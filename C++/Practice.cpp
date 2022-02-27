@@ -1,40 +1,94 @@
 #include <iostream>
 
+#define ull unsigned long long int
+
 using namespace std;
 
-struct Vector2
+bool isPowerOf10(ull a)
 {
-    int x;
-    int y;
-};
+    while (a > 1)
+    {
+        if (a % 10 > 0)
+        {
+            return false;
+        }
+        a /= 10;
+    }
+    return true;
+}
+
+ull GetLargestCoin(ull price)
+{
+    if(price <= 0)
+    {
+        return 0;
+    }
+    if(price < 10)
+    {
+        return 1;
+    }
+
+    ull divider = 10;
+    while(true)
+    {
+        if(price / divider == 0)
+        {
+            return divider / 4;
+        }
+        divider = divider * 25 / 10;
+        if(price / divider == 0)
+        {
+            return divider * 10 / 25;
+        }
+        divider = divider * 4;
+    }
+
+    return -1; // -1이 출력되면 문제 있음.
+}
+
+ull GetCoinCount(ull price, ull largestCoin)
+{
+    if(price < 10)
+    {
+        return price;
+    }
+
+    if (price == 10)
+    {
+        return 1;
+    }
+
+    ull nextLargestCoin;
+
+    bool flag = isPowerOf10(largestCoin);
+    
+    if(flag == true) // 10의 제곱수
+    {
+        nextLargestCoin = largestCoin / 4;
+    }
+    else // 25포함
+    {
+        nextLargestCoin = largestCoin / 25 * 10;
+    }
+
+    ull cc = price / largestCoin + GetCoinCount(price % largestCoin, nextLargestCoin);
+    return cc;
+}
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    Vector2 points[3];
+    ull T;
+    cin >> T;
 
-    for(int i=0 ; i<3 ; ++i)
+    for(int i=0 ; i<T ; ++i)
     {
-        cin >> points[i].x >> points[i].y;
+        ull price;
+        cin >> price;
+
+        cout << GetCoinCount(price, GetLargestCoin(price));
     }
 
-    // 유일 x, y의 index 찾기
-    int xIndex = -1;
-    int yIndex = -1;
-
-    for(int i=0 ; i<3 ; ++i)
-    {
-        if(points[i].x != points[(i+1)%3].x  &&  points[i].x != points[(i+2)%3].x)
-        {
-            xIndex = i;
-        }
-        if(points[i].y != points[(i+1)%3].y  &&  points[i].y != points[(i+2)%3].y)
-        {
-            yIndex = i;
-        }
-    }
-
-    cout << points[xIndex].x << " " << points[yIndex].y;
 }
