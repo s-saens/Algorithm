@@ -2,30 +2,39 @@
 
 using namespace std;
 
-int Fives(int n)
+struct Vector2
 {
-    int cnt = 0;
-    while(n%5 == 0)
-    {
-        n /= 5;
-        cnt++;
-    }
-    return cnt;
-}
+    int x;
+    int y;
+};
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int N;
-    cin >> N;
+    Vector2 points[3];
 
-    int cnt = 0;
-    for(int i=1 ; i<=N ; ++i)
+    for(int i=0 ; i<3 ; ++i)
     {
-        cnt += Fives(i);
+        cin >> points[i].x >> points[i].y;
     }
 
-    cout << cnt;
+    // 유일 x, y의 index 찾기
+    int xIndex = -1;
+    int yIndex = -1;
+
+    for(int i=0 ; i<3 ; ++i)
+    {
+        if(points[i].x != points[(i+1)%3].x  &&  points[i].x != points[(i+2)%3].x)
+        {
+            xIndex = i;
+        }
+        if(points[i].y != points[(i+1)%3].y  &&  points[i].y != points[(i+2)%3].y)
+        {
+            yIndex = i;
+        }
+    }
+
+    cout << points[xIndex].x << " " << points[yIndex].y;
 }
