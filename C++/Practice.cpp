@@ -1,18 +1,16 @@
 #include <iostream>
-#include <map>
 
 using namespace std;
 
-string IsRightTriangle(int max, int a, int b)
+int Fives(int n)
 {
-    if(max*max == a*a + b*b)
+    int cnt = 0;
+    while(n%5 == 0)
     {
-        return "right";
+        n /= 5;
+        cnt++;
     }
-    else
-    {
-        return "wrong";
-    }
+    return cnt;
 }
 
 int main()
@@ -20,33 +18,14 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int a = 1;
-    int b = 1;
-    int c = 1;
-    while(true)
-    {
-        cin >> a >> b >> c;
-        if(a==0 && b==0 && c==0)
-        {
-            return 0;
-        }
+    int N;
+    cin >> N;
 
-        if(a > b && a > c)
-        {
-            cout << IsRightTriangle(a, b, c);
-        }
-        else if(b > a && b > c)
-        {
-            cout << IsRightTriangle(b, a, c);
-        }
-        else if(c > a && c > b)
-        {
-            cout << IsRightTriangle(c, a, b);
-        }
-        else
-        {
-            cout << IsRightTriangle(a, b, c);
-        }
-        cout << "\n";
+    int cnt = 0;
+    for(int i=1 ; i<=N ; ++i)
+    {
+        cnt += Fives(i);
     }
+
+    cout << cnt;
 }
