@@ -1,31 +1,63 @@
 #include <iostream>
-#include <cmath>
-#define ull unsigned long long
+#include <algorithm>
+
 using namespace std;
 
-ull M = 1234567891;
+int minimum = 1000000000;
+int maximum = -1000000000;
+int N;
+int numbers[12];
 
-ull GetPower31(ull n)
+void TryAll(int index, int lastOperated, int op[4])
 {
-    ull ret = 1;
-    for(int i=0 ; i<n ; ++i)
+    if(index == N-1)
     {
-        ret %= M;
-        ret *= 31;
-        ret %= M;
+        minimum = min(minimum, lastOperated);
+        maximum = max(maximum, lastOperated);
+        return;
     }
-    return ret%M;
-}
+    for(int i=0 ; i<4 ; ++i)
+    {
+        if(op[i] <= 0 )
+        {
+            continue;
+        }
 
-ull Hashing(string s) // a = 97
-{
-    ull sum = 0;
-    int len = s.length();
-    for(int i=0 ; i<len ; ++i)
-    {
-        sum += ( (s[i]-96) * GetPower31(i) ) % M;
+        int operated;
+        switch (i)
+        {
+        case 0:
+            operated = lastOperated + numbers[index+1];
+            break;
+
+        case 1:
+            operated = lastOperated - numbers[index + 1];
+            break;
+
+        case 2:
+            operated = lastOperated * numbers[index + 1];
+            break;
+
+        case 3:
+            operated = lastOperated / numbers[index + 1];
+            break;
+        
+        default:
+            cout << "Somthing's wrong";
+            return;
+            break;
+        }
+
+        int newOp[4];
+        // Op 배열 복사
+        for(int j=0 ; j<4 ; ++j)
+        {
+            newOp[j] = op[j];
+        }
+        newOp[i]--;
+
+        TryAll(index + 1, operated, newOp);
     }
-    return sum % M;
 }
 
 int main()
@@ -34,11 +66,22 @@ int main()
     cin.tie(0);
     cout.tie(0);
 
-    int L;
-    string s;
-    cin >> L >> s;
+    cin >> N;
 
-    cout << Hashing(s);
+    for(int i=0 ; i<N ; ++i)
+    {
+        cin >> numbers[i];
+    }
+
+    int operators[4];
+    for (int i = 0 ; i<4 ; ++i)
+    {
+        cin >> operators[i];
+    }
+
+    TryAll(0, numbers[0], operators);
+
+    cout << maximum << "\n" << minimum << "\n";
 
     return 0;
 }
