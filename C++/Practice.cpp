@@ -1,33 +1,27 @@
 #include <iostream>
-#include <vector>
-#include <algorithm>
+#include <cmath>
 using namespace std;
 
-bool cmp(string a, string b)
+int f[15];
+
+int factorial(int n)
 {
-    int aLen = a.length();
-    int bLen = b.length();
-
-    if(aLen < bLen)
+    if(f[n] != -1)
     {
-        return true;
+        return f[n];
     }
-    else if(aLen > bLen)
+    if(n == 0)
     {
-        return false;
+        return 1;
     }
-
-    if(a.compare(b) > 0)
+    if(n == 1)
     {
-        return false;
-    }
-    else
-    {
-        return true;
+        return 1;
     }
 
+    f[n] = n * factorial(n-1);
+    return f[n];
 }
-
 
 int main()
 {
@@ -35,30 +29,18 @@ int main()
     cin.tie(0);
     cout.tie(0);
 
-    int N;
-
-    cin >> N;
-
-    vector<string> strings;
-
-    for(int i=0 ; i<N ; ++i)
+    for(int i=0 ; i<15 ; ++i)
     {
-        string s;
-        cin >> s;
-        if(strings.empty() == false && *find(strings.begin(), strings.end(), s) == s)
-        {
-            continue;
-        }
-
-        strings.push_back(s);
+        f[i] = -1;
     }
 
-    sort(strings.begin(), strings.end(), cmp);
+    int n, r;
 
-    for(int i=0 ; i<strings.size() ; ++i)
-    {
-        cout << strings[i] << "\n";
-    }
+    cin >> n >> r;
+
+    int answer = factorial(n) / factorial(n-r) / factorial(r);
+
+    cout << answer;
 
     return 0;
 }
