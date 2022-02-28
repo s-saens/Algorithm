@@ -1,26 +1,31 @@
 #include <iostream>
 #include <cmath>
+#define ull unsigned long long
 using namespace std;
 
-int f[15];
+ull M = 1234567891;
 
-int factorial(int n)
+ull GetPower31(ull n)
 {
-    if(f[n] != -1)
+    ull ret = 1;
+    for(int i=0 ; i<n ; ++i)
     {
-        return f[n];
+        ret %= M;
+        ret *= 31;
+        ret %= M;
     }
-    if(n == 0)
-    {
-        return 1;
-    }
-    if(n == 1)
-    {
-        return 1;
-    }
+    return ret%M;
+}
 
-    f[n] = n * factorial(n-1);
-    return f[n];
+ull Hashing(string s) // a = 97
+{
+    ull sum = 0;
+    int len = s.length();
+    for(int i=0 ; i<len ; ++i)
+    {
+        sum += ( (s[i]-96) * GetPower31(i) ) % M;
+    }
+    return sum % M;
 }
 
 int main()
@@ -29,18 +34,11 @@ int main()
     cin.tie(0);
     cout.tie(0);
 
-    for(int i=0 ; i<15 ; ++i)
-    {
-        f[i] = -1;
-    }
+    int L;
+    string s;
+    cin >> L >> s;
 
-    int n, r;
-
-    cin >> n >> r;
-
-    int answer = factorial(n) / factorial(n-r) / factorial(r);
-
-    cout << answer;
+    cout << Hashing(s);
 
     return 0;
 }
