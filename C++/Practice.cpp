@@ -1,87 +1,56 @@
 #include <iostream>
+#include <vector>
 #include <algorithm>
 
 using namespace std;
 
-int minimum = 1000000000;
-int maximum = -1000000000;
-int N;
-int numbers[12];
+vector<int> arr;
 
-void TryAll(int index, int lastOperated, int op[4])
+void AddNumber(int num)
 {
-    if(index == N-1)
+    int len = arr.size();
+    int l = 0;
+    int r = len - 1;
+
+    if(len <= 0 || arr[len-1] < num)
     {
-        minimum = min(minimum, lastOperated);
-        maximum = max(maximum, lastOperated);
+        arr.push_back(num);
         return;
     }
-    for(int i=0 ; i<4 ; ++i)
+    
+    while(r > l)
     {
-        if(op[i] <= 0 )
+        int m = (l + r) / 2;
+        if (arr[m] >= num)
         {
-            continue;
+            r = m;
         }
-
-        int operated;
-        switch (i)
+        else
         {
-        case 0:
-            operated = lastOperated + numbers[index+1];
-            break;
-
-        case 1:
-            operated = lastOperated - numbers[index + 1];
-            break;
-
-        case 2:
-            operated = lastOperated * numbers[index + 1];
-            break;
-
-        case 3:
-            operated = lastOperated / numbers[index + 1];
-            break;
-        
-        default:
-            cout << "Somthing's wrong";
-            return;
-            break;
+            l = m+1;
         }
-
-        int newOp[4];
-        // Op 배열 복사
-        for(int j=0 ; j<4 ; ++j)
-        {
-            newOp[j] = op[j];
-        }
-        newOp[i]--;
-
-        TryAll(index + 1, operated, newOp);
     }
+
+    arr[l] = num;
+
+    return;
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0);
-    cout.tie(0);
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int N;
 
     cin >> N;
 
-    for(int i=0 ; i<N ; ++i)
+    for (int i = 0; i < N; ++i)
     {
-        cin >> numbers[i];
+        int num;
+        cin >> num;
+        AddNumber(num);
     }
 
-    int operators[4];
-    for (int i = 0 ; i<4 ; ++i)
-    {
-        cin >> operators[i];
-    }
-
-    TryAll(0, numbers[0], operators);
-
-    cout << maximum << "\n" << minimum << "\n";
-
-    return 0;
+    cout << arr.size();
 }
