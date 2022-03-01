@@ -6,22 +6,16 @@ using namespace std;
 
 vector<int> arr;
 
-void AddNumber(int num)
+int BinarySearch(int num) // This function returns the first index of the number. If num is not in the container, it returns -1.
 {
     int len = arr.size();
     int l = 0;
     int r = len - 1;
 
-    if(len <= 0 || arr[len-1] < num)
+    while(l < r)
     {
-        arr.push_back(num);
-        return;
-    }
-    
-    while(r > l)
-    {
-        int m = (l + r) / 2;
-        if (arr[m] >= num)
+        int m = (l+r)/2;
+        if(arr[m] >= num)
         {
             r = m;
         }
@@ -30,10 +24,12 @@ void AddNumber(int num)
             l = m+1;
         }
     }
+    if(arr[l] == num)
+    {
+        return l;
+    }
 
-    arr[l] = num;
-
-    return;
+    return -1;
 }
 
 int main()
@@ -42,15 +38,30 @@ int main()
     cin.tie(NULL);
 
     int N;
-
+    cout << "Array size : ";
     cin >> N;
 
+    cout << "Array members(in sorted order) : ";
     for (int i = 0; i < N; ++i)
     {
         int num;
         cin >> num;
-        AddNumber(num);
+        arr.push_back(num);
     }
 
-    cout << arr.size();
+    int S;
+    cout << "Number to search : ";
+    cin >> S;
+
+    int index = BinarySearch(S);
+
+    cout << "\nIndex : " << index;
+    if(index > -1)
+    {
+        cout << "\nNumber : " << arr[index];
+    }
+    else
+    {
+        cout << "\nNumber is not in the array\n";
+    }
 }
