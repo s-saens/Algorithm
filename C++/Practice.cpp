@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <vector>
 
 using namespace std;
 
@@ -12,17 +13,40 @@ int main()
     int N;
     cin >> N;
 
-    int arr[N];
+    vector<int> v;
 
-    for(int i=0 ; i<N ; ++i)
+    for (int i = 0; i < N; ++i)
     {
-        cin >> arr[i];
+        int num;
+        cin >> num;
+
+        int l, r, m;
+        l = 0;
+        r = i;
+
+        if (v.empty() == true)
+        {
+            v.push_back(num);
+            continue;
+        }
+
+        while (r > l)
+        {
+            m = (l + r) / 2;
+            if (v[m] < num)
+            {
+                l = m + 1;
+            }
+            else
+            {
+                r = m;
+            }
+        }
+        v.insert(v.begin() + l, num);
     }
 
-    sort(arr, arr+N);
-
-    for(int i=0 ; i<N ; ++i)
+    for (int i = 0; i < N; ++i)
     {
-        cout << arr[i] << "\n";
+        cout << v[i] << "\n";
     }
 }
