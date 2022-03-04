@@ -1,5 +1,5 @@
 #include <iostream>
-#include <algorithm>
+#include <queue>
 
 using namespace std;
 
@@ -9,27 +9,31 @@ int main()
     cin.tie(NULL);
     cout.tie(NULL);
 
-    int N, M;
+    int N;
+
     cin >> N;
-    int A[N];
+    queue<int> q1;
 
-    for(int i=0 ; i <N ; ++i)
+    for(int i=1; i<=N ; ++i)
     {
-        cin >> A[i];
-    }
-    cin >> M;
-    int findings[M];
-
-    for(int i=0 ; i<M ; ++i)
-    {
-        cin >> findings[i];
+        q1.push(i);
     }
 
-    sort(A, A+N);
-
-    for(int i=0 ; i<M ; ++i)
+    for(bool i=false ; ; i=!i)
     {
-        cout << binary_search(A, A+N, findings[i]) << "\n";
+        if(q1.size() <= 1)
+        {
+            break;
+        }
+
+        if (i == true)
+        {
+            q1.push(q1.front());
+        }
+        q1.pop();
     }
+
+    cout << q1.front();
+
     return 0;
 }
