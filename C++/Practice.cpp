@@ -1,67 +1,28 @@
 #include <iostream>
 #include <algorithm>
+#include <climits>
+
+#define ull unsigned long long int
 
 using namespace std;
 
-int SearchFirstIndex(int* cards, int length, int number)
+ull DP[1000001];
+
+ull GetMinCnt(int x)
 {
-    int l, r, m;
-    l = 0;
-    r = length-1;
-
-    if (cards[l] == number)
+    if(DP[x] != -1)
     {
-        return l;
+        return DP[x];
     }
 
-    while(l < r)
-    {
-        m = (l+r)/2;
-        if(cards[m] >= number)
-        {
-            r = m;
-        }
-        else
-        {
-            l = m+1;
-        }
-    }
+    ull minCnt = INT_MAX;
 
-    if(cards[l] != number)
-    {
-        return -1;
-    }
-    return l;
-}
+    minCnt = min(minCnt, 1 + GetMinCnt(x - 1));
+    if(x%3 == 0) minCnt = min(minCnt, 1 + GetMinCnt(x/3));
+    if(x%2 == 0) minCnt = min(minCnt, 1 + GetMinCnt(x/2));
 
-int SearchLastIndex(int *cards, int length, int number)
-{
-    int l, r, m;
-    l = 0;
-    r = length - 1;
-
-    if (cards[r] == number)
-    {
-        return r;
-    }
-
-    while (l < r)
-    {
-        m = (l + r) / 2;
-        if (cards[m] <= number)
-        {
-            l = m+1;
-        }
-        else
-        {
-            r = m;
-        }
-    }
-    if (cards[l-1] != number)
-    {
-        return -1;
-    }
-    return l-1;
+    DP[x] = minCnt;
+    return minCnt;
 }
 
 int main()
@@ -70,44 +31,16 @@ int main()
     cin.tie(NULL);
     cout.tie(NULL);
 
+    for(int i=1 ; i<1000001 ; ++i)
+    {
+        DP[i] = -1;
+    }
+    DP[1] = 0;
+
     int N;
     cin >> N;
-    int cards[N];
 
-    for(int i=0 ; i<N ; ++i)
-    {
-        cin >> cards[i];
-    }
-
-    sort(cards, cards+N);
-
-    int M;
-    cin >> M;
-    int numbers[M];
-    int counts[M];
-
-    for(int i=0; i<M ; ++i)
-    {
-        cin >> numbers[i];
-    }
-
-    for(int i=0 ; i<M ; ++i)
-    {
-        int num = numbers[i];
-        int firstIndex = SearchFirstIndex(cards, N, num);
-        int lastIndex = SearchLastIndex(cards, N, num);
-
-        counts[i] = lastIndex-firstIndex + 1;
-        if (firstIndex == -1)
-        {
-            counts[i]--;
-        }
-    }
-
-    for(int i=0 ; i<M ; ++i)
-    {
-        cout << counts[i] << ' ';
-    }
+    cout << GetMinCnt(N);
 
     return 0;
 }
