@@ -1,5 +1,4 @@
 #include <iostream>
-#include <queue>
 
 using namespace std;
 
@@ -12,28 +11,42 @@ int main()
     int N;
 
     cin >> N;
-    queue<int> q1;
+    string parenthesis[N];
 
-    for(int i=1; i<=N ; ++i)
+    for(int i=0 ; i<N ; ++i)
     {
-        q1.push(i);
+        cin >> parenthesis[i];
     }
 
-    for(bool i=false ; ; i=!i)
+    for(int i=0 ; i<N ; ++i)
     {
-        if(q1.size() <= 1)
+        int len = parenthesis[i].length();
+        int count = 0;
+        for(int j=0 ; j<len ; ++j)
         {
-            break;
-        }
+            if(parenthesis[i][j] == '(')
+            {
+                count++;
+            }
+            else if(parenthesis[i][j] == ')')
+            {
+                count--;
+            }
 
-        if (i == true)
-        {
-            q1.push(q1.front());
+            if(count < 0)
+            {
+                break;
+            }
         }
-        q1.pop();
+        if(count == 0)
+        {
+            cout << "YES" << "\n";
+        }
+        else
+        {
+            cout << "NO" << "\n";
+        }
     }
-
-    cout << q1.front();
 
     return 0;
 }
