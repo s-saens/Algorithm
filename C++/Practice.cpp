@@ -1,6 +1,5 @@
 #include <iostream>
 #include <algorithm>
-#include <vector>
 
 using namespace std;
 
@@ -10,43 +9,27 @@ int main()
     cin.tie(NULL);
     cout.tie(NULL);
 
-    int N;
+    int N, M;
     cin >> N;
+    int A[N];
 
-    vector<int> v;
-
-    for (int i = 0; i < N; ++i)
+    for(int i=0 ; i <N ; ++i)
     {
-        int num;
-        cin >> num;
+        cin >> A[i];
+    }
+    cin >> M;
+    int findings[M];
 
-        int l, r, m;
-        l = 0;
-        r = i;
-
-        if (v.empty() == true)
-        {
-            v.push_back(num);
-            continue;
-        }
-
-        while (r > l)
-        {
-            m = (l + r) / 2;
-            if (v[m] < num)
-            {
-                l = m + 1;
-            }
-            else
-            {
-                r = m;
-            }
-        }
-        v.insert(v.begin() + l, num);
+    for(int i=0 ; i<M ; ++i)
+    {
+        cin >> findings[i];
     }
 
-    for (int i = 0; i < N; ++i)
+    sort(A, A+N);
+
+    for(int i=0 ; i<M ; ++i)
     {
-        cout << v[i] << "\n";
+        cout << binary_search(A, A+N, findings[i]) << "\n";
     }
+    return 0;
 }
