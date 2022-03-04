@@ -1,29 +1,9 @@
 #include <iostream>
 #include <algorithm>
-#include <climits>
-
-#define ull unsigned long long int
+#include <queue>
+#include <vector>
 
 using namespace std;
-
-ull DP[1000001];
-
-ull GetMinCnt(int x)
-{
-    if(DP[x] != -1)
-    {
-        return DP[x];
-    }
-
-    ull minCnt = INT_MAX;
-
-    minCnt = min(minCnt, 1 + GetMinCnt(x - 1));
-    if(x%3 == 0) minCnt = min(minCnt, 1 + GetMinCnt(x/3));
-    if(x%2 == 0) minCnt = min(minCnt, 1 + GetMinCnt(x/2));
-
-    DP[x] = minCnt;
-    return minCnt;
-}
 
 int main()
 {
@@ -31,16 +11,56 @@ int main()
     cin.tie(NULL);
     cout.tie(NULL);
 
-    for(int i=1 ; i<1000001 ; ++i)
-    {
-        DP[i] = -1;
-    }
-    DP[1] = 0;
-
     int N;
+
     cin >> N;
 
-    cout << GetMinCnt(N);
+    vector<int> outputs;
+    queue<int> q;
+
+    for(int i=0 ; i<N ; ++i)
+    {
+        string op;
+        cin >> op;
+
+        switch (op[1])
+        {
+            case 'u': // push
+                int element;
+                cin >> element;
+                q.push(element);
+                break;
+            case 'o': // pop
+                if(q.empty()) outputs.push_back(-1);
+                else
+                {
+                    outputs.push_back(q.front());
+                    q.pop();
+                }
+                break;
+            case 'i': // size
+                outputs.push_back(q.size());
+                break;
+            case 'm': // empty
+                outputs.push_back(q.empty());
+                break;
+            case 'r': // front
+                if(q.empty()) outputs.push_back(-1);
+                else outputs.push_back(q.front());
+                break;
+            case 'a': // back
+                if(q.empty()) outputs.push_back(-1);
+                else outputs.push_back(q.back());
+                break;
+            default:
+                break;
+        }
+    }
+
+    for(int i=0 ; i<outputs.size() ; ++i)
+    {
+        cout << outputs[i] << "\n";
+    }
 
     return 0;
 }
