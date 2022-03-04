@@ -1,6 +1,27 @@
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
+
+int SearchFirstIndex(int* cards, int length, int number)
+{
+    int l, r, m;
+    l = 0;
+    r = length-1;
+    while(l < r)
+    {
+        m = (l+r)/2;
+        if(cards[m] >= number)
+        {
+            r = m;
+        }
+        else
+        {
+            l = m+1;
+        }
+    }
+    return l;
+}
 
 int main()
 {
@@ -9,43 +30,48 @@ int main()
     cout.tie(NULL);
 
     int N;
-
     cin >> N;
-    string parenthesis[N];
+    int cards[N];
 
     for(int i=0 ; i<N ; ++i)
     {
-        cin >> parenthesis[i];
+        cin >> cards[i];
     }
 
-    for(int i=0 ; i<N ; ++i)
-    {
-        int len = parenthesis[i].length();
-        int count = 0;
-        for(int j=0 ; j<len ; ++j)
-        {
-            if(parenthesis[i][j] == '(')
-            {
-                count++;
-            }
-            else if(parenthesis[i][j] == ')')
-            {
-                count--;
-            }
+    sort(cards, cards+N);
 
-            if(count < 0)
+    int M;
+    cin >> M;
+    int numbers[M];
+    int counts[M];
+
+    for(int i=0; i<M ; ++i)
+    {
+        cin >> numbers[i];
+    }
+
+    for(int i=0 ; i<M ; ++i)
+    {
+        int num = numbers[i];
+        int searchIndex = SearchFirstIndex(cards, N, num);
+        int cnt = 0;
+        for(int j=searchIndex ; j<N ; ++j)
+        {
+            if(cards[j] == num)
             {
-                break;
+                cnt++;
+            }
+            else
+            {
+                break;;
             }
         }
-        if(count == 0)
-        {
-            cout << "YES" << "\n";
-        }
-        else
-        {
-            cout << "NO" << "\n";
-        }
+        counts[i] = cnt;
+    }
+
+    for(int i=0 ; i<M ; ++i)
+    {
+        cout << counts[i] << ' ';
     }
 
     return 0;
