@@ -1,13 +1,31 @@
 #include <iostream>
 #include <algorithm>
-#include <queue>
 #include <vector>
 
 using namespace std;
 
+
+short len = 21;
+
+void Clear(short* arr)
+{
+    for(int i=0 ; i<len ; ++i)
+    {
+        arr[i] = -1;
+    }
+}
+void Fill(short* arr)
+{
+    for(int i=0 ; i<len ; ++i)
+    {
+        arr[i] = i;
+    }
+}
+
 int main()
 {
     ios::sync_with_stdio(false);
+    ios_base::sync_with_stdio(0);
     cin.tie(NULL);
     cout.tie(NULL);
 
@@ -15,45 +33,56 @@ int main()
 
     cin >> N;
 
-    vector<int> outputs;
-    queue<int> q;
+    short arr[21];
+    vector<bool> outputs;
 
-    for(int i=0 ; i<N ; ++i)
+    Clear(arr);
+
+    for (int i = 0; i < N; ++i)
     {
+        short x;
         string op;
         cin >> op;
 
         switch (op[1])
         {
-            case 'u': // push
-                int element;
-                cin >> element;
-                q.push(element);
-                break;
-            case 'o': // pop
-                if(q.empty()) outputs.push_back(-1);
-                else
-                {
-                    outputs.push_back(q.front());
-                    q.pop();
-                }
-                break;
-            case 'i': // size
-                outputs.push_back(q.size());
-                break;
-            case 'm': // empty
-                outputs.push_back(q.empty());
-                break;
-            case 'r': // front
-                if(q.empty()) outputs.push_back(-1);
-                else outputs.push_back(q.front());
-                break;
-            case 'a': // back
-                if(q.empty()) outputs.push_back(-1);
-                else outputs.push_back(q.back());
-                break;
-            default:
-                break;
+        case 'd': // add
+            cin >> x;
+            if(arr[x] == -1)
+            {
+                arr[x] = x;
+            }
+            break;
+        case 'e': // remove
+            cin >> x;
+            if(arr[x] != -1)
+            {
+                arr[x] = -1;
+            }
+            break;
+        case 'h': // check
+            cin >> x;
+            outputs.push_back(arr[x] == x);
+            break;
+        case 'o': // toggle
+            cin >> x;
+            if (arr[x] == -1)
+            {
+                arr[x] = x;
+            }
+            else
+            {
+                arr[x] = -1;
+            }
+            break;
+        case 'l': // all
+            Fill(arr);
+            break;
+        case 'm': // empty
+            Clear(arr);
+            break;
+        default:
+            break;
         }
     }
 
