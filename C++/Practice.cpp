@@ -1,25 +1,25 @@
 #include <iostream>
 #include <algorithm>
-#include <vector>
 
 using namespace std;
 
+int DP[31][31]; // DP[x][y] 에 있는 원소는 F(x, y)를 의미함.
 
-short len = 21;
+int Calc(int x, int y)
+{
+    if(DP[x][y] != -1)
+    {
+        return DP[x][y];
+    }
 
-void Clear(short* arr)
-{
-    for(int i=0 ; i<len ; ++i)
+    int sum = 0;
+    for(int i=y-1 ; i>=x-1 ; --i)
     {
-        arr[i] = -1;
+        sum += Calc(x-1,i);
     }
-}
-void Fill(short* arr)
-{
-    for(int i=0 ; i<len ; ++i)
-    {
-        arr[i] = i;
-    }
+
+    DP[x][y] = sum;
+    return sum;
 }
 
 int main()
@@ -29,66 +29,40 @@ int main()
     cin.tie(NULL);
     cout.tie(NULL);
 
-    int N;
+    int T;
+    cin >> T;
 
-    cin >> N;
-
-    short arr[21];
-    vector<bool> outputs;
-
-    Clear(arr);
-
-    for (int i = 0; i < N; ++i)
+    for(short i=0 ; i<31 ; ++i)
     {
-        short x;
-        string op;
-        cin >> op;
-
-        switch (op[1])
+        for(short j=0 ; j<31 ; ++j)
         {
-        case 'd': // add
-            cin >> x;
-            if(arr[x] == -1)
+            if(i == j)
             {
-                arr[x] = x;
+                DP[i][j] = 1;
             }
-            break;
-        case 'e': // remove
-            cin >> x;
-            if(arr[x] != -1)
+            else if(i==1)
             {
-                arr[x] = -1;
-            }
-            break;
-        case 'h': // check
-            cin >> x;
-            outputs.push_back(arr[x] == x);
-            break;
-        case 'o': // toggle
-            cin >> x;
-            if (arr[x] == -1)
-            {
-                arr[x] = x;
+                DP[i][j] = j;
             }
             else
             {
-                arr[x] = -1;
+                DP[i][j] = -1;
             }
-            break;
-        case 'l': // all
-            Fill(arr);
-            break;
-        case 'm': // empty
-            Clear(arr);
-            break;
-        default:
-            break;
         }
     }
 
-    for(int i=0 ; i<outputs.size() ; ++i)
+    int answers[T];
+
+    for(int i=0 ; i<T ; ++i)
     {
-        cout << outputs[i] << "\n";
+        int x, y;
+        cin >> x >> y;
+        answers[i] = Calc(x, y);
+    }
+
+    for(int i=0; i<T ; ++i)
+    {
+        cout << answers[i] << "\n";
     }
 
     return 0;
