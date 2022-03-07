@@ -11,20 +11,45 @@ int main()
     cin.tie(NULL);
     cout.tie(NULL);
 
-    int N;
-    cin >> N;
+    int L;
+    cin >> L;
 
-    int minimum = INT_MAX;
-    int maximum = 0;
 
-    for(int i=0 ; i<N ; ++i)
+    int S[L+1];
+    S[0] = 0;
+    for(int i=1 ; i<L+1 ; ++i)
     {
-        int a;
-        cin >> a;
-        if(minimum > a) minimum = a;
-        if(maximum < a) maximum = a;
+        cin >> S[i];
+    }
+    int n;
+    cin >> n;
+
+    sort(S, S+L+1);
+
+
+    int l, r;
+    for(int i=0 ; i<L ; ++i)
+    {
+        l = S[i];
+        r = S[i+1];
+
+        if(S[i+1] == n)
+        {
+            cout << 0;
+            return 0;
+        }
+
+        if(l < n && n < r)
+        {
+            break;
+        }
     }
 
-    cout << minimum * maximum;
+    int lCnt = n-l-1;
+    int rCnt = r-n;
+
+    cout << (lCnt*rCnt) + (rCnt-1);
+
+
     return 0;
 }
