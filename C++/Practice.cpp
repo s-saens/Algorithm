@@ -2,12 +2,6 @@
 
 using namespace std;
 
-short bitCount(short x)
-{
-    if(x == 0) return 0;
-    return x % 2 + bitCount(x/2);
-}
-
 int main()
 {
     ios::sync_with_stdio(false);
@@ -15,10 +9,47 @@ int main()
     cin.tie(NULL);
     cout.tie(NULL);
 
-    unsigned int X;
-    cin >> X;
+    int N, K;
+    cin >> N >> K;
 
-    cout << bitCount(X);
+    int jose[N];
+    int peop[N];
+
+    for(int i=0 ; i<N ; ++i)
+    {
+        peop[i] = i+1;
+        jose[i] = -1;
+    }
+
+    int lastIndex = -1;
+    for(int i=0 ; i<N ; ++i)
+    {
+        int remainMove = K;
+
+        while(remainMove>0)
+        {
+            lastIndex = (lastIndex + 1) % N;
+            if (peop[lastIndex] == -1)
+            {
+                remainMove++;
+            }
+            remainMove--;
+        }
+        jose[i] = peop[lastIndex];
+        peop[lastIndex] = -1;
+    }
+
+    cout << '<';
+    for(int i=0 ; i<N ; ++i)
+    {
+        cout << jose[i];
+        if(i < N-1)
+        {
+            cout << ", ";
+        }
+    }
+    cout << '>';
+
 
     return 0;
 }
