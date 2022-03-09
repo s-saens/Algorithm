@@ -1,7 +1,14 @@
 #include <iostream>
-#include <algorithm>
 
 using namespace std;
+
+struct Point
+{
+    int column;
+    short row;
+};
+
+bool visited[6][6];
 
 int main()
 {
@@ -10,38 +17,74 @@ int main()
     cin.tie(NULL);
     cout.tie(NULL);
 
-    string s;
-    cin >> s;
-
-    int len = s.length();
-
-    string answer = "{";
-
-    for(int i=0 ; i<len-2 ; ++i)
+    for (int i = 0; i < 6; ++i)
     {
-        string newS;
-        string fragments[3];
-        for(int j=i+1 ; j<len-1 ; ++j)
+        for (int j = 0; j < 6; ++j)
         {
-            // (시작위치, 길이)
-            fragments[0] = s.substr(0, i+1);
-            reverse(fragments[0].begin(), fragments[0].end());
-            fragments[1] = s.substr(i + 1, j - i);
-            reverse(fragments[1].begin(), fragments[1].end());
-            fragments[2] = s.substr(j + 1, len - j - 1);
-            reverse(fragments[2].begin(), fragments[2].end());
-            
-            newS = fragments[0] + fragments[1] + fragments[2];
-
-            if (answer.compare(newS) > 0)
-            {
-                answer = newS;
-            }
+            visited[i][j] = false;
         }
-
     }
 
-    cout << answer;
+    Point firstPoint, lastPoint;
+
+    string input;
+    cin >> input;
+
+    lastPoint.column = (int)input[0] - (int)'A';
+    lastPoint.row = (int)input[1] - (int)'1';
+
+    visited[lastPoint.column][lastPoint.row] = true;
+
+    firstPoint.column = lastPoint.column;
+    firstPoint.row = lastPoint.row;
+
+    bool valid = true;
+
+    for (int i = 1; i < 36; ++i)
+    {
+        Point p;
+        cin >> input;
+        p.column = (int)input[0] - (int)'A';
+        p.row = (int)input[1] - (int)'1';
+
+        // cout << p.column << ", " << p.row << "\n";
+
+        if (visited[p.column][p.row])
+        {
+            valid = false;
+        }
+
+        int deltaColumn = abs(p.column - lastPoint.column);
+        int deltaRow = abs(p.row - lastPoint.row);
+
+        if (deltaRow + deltaColumn != 3 || deltaRow * deltaColumn != 2)
+        {
+            valid = false;
+        }
+
+        lastPoint.column = p.column;
+        lastPoint.row = p.row;
+        
+        visited[p.column][p.row] = true;
+    }
+
+    int dC = abs(lastPoint.column - firstPoint.column);
+    int dR = abs(lastPoint.row - firstPoint.row);
+
+        if (dC + dR != 3 || dC * dR != 2)
+    {
+        valid = false;
+    }
+
+
+    if (valid)
+    {
+        cout << "Valid";
+    }
+    else
+    {
+        cout << "Invalid";
+    }
 
     return 0;
 }
