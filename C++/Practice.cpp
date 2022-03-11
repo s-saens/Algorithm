@@ -1,7 +1,4 @@
 #include <iostream>
-#include <algorithm>
-
-#define ull unsigned long long int
 
 using namespace std;
 
@@ -10,33 +7,38 @@ int main()
     ios_base::sync_with_stdio(0);
     cin.tie(NULL);
     
-    ull X, Y, parallel, diagonal;
-    cin >> X >> Y >> parallel >> diagonal;
+    int requiredCnt[9];
 
-    bool canMoveDiagonally = 2*parallel >= diagonal;
-    bool isParallelSmall = parallel < diagonal;
-
-    ull answer;
-
-    if(canMoveDiagonally)
+    for(int i=0 ; i<9 ; ++i)
     {
-        ull maximum = max(X, Y);
-        ull minimum = min(X, Y);
-
-        ull diagonalMoveCnt = minimum;
-        ull parallelMoveCnt = maximum - diagonalMoveCnt;
-        ull diagonalAndParallel = diagonalMoveCnt * diagonal + parallelMoveCnt * parallel;
-
-        ull diagonalOnly = maximum * diagonal - ((maximum-minimum)%2) * (diagonal - parallel);
-        
-        answer = min(diagonalAndParallel, diagonalOnly);
-    }
-    else
-    {
-        answer = (X + Y) * parallel;
+        requiredCnt[i] = 0;
     }
 
-    cout << answer;
+    string s;
+    cin >> s;
+    int len = s.length();
+
+    int maxRequireCnt = 0;
+
+    for(int i=0 ; i<len ; ++i)
+    {
+        if(s[i] == '9')
+        {
+            requiredCnt[6]++;
+        }
+        else
+        {
+            requiredCnt[s[i] - '0']++;
+        }
+    }
+    requiredCnt[6] = (requiredCnt[6] % 2) + requiredCnt[6] / 2;
+
+    for(int i=0 ; i<9 ; ++i)
+    {
+        maxRequireCnt = max(maxRequireCnt, requiredCnt[i]);
+    }
+
+    cout << maxRequireCnt;
 
     return 0;
 }
