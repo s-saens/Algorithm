@@ -1,5 +1,5 @@
 #include <iostream>
-#include <queue>
+#include <deque>
 #include <vector>
 
 using namespace std;
@@ -9,7 +9,7 @@ int main()
     ios_base::sync_with_stdio(0);
     cin.tie(NULL);
 
-    queue<int> q;
+    deque<int> dq;
     vector<int> answers;
 
     int N;
@@ -24,32 +24,47 @@ int main()
         switch (op[1])
         {
             case 'u': // push
-                cin >> X;
-                q.push(X);
+                if(op[5] == 'f') // push front
+                {
+                    cin >> X;
+                    dq.push_front(X);
+                }
+                else if(op[5] == 'b') // push back
+                {
+                    cin >> X;
+                    dq.push_back(X);
+                }
                 break;
             case 'o': // pop
-                if(!q.empty())
-                {
-                    answers.push_back(q.front());
-                    q.pop();
-                }
-                else
+                if(dq.empty())
                 {
                     answers.push_back(-1);
                 }
-                
+                else
+                {
+                    if(op[4] == 'f')
+                    {
+                        answers.push_back(dq.front());
+                        dq.pop_front();
+                    }
+                    else if(op[4] == 'b')
+                    {
+                        answers.push_back(dq.back());
+                        dq.pop_back();
+                    }
+                }
                 break;
             case 'i': // size
-                answers.push_back(q.size());
+                answers.push_back(dq.size());
                 break;
             case 'm': // empty
-                answers.push_back(q.empty());
+                answers.push_back(dq.empty());
                 break;
             case 'r': // front
-                answers.push_back(q.empty() ? -1 : q.front());
+                answers.push_back(dq.empty() ? -1 : dq.front());
                 break;
             case 'a': // back
-                answers.push_back(q.empty() ? -1 : q.back());
+                answers.push_back(dq.empty() ? -1 : dq.back());
                 break;
             default:
                 break;
