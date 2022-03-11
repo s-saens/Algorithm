@@ -10,24 +10,21 @@ int main()
 
     string s;
     cin >> s;
-
     int len = s.length();
 
-    int numbers[len];
+    int area0Cnt = s[0] == '0';
+    int area1Cnt = s[0] == '1';
 
-
-    for(int i=0 ; i<len ; ++i)
+    for(int i=1 ; i<len ; ++i)
     {
-        numbers[i] = (int)s[i]-(int)'0';
+        if(s[i-1] != s[i])
+        {
+            if(s[i] == '0') area0Cnt++;
+            if(s[i] == '1') area1Cnt++;
+        }
     }
 
-    sort(numbers, numbers + len);
-
-    for(int i=len-1 ; i>=0 ; --i)
-    {
-        cout << numbers[i];
-    }
-
+    cout << min(area0Cnt, area1Cnt);
 
     return 0;
 }
