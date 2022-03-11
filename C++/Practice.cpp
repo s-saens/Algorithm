@@ -1,30 +1,42 @@
 #include <iostream>
 #include <algorithm>
 
+#define ull unsigned long long int
+
 using namespace std;
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(NULL);
+    
+    ull X, Y, parallel, diagonal;
+    cin >> X >> Y >> parallel >> diagonal;
 
-    string s;
-    cin >> s;
-    int len = s.length();
+    bool canMoveDiagonally = 2*parallel >= diagonal;
+    bool isParallelSmall = parallel < diagonal;
 
-    int area0Cnt = s[0] == '0';
-    int area1Cnt = s[0] == '1';
+    ull answer;
 
-    for(int i=1 ; i<len ; ++i)
+    if(canMoveDiagonally)
     {
-        if(s[i-1] != s[i])
-        {
-            if(s[i] == '0') area0Cnt++;
-            if(s[i] == '1') area1Cnt++;
-        }
+        ull maximum = max(X, Y);
+        ull minimum = min(X, Y);
+
+        ull diagonalMoveCnt = minimum;
+        ull parallelMoveCnt = maximum - diagonalMoveCnt;
+        ull diagonalAndParallel = diagonalMoveCnt * diagonal + parallelMoveCnt * parallel;
+
+        ull diagonalOnly = maximum * diagonal - ((maximum-minimum)%2) * (diagonal - parallel);
+        
+        answer = min(diagonalAndParallel, diagonalOnly);
+    }
+    else
+    {
+        answer = (X + Y) * parallel;
     }
 
-    cout << min(area0Cnt, area1Cnt);
+    cout << answer;
 
     return 0;
 }
