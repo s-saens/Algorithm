@@ -1,56 +1,27 @@
 #include <iostream>
-#include <vector>
-
+#include <cmath>
 using namespace std;
+#define ll long long int
+
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(NULL);
 
-    int N, K;
-    cin >> N >> K;
+    ll A, B;
+    cin >> A >> B;
 
-    vector<int> josephus;
-    int people[N];
-    bool selected[N];
-
-    for(int i=0 ; i<N ; ++i)
+    ll answer;
+    if(A > B)
     {
-        people[i] = i+1;
-        selected[i] = false;
+        answer = A - B;
+    }
+    else
+    {
+        answer = B - A;
     }
 
-    int lastIndex = 0;
-
-    int cnt = K;
-    for (int i = 0; i < N; ++i)
-    {
-        int cnt = K;
-        while(cnt > 0)
-        {
-            if (!selected[lastIndex])
-            {
-                cnt--;
-            }
-
-            if(cnt > 0)
-            {
-                lastIndex = (lastIndex + 1) % N;
-            }
-        }
-        josephus.push_back(people[lastIndex]);
-        selected[lastIndex] = true;
-        lastIndex = (lastIndex + 1) % N;
-    }
-
-    string answer = "<";
-    cout << '<';
-    for(int i=0 ; i<N-1 ; ++i)
-    {
-        cout << josephus[i] << ", ";
-    }
-    cout << josephus[N-1] << '>';
-
+    cout << answer;
     return 0;
 }
