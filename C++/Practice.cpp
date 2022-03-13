@@ -1,66 +1,76 @@
 #include <iostream>
+#include <stack>
 
 using namespace std;
 
-struct Person
-{
-    int weight;
-    int height;
-    int rank;
-};
-
-short Sign(int x)
-{
-    if(x > 0)
-    {
-        return 1;
-    }
-    else if(x < 0)
-    {
-        return -1;
-    }
-    return 0;
-}
-
-int Dungchi(Person p1, Person p2) // 0이면 덩치 판정 불가, 2이면 p1이 덩치 큼, -2이면 p2가 덩치 큼
-{
-    int deltaW = p1.weight - p2.weight;
-    int deltaH = p1.height - p2.height;
-    int signDW = Sign(deltaW);
-    int signDH = Sign(deltaH);
-    return signDW + signDH;
-}
-
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(NULL);
+    string s = " ";
 
-    int N;
-    cin >> N;
-
-    Person people[N];
-
-    for (int i = 0; i < N; ++i)
+    while(true)
     {
-        cin >> people[i].weight >> people[i].height;
-        people[i].rank = 1;
-    }
-
-    for (int i = 0; i < N; ++i)
-    {
-        for(int j=0 ; j<N ; ++j)
+        getline(cin, s);
+        bool isStrange = false;
+        int len = s.length();
+        if (len == 1 && s[0] == '.')
         {
-            if( Dungchi(people[i], people[j]) == -2 )
+            return 0;
+        }
+
+        stack<char> brackets;
+
+        for(int i=0 ; i<len ; ++i)
+        {
+            char c = s[i];
+            char lastBracket = '?';
+            if (brackets.size() > 0)
             {
-                people[i].rank += 1;
+                lastBracket = brackets.top();
+            }
+            if(c == '(' || c == '[')
+            {
+                brackets.push(c);
+            }
+            else if(c == ']')
+            {
+                if (lastBracket == '[')
+                {
+                    brackets.pop();
+                }
+                else
+                {
+                    isStrange = true;
+                    break;
+                }
+            }
+            else if(c == ')')
+            {
+                if (lastBracket == '(')
+                {
+                    brackets.pop();
+                }
+                else
+                {
+                    isStrange = true;
+                    break;
+                }
             }
         }
-    }
 
-    for(int i=0 ; i<N ; ++i)
-    {
-        cout << people[i].rank << "\n";
+        if(isStrange)
+        {
+            cout << "no" << endl;
+            continue;
+        }
+
+        if(brackets.size() == 0)
+        {
+            cout << "yes" << endl;
+        }
+        else
+        {
+            cout << "no" << endl;
+        }
     }
 
     return 0;
