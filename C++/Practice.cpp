@@ -5,73 +5,26 @@ using namespace std;
 
 int main()
 {
-    string s = " ";
+    ios_base::sync_with_stdio(0);
+    cin.tie(NULL);
 
-    while(true)
+    int E, S, M;
+    cin >> E >> S >> M;
+
+    int nowE = 1;
+    int nowS = 1;
+    int nowM = 1;
+
+    int cnt = 1;
+    while(nowE != E || nowS != S || nowM != M)
     {
-        getline(cin, s);
-        bool isStrange = false;
-        int len = s.length();
-        if (len == 1 && s[0] == '.')
-        {
-            return 0;
-        }
-
-        stack<char> brackets;
-
-        for(int i=0 ; i<len ; ++i)
-        {
-            char c = s[i];
-            char lastBracket = '?';
-            if (brackets.size() > 0)
-            {
-                lastBracket = brackets.top();
-            }
-            if(c == '(' || c == '[')
-            {
-                brackets.push(c);
-            }
-            else if(c == ']')
-            {
-                if (lastBracket == '[')
-                {
-                    brackets.pop();
-                }
-                else
-                {
-                    isStrange = true;
-                    break;
-                }
-            }
-            else if(c == ')')
-            {
-                if (lastBracket == '(')
-                {
-                    brackets.pop();
-                }
-                else
-                {
-                    isStrange = true;
-                    break;
-                }
-            }
-        }
-
-        if(isStrange)
-        {
-            cout << "no" << endl;
-            continue;
-        }
-
-        if(brackets.size() == 0)
-        {
-            cout << "yes" << endl;
-        }
-        else
-        {
-            cout << "no" << endl;
-        }
+        cnt++;
+        nowE = nowE%15 + 1;
+        nowS = nowS%28 + 1;
+        nowM = nowM%19 + 1;
     }
+
+    cout << cnt;
 
     return 0;
 }
