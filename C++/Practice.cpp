@@ -7,24 +7,31 @@ int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(NULL);
+    
+    int K;
+    cin >> K;
 
-    int E, S, M;
-    cin >> E >> S >> M;
+    int sum = 0;
+    stack<int> numbers;
 
-    int nowE = 1;
-    int nowS = 1;
-    int nowM = 1;
-
-    int cnt = 1;
-    while(nowE != E || nowS != S || nowM != M)
+    for(int i=0 ; i<K ; ++i)
     {
-        cnt++;
-        nowE = nowE%15 + 1;
-        nowS = nowS%28 + 1;
-        nowM = nowM%19 + 1;
+        int input;
+        cin >> input;
+
+        if(input == 0)
+        {
+            sum -= numbers.top();
+            numbers.pop();
+        }
+        else
+        {
+            sum += input;
+            numbers.push(input);
+        }
     }
 
-    cout << cnt;
+    cout << sum;
 
     return 0;
 }
