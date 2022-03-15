@@ -105,8 +105,6 @@ int main()
     cout << fixed;
     cout.precision(0);
 
-    cout << "\n";
-
     // 산술평균
     cout << (int)round(average) << "\n";
 
