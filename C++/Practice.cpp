@@ -1,121 +1,70 @@
 #include <iostream>
 #include <algorithm>
-#include <cmath>
+#define ll long long int
 
 using namespace std;
+
+ll CutLength(int treeHeight, int cuttingLength)
+{
+    if(treeHeight > cuttingLength)
+    {
+        return treeHeight - cuttingLength;
+    }
+    else
+    {
+        return 0;
+    }
+}
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(NULL);
 
-    int N;
-    cin >> N;
+    ll N, Req;
+    cin >> N >> Req;
 
-    int arr[N];
+    ll trees[N];
 
-    int sum = 0;
-    int maximum = -40000;
-    int minimum = 40000;
-
-    int cntPositive[4001];
-    int cntNegative[4001];
-    int cnt0 = 0;
-
-    for (int i = 0; i < 4001; ++i) // 배열 초기화
-    {
-        cntPositive[i] = 0;
-        cntNegative[i] = 0;
-    }
-
-    // input
     for(int i=0 ; i<N ; ++i)
     {
-        int input;
-        cin >> input;
-        arr[i] = input;
+        cin >> trees[i];
+    }
 
-        sum += input;
+    sort(trees, trees+N);
 
-        maximum = max(maximum, input);
-        minimum = min(minimum, input);
+    ll sum = 0;
 
-        if(input > 0)
+    ll l = 0;
+    ll r = trees[N-1];
+
+    while(l < r)
+    {
+        sum = 0;
+
+        ll mid = (l+r)/2;
+
+        for(int i=N-1 ; i>=0 ; --i)
         {
-            cntPositive[input]++;
+            sum += CutLength(trees[i], mid);
+            if (sum >= Req)
+            {
+                break;
+            }
         }
-        else if(input < 0)
+
+        if(sum < Req)
         {
-            cntNegative[-input]++;
+            r = mid;
         }
         else
         {
-            cnt0++;
+            l = mid+1;
         }
     }
 
-    // 산술 평균 구하기
-    double average = 1.0 * sum / N;
+    cout << l-1;
 
-    // 중앙값 구하기
-    sort(arr, arr+N);
-    int midNumber = arr[N/2];
-
-    // 최빈값 구하기
-    int maxCnt = max(0, cnt0); // 최빈값의 빈도 찾기
-    for(int i=1 ; i<4001 ; ++i) // 최빈값의 빈도 찾기
-    {
-        maxCnt = max(max(maxCnt, cntPositive[i]), cntNegative[i]);
-    }
-
-    int mostFrequentsCnt = 0; // 최빈값의 개수
-    int mostFrequent = 0;
-    for(int i=-4000 ; i<=4000 ; ++i) // 최고 빈도를 가진 수, 즉 최빈값 찾기. 오름차순으로 탐색. 두 개 이상인 경우 
-    {
-        if(i>0)
-        {
-            if (cntPositive[i] == maxCnt)
-            {
-                mostFrequent = i;
-                mostFrequentsCnt++;
-            }
-        }
-        else if(i<0)
-        {
-            if(cntNegative[-i] == maxCnt)
-            {
-                mostFrequent = i;
-                mostFrequentsCnt++;
-            }
-        }
-        else // i == 0
-        {
-            if(cnt0 == maxCnt)
-            {
-                mostFrequent = i;
-                mostFrequentsCnt++;
-            }
-        }
-        if(mostFrequentsCnt >= 2)
-        {
-            break;
-        }
-    }
-
-    cout << fixed;
-    cout.precision(0);
-
-    // 산술평균
-    cout << (int)round(average) << "\n";
-
-    // 중앙값
-    cout << midNumber << "\n";
-
-    // 최빈값
-    cout << mostFrequent << "\n";
-
-    // 범위
-    cout << maximum - minimum << "\n";
 
     return 0;
 }
