@@ -4,43 +4,87 @@
 
 using namespace std;
 
+// 블럭 제거 2초
+// 블럭 놓기 1초
+
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(NULL);
 
-    int N;
-    cin >> N;
+    int X, Y;
+    cin >> X >> Y;
 
-    int maximumNumber = 0;
-    int winIndex;
+    int floorSize = X * Y; // floorSize
 
-    for(int i=0 ; i<N ; ++i)
+    ull B;
+    cin >> B;
+
+    int blocks[floorSize];
+    int maxHeight = 0;
+    int minHeight = 256;
+    int diggables[floorSize];
+    int empties[floorSize];
+
+    for (int i = 0; i < floorSize; ++i)
     {
-        int number[5];
-        for(int j=0 ; j<5 ; ++j)
+        cin >> blocks[i];
+        maxHeight = max(maxHeight, blocks[i]);
+        minHeight = min(minHeight, blocks[i]);
+    }
+
+
+    for(int i=0 ; i<floorSize ; ++i)
+    {
+        empties[i] = maxHeight - blocks[i];
+    }
+    for(int i=floorSize-1 ; i>=0 ; --i)
+    {
+        diggables[i] = blocks[i] - minHeight;
+    }
+
+    int minTime = 500 * 500 * 256;
+    int answerHeight = 0;
+
+    // sort(blocks, blocks + floorSize);
+
+
+    for(int cuttingHeight = minHeight ; cuttingHeight <= maxHeight ; ++cuttingHeight)
+    {
+        int diggableCnt = 0;
+        int emptyCnt = 0;
+        for(int i=0 ; i<floorSize ; ++i)
         {
-            cin >> number[j];
+            if(blocks[i] < cuttingHeight) // 왼쪽에 있는 경우 : 채워야됨
+            {
+                emptyCnt += cuttingHeight - blocks[i];
+            }
+            else// 오른쪽에 있는 경우 : 파야됨
+            {
+                diggableCnt += blocks[i] - cuttingHeight;
+            }
         }
 
-        for(int j=0 ; j<3 ; ++j)
+        if(diggableCnt + B >= emptyCnt) // 채울 수 있음, 즉 height 만족 가능.
         {
-            for(int k=j+1 ; k<4 ; ++k)
+            int t = diggableCnt * 2 + emptyCnt;
+            if(minTime > t)
             {
-                for(int l=k+1 ; l<5 ; ++l)
-                {
-                    int sum = number[j] + number[k] + number[l];
-                    if(maximumNumber <= sum%10)
-                    {
-                        maximumNumber = sum%10;
-                        winIndex = i+1;
-                    }
-                }
+                minTime = t;
+                answerHeight = cuttingHeight;
             }
+            else if(minTime == t)
+            {
+                answerHeight = max(cuttingHeight, answerHeight);
+            }
+        }
+        else
+        {
+            break;
         }
     }
 
-    cout << winIndex;
+    cout << minTime << ' ' << answerHeight;
 
     return 0;
 }
