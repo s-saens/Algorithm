@@ -1,70 +1,35 @@
 #include <iostream>
 #include <algorithm>
-#define ll long long int
+#define ull unsigned long long int
 
 using namespace std;
 
-ll CutLength(int treeHeight, int cuttingLength)
-{
-    if(treeHeight > cuttingLength)
-    {
-        return treeHeight - cuttingLength;
-    }
-    else
-    {
-        return 0;
-    }
-}
+// 블럭 제거 2초
+// 블럭 놓기 1초
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(NULL);
 
-    ll N, Req;
-    cin >> N >> Req;
+    int X, Y;
+    cin >> X >> Y;
 
-    ll trees[N];
+    int floorSize = X * Y; // floorSize
+    
+    ull B;
+    cin >> B;
 
-    for(int i=0 ; i<N ; ++i)
+    int blockCnt[floorSize];
+
+    for(int i=0 ; i<floorSize ; ++i)
     {
-        cin >> trees[i];
+        cin >> blockCnt[i];
     }
 
-    sort(trees, trees+N);
+    sort(blockCnt, blockCnt+floorSize);
 
-    ll sum = 0;
-
-    ll l = 0;
-    ll r = trees[N-1];
-
-    while(l < r)
-    {
-        sum = 0;
-
-        ll mid = (l+r)/2;
-
-        for(int i=N-1 ; i>=0 ; --i)
-        {
-            sum += CutLength(trees[i], mid);
-            if (sum >= Req)
-            {
-                break;
-            }
-        }
-
-        if(sum < Req)
-        {
-            r = mid;
-        }
-        else
-        {
-            l = mid+1;
-        }
-    }
-
-    cout << l-1;
-
+    int time = 0;
 
     return 0;
 }
