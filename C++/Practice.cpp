@@ -1,117 +1,85 @@
 #include <iostream>
-#include <vector>
+#include <cmath>
+#include <algorithm>
+#define ll long long int
 
 using namespace std;
 
-class Molecule
+struct Point
 {
-    public:
-    int C;
-    int H;
-    int O;
-
-    Molecule(int c, int h, int o)
-    {
-        C = c;
-        H = h;
-        O = o;
-    }
-
-    Molecule operator + (Molecule &m)
-    {
-        int c = C + m.C;
-        int h = H + m.H;
-        int o = O + m.O;
-
-        return Molecule(c, h, o);
-    }
-
-    Molecule operator * (int& a)
-    {
-        int c = C * a;
-        int h = H * a;
-        int o = O * a;
-
-        return Molecule(c, h, o);
-    }
-
-    bool operator == (Molecule &m)
-    {
-        return (C == m.C && H == m.H && O == m.O);
-    }
+    ll x;
+    ll y;
 };
 
-void ResetToZero(int& a, int& b, int& c)
+ll DistancePow2(Point &p1, Point &p2)
 {
-    a = 0;
-    b = 0;
-    c = 0;
+    ll dx = p1.x - p2.x;
+    ll dy = p1.y - p2.y;
+    return dx * dx + dy * dy;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(NULL);
-    
-    string input;
-    cin >> input;
-    int len = input.length();
 
-    vector<Molecule> molecules;
-
-    int c = 0;
-    int h = 0;
-    int o = 0;
-    int *lastChar;
-    for(int i=0 ; i<len ; ++i)
+    Point p[3];
+    for (int i = 0; i < 3; ++i)
     {
-        switch (input[i])
-        {
-        case 'C':
-            lastChar = &c;
-            c++;
-            break;
-        case 'H':
-            lastChar = &h;
-            h++;
-            break;
-        case 'O':
-            lastChar = &o;
-            o++;
-            break;
-        case '+':
-        case '=':
-            molecules.push_back(Molecule(c, h, o));
-            ResetToZero(c, h, o);
-            break;
-        default: // 입력 제한 있으므로 이 경우 항상 숫자.
-            (*lastChar) += input[i]-'0'-1;
-            break;
-        }
-    }
-    
-    molecules.push_back(Molecule(c, h, o));
-    ResetToZero(c, h, o);
-
-    for(int i=1 ; i<=10 ; ++i)
-    {
-        for(int j=1 ; j<=10 ; ++j)
-        {
-            for(int k=1 ; k<=10 ; ++k)
-            {
-                Molecule mol0 = (molecules[0] * i);
-                Molecule mol1 = (molecules[1] * j);
-                Molecule mol2 = (molecules[2] * k);
-
-                if( ((mol0 + mol1) == mol2) )
-                {
-                    cout << i << ' ' << j << ' ' << k << "\n";
-                    return 0;
-                }
-            }
-        }
+        cin >> p[i].x >> p[i].y;
     }
 
-    cout << "NEMOGUCE";
+    ll d2[3];
+    for (int i = 0; i < 3; ++i)
+    {
+        d2[i] = DistancePow2(p[i], p[(i + 1) % 3]);
+    }
+
+    sort(d2, d2 + 3);
+
+    // 삼각형 아님
+    if (sqrt(d2[0]) + sqrt(d2[1]) <= sqrt(d2[2]))
+    {
+        cout << 'X';
+        return 0;
+    }
+
+    // 정삼각형
+    if (d2[0] == d2[1] && d2[1] == d2[2])
+    {
+        cout << "JungTriangle";
+        return 0;
+    }
+
+    bool is2 = false;
+    if (d2[0] == d2[1] || d2[1] == d2[2])
+    {
+        is2 = true;
+    }
+
+    string answer;
+
+    if (d2[0] + d2[1] == d2[2]) // 직각
+    {
+        answer = "Jikkak";
+    }
+    else if (d2[0] + d2[1] > d2[2]) // 예각
+    {
+        answer = "Yeahkak";
+    }
+    else if (d2[0] + d2[1] < d2[2]) // 둔각
+    {
+        answer = "Dunkak";
+    }
+
+    if (is2)
+    {
+        answer += '2';
+    }
+
+    answer += "Triangle";
+
+    cout << answer;
+
     return 0;
 }
