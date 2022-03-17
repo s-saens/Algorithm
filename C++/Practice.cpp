@@ -3,6 +3,12 @@
 
 using namespace std;
 
+struct Point
+{
+    bool horizontal = false;
+    bool vertical = false;
+};
+
 int main()
 {
     ios_base::sync_with_stdio(0);
@@ -10,28 +16,83 @@ int main()
 
     int N;
     cin >> N;
-    int k[N];
 
-    for(int i=0 ; i<N ; ++i)
+    string operation;
+    cin >> operation;
+    int len = operation.length();
+
+    Point points[N][N];
+
+    int nowX = 0, nowY = 0;
+
+    for (int i = 0; i < len ; ++i)
     {
-        cin >> k[i];
-    }
-
-    sort(k, k+N);
-
-    int requiredCnt = 0;
-    int answer = 0;
-    for(int i=0 ; i<N ; ++i)
-    {
-        requiredCnt = k[i];
-        if(i >= requiredCnt)
+        switch (operation[i])
         {
-            answer = i+1;
-            break;
+            case 'U': // UP
+                if (nowY > 0)
+                {
+                    points[nowY][nowX].vertical = true;
+                    nowY--;
+                    points[nowY][nowX].vertical = true;
+                }
+                break;
+            case 'D': // DOWN
+                if (nowY < N-1)
+                {
+                    points[nowY][nowX].vertical = true;
+                    nowY++;
+                    points[nowY][nowX].vertical = true;
+                }
+                break;
+            case 'L': // LEFT
+                if (nowX > 0)
+                {
+                    points[nowY][nowX].horizontal = true;
+                    nowX--;
+                    points[nowY][nowX].horizontal = true;
+                }
+                break;
+            case 'R': // RIGHT
+                if (nowX < N-1)
+                {
+                    points[nowY][nowX].horizontal = true;
+                    nowX++;
+                    points[nowY][nowX].horizontal = true;
+                }
+                break;
+
+            default:
+                break;
         }
     }
 
-    cout <<  answer;
+    for(int i=0 ; i<N ; ++i)
+    {
+        for(int j=0 ; j<N ; ++j)
+        {
+            char c;
+            Point& p = points[i][j];
+            if(p.horizontal && p.vertical) // +
+            {
+                c = '+';
+            }
+            else if(p.horizontal) // |
+            {
+                c = '-';
+            }
+            else if(p.vertical) // -
+            {
+                c = '|';
+            }
+            else // .
+            {
+                c = '.';
+            }
+            cout << c;
+        }
+        cout << "\n";
+    }
 
     return 0;
 }
