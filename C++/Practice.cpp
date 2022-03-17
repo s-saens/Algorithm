@@ -3,95 +3,44 @@
 
 using namespace std;
 
-struct Point
+string SumOfEachNumbers(string number)
 {
-    bool horizontal = false;
-    bool vertical = false;
-};
+    int sum = 0;
+    int len = number.length();
+    for (int i = 0; i < len; ++i)
+    {
+        sum += number[i] - '0';
+    }
+    return to_string(sum);
+}
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(NULL);
 
-    int N;
-    cin >> N;
+    string X;
+    cin >> X;
+    int len = X.length();
 
-    string operation;
-    cin >> operation;
-    int len = operation.length();
+    int cnt = 0;
 
-    Point points[N][N];
-
-    int nowX = 0, nowY = 0;
-
-    for (int i = 0; i < len ; ++i)
+    while(X.length() > 1)
     {
-        switch (operation[i])
-        {
-            case 'U': // UP
-                if (nowY > 0)
-                {
-                    points[nowY][nowX].vertical = true;
-                    nowY--;
-                    points[nowY][nowX].vertical = true;
-                }
-                break;
-            case 'D': // DOWN
-                if (nowY < N-1)
-                {
-                    points[nowY][nowX].vertical = true;
-                    nowY++;
-                    points[nowY][nowX].vertical = true;
-                }
-                break;
-            case 'L': // LEFT
-                if (nowX > 0)
-                {
-                    points[nowY][nowX].horizontal = true;
-                    nowX--;
-                    points[nowY][nowX].horizontal = true;
-                }
-                break;
-            case 'R': // RIGHT
-                if (nowX < N-1)
-                {
-                    points[nowY][nowX].horizontal = true;
-                    nowX++;
-                    points[nowY][nowX].horizontal = true;
-                }
-                break;
-
-            default:
-                break;
-        }
+        X = SumOfEachNumbers(X);
+        cnt++;
     }
 
-    for(int i=0 ; i<N ; ++i)
+    int lastNumber = X[0] - '0';
+
+    cout << cnt << "\n";
+    if(lastNumber % 3 == 0)
     {
-        for(int j=0 ; j<N ; ++j)
-        {
-            char c;
-            Point& p = points[i][j];
-            if(p.horizontal && p.vertical) // +
-            {
-                c = '+';
-            }
-            else if(p.horizontal) // |
-            {
-                c = '-';
-            }
-            else if(p.vertical) // -
-            {
-                c = '|';
-            }
-            else // .
-            {
-                c = '.';
-            }
-            cout << c;
-        }
-        cout << "\n";
+        cout << "YES";
+    }
+    else
+    {
+        cout << "NO" ;
     }
 
     return 0;
