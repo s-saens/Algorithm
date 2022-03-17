@@ -1,47 +1,83 @@
 #include <iostream>
-#include <algorithm>
+#include <vector>
+#define ll long long int
+#define MMM 1000000
 
 using namespace std;
 
-string SumOfEachNumbers(string number)
+
+vector<ll> primes;
+
+bool isPrime[MMM];
+
+void InitFlags()
 {
-    int sum = 0;
-    int len = number.length();
-    for (int i = 0; i < len; ++i)
+    for(int i=0 ; i<MMM ; ++i)
     {
-        sum += number[i] - '0';
+        isPrime[i] = true;
     }
-    return to_string(sum);
 }
+
+void SetFlagsAsFalse(int startNumber)
+{
+    for(int i=startNumber+startNumber ; i<MMM ; i+=startNumber)
+    {
+        isPrime[i] = false;
+    }
+}
+
+void SetPrimes()
+{
+    isPrime[0] = false;
+    for(int i=2 ; i<MMM ; ++i)
+    {
+        if(isPrime[i])
+        {
+            SetFlagsAsFalse(i);
+            primes.push_back(i);
+        }
+    }
+}
+
+string IsValid(ll number)
+{
+    int len = primes.size();
+    for(int i=0 ; i<len ; ++i)
+    {
+        if(number % primes[i] == 0)
+        {
+            return "NO";
+        }
+    }
+    return "YES";
+}
+
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(NULL);
 
-    string X;
-    cin >> X;
-    int len = X.length();
+    InitFlags();
+    SetPrimes();
 
-    int cnt = 0;
+    short N;
+    cin >> N;
 
-    while(X.length() > 1)
+    string answer[N];
+
+    for(int i=0 ; i<N ; ++i)
     {
-        X = SumOfEachNumbers(X);
-        cnt++;
+        ll number;
+        cin >> number;
+        answer[i] = IsValid(number);
     }
 
-    int lastNumber = X[0] - '0';
+    for(int i=0 ; i<N ; ++i)
+    {
+        cout << answer[i] << "\n";
+    }
 
-    cout << cnt << "\n";
-    if(lastNumber % 3 == 0)
-    {
-        cout << "YES";
-    }
-    else
-    {
-        cout << "NO" ;
-    }
 
     return 0;
 }
