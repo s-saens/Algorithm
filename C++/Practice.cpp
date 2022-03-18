@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 #include <map>
 #include <algorithm>
 
@@ -10,42 +9,30 @@ int main()
     ios_base::sync_with_stdio(0);
     cin.tie(NULL);
 
-    map<string, int> names;
-    vector<string> dbj;
+    map<string, string> passwords;
 
     int N, M;
     cin >> N >> M;
 
-    int cnt = 0;
-
     for(int i=0 ; i<N ; ++i)
     {
-        string n;
-        cin >> n;
-        if(names.count(n) == 0)
-        {
-            names[n] = 1;
-        }
+        string site, pw;
+        cin >> site >> pw;
+        passwords[site] = pw;
     }
+
+    string answers[M];
     for(int i=0 ; i<M ; ++i)
     {
-        string n;
-        cin >> n;
-        if(names.count(n) == 1)
-        {
-            dbj.push_back(n);
-            cnt++;
-        }
+        string site;
+        cin >> site;
+        answers[i] = passwords[site];
     }
 
-
-    sort(dbj.begin(), dbj.end());
-
-    cout << cnt << "\n";
-    for(int i=0 ; i<cnt ; ++i)
+    for(int i=0 ; i<M ; ++i)
     {
-        cout << dbj[i] << "\n";
+        cout << answers[i] << "\n";
     }
-
+    
     return 0;
 }
