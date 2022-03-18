@@ -1,34 +1,45 @@
 #include <iostream>
-#include <cmath>
+#include <map>
+#define ll unsigned long long
+
 using namespace std;
 
-int pSum[50001];
+ll *stairs;
+map<pair<int, int>, ll> maxScore;
+int stairsCnt;
 
-int GetSetPow(int n)
+ll GoUp(int index, int seq)
 {
-    if(pSum[n] > -1) return pSum[n];
-
-    int rn = (int)sqrt(n);
-
-    int minimum = n;
-
-    for(int i=rn ; i>=1 ; --i)
-    {
-        minimum = min( 1 + GetSetPow(n - (i * i)), minimum );
-    }
+    pair<int, int> p = make_pair(index, seq);
     
-    pSum[n] = minimum;
-    return pSum[n];
-}
-
-void InitPow()
-{
-    for(int i=0 ; i<50001 ; ++i)
+    if (maxScore[p] > 0)
     {
-        pSum[i] = -1;
+        return maxScore[p];
     }
-    pSum[0] = 0;
-    pSum[1] = 1;
+
+    ll oneStep = 0;
+    ll twoStep = 0;
+
+    if(index == stairsCnt-2 && seq >= 1) // 마지막 계단 못밟는 경우(마지막에서 두번째인데 seq가 1 이상인 상태), 0을 return
+    {
+        return 0;
+    }
+
+    if (index < stairsCnt - 1 && seq < 1) // +1 계단 밟을 수 있음
+    {
+        oneStep = GoUp(index + 1, seq + 1);
+    }
+
+    if (index < stairsCnt - 2) // +2 계단 밟을 수 있음
+    {
+        twoStep = GoUp(index + 2, 0);
+    }
+
+
+    ll sum = stairs[index] + max(oneStep, twoStep);
+
+    maxScore[p] = sum;
+    return sum;
 }
 
 int main()
@@ -36,12 +47,31 @@ int main()
     ios_base::sync_with_stdio(0);
     cin.tie(NULL);
 
-    InitPow();
+    int N;
+    cin >> N;
 
-    int n;
-    cin >> n;
+    stairsCnt = N;
 
-    cout << GetSetPow(n);
+    ll s[N];
+
+    stairs = s;
+
+    for (int i = 0; i < N; ++i)
+    {
+        for(int j=0 ; j<3 ; ++j)
+        {
+            maxScore[make_pair(i, j)] = 0;
+        }
+        cin >> stairs[i];
+    }
+
+    if(N == 1)
+    {
+        cout << GoUp(0, 0);
+        return 0;
+    }
+
+    cout << max(GoUp(0, 0), GoUp(1, 0));
 
     return 0;
 }
