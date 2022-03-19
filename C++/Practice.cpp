@@ -1,37 +1,22 @@
 #include <iostream>
-#include <vector>
+#include <algorithm>
 
 using namespace std;
 
-struct Node
+struct Person
 {
-    bool visited = false;
-    vector<int> linkedNodeIndexes;
+    int index;
+    int time;
 };
 
-int C, P;
-int cnt = 0;
-
-Node* nodes;
-
-void DFS(int index)
+bool cmp(Person &p1, Person &p2)
 {
-    if(nodes[index].visited)
+    if(p1.time > p2.time)
     {
-        return;
+        return true;
     }
-    nodes[index].visited = true;
-    cnt++;
+    return false;
 
-    vector<int>& linked = nodes[index].linkedNodeIndexes;
-
-    for(int i=0 ; i<linked.size() ; ++i)
-    {
-        if(!nodes[linked[i]].visited)
-        {
-            DFS(linked[i]);
-        }
-    }
 }
 
 int main()
@@ -39,22 +24,26 @@ int main()
     ios_base::sync_with_stdio(0);
     cin.tie(NULL);
 
-    cin >> C >> P;
-    Node n[C+1];
-    nodes = n;
+    int N;
+    cin >> N;
 
-    for(int i=0 ; i<P ; ++i)
+    int time[N];
+
+    for(int i=0 ; i<N ; ++i)
     {
-        int a, b;
-        cin >> a >> b;
-
-        nodes[a].linkedNodeIndexes.push_back(b);
-        nodes[b].linkedNodeIndexes.push_back(a);
+        cin >> time[i];
     }
 
-    DFS(1);
+    sort(time, time + N);
 
-    cout << cnt-1;
+    int sum=0;
+
+    for(int i=0 ; i < N ; ++i)
+    {
+        sum += time[i] * (N-i);
+    }
+
+    cout << sum;
 
     return 0;
 }
