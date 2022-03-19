@@ -1,45 +1,37 @@
 #include <iostream>
-#include <map>
-#define ll unsigned long long
+#include <vector>
 
 using namespace std;
 
-ll *stairs;
-map<pair<int, int>, ll> maxScore;
-int stairsCnt;
-
-ll GoUp(int index, int seq)
+struct Node
 {
-    pair<int, int> p = make_pair(index, seq);
-    
-    if (maxScore[p] > 0)
+    bool visited = false;
+    vector<int> linkedNodeIndexes;
+};
+
+int C, P;
+int cnt = 0;
+
+Node* nodes;
+
+void DFS(int index)
+{
+    if(nodes[index].visited)
     {
-        return maxScore[p];
+        return;
     }
+    nodes[index].visited = true;
+    cnt++;
 
-    ll oneStep = 0;
-    ll twoStep = 0;
+    vector<int>& linked = nodes[index].linkedNodeIndexes;
 
-    if(index == stairsCnt-2 && seq >= 1) // 마지막 계단 못밟는 경우(마지막에서 두번째인데 seq가 1 이상인 상태), 0을 return
+    for(int i=0 ; i<linked.size() ; ++i)
     {
-        return 0;
+        if(!nodes[linked[i]].visited)
+        {
+            DFS(linked[i]);
+        }
     }
-
-    if (index < stairsCnt - 1 && seq < 1) // +1 계단 밟을 수 있음
-    {
-        oneStep = GoUp(index + 1, seq + 1);
-    }
-
-    if (index < stairsCnt - 2) // +2 계단 밟을 수 있음
-    {
-        twoStep = GoUp(index + 2, 0);
-    }
-
-
-    ll sum = stairs[index] + max(oneStep, twoStep);
-
-    maxScore[p] = sum;
-    return sum;
 }
 
 int main()
@@ -47,31 +39,22 @@ int main()
     ios_base::sync_with_stdio(0);
     cin.tie(NULL);
 
-    int N;
-    cin >> N;
+    cin >> C >> P;
+    Node n[C+1];
+    nodes = n;
 
-    stairsCnt = N;
-
-    ll s[N];
-
-    stairs = s;
-
-    for (int i = 0; i < N; ++i)
+    for(int i=0 ; i<P ; ++i)
     {
-        for(int j=0 ; j<3 ; ++j)
-        {
-            maxScore[make_pair(i, j)] = 0;
-        }
-        cin >> stairs[i];
+        int a, b;
+        cin >> a >> b;
+
+        nodes[a].linkedNodeIndexes.push_back(b);
+        nodes[b].linkedNodeIndexes.push_back(a);
     }
 
-    if(N == 1)
-    {
-        cout << GoUp(0, 0);
-        return 0;
-    }
+    DFS(1);
 
-    cout << max(GoUp(0, 0), GoUp(1, 0));
+    cout << cnt-1;
 
     return 0;
 }
