@@ -1,32 +1,35 @@
 #include <iostream>
-#include <vector>
+#include <map>
+
 using namespace std;
 
-struct Node
+int F()
 {
-    bool visited = false;
-    vector<int> linkedIndexes;
-};
+    int N;
+    cin >> N;
 
-Node* nodes;
+    map<string, int> clothes;
 
-void DFS(int index)
-{
-    if(nodes[index].visited)
+    for (int i = 0; i < N; ++i)
     {
-        return;
-    }
-    
-    nodes[index].visited = true;
-
-    vector<int> &linked = nodes[index].linkedIndexes;
-
-    for(int i=0 ; i<linked.size() ; ++i)
-    {
-        DFS(linked[i]);
+        string cloth, cate;
+        cin >> cloth >> cate;
+        if(clothes.count(cate) == 0)
+        {
+            clothes[cate] = 2;
+        }
+        else
+        {
+            clothes[cate]++;
+        }
     }
 
-    return;
+    int sum = 1;
+    for (map<string, int>::iterator it = clothes.begin() ; it != clothes.end() ; ++it)
+    {
+        sum *= (*it).second;
+    }
+    return sum-1;
 }
 
 int main()
@@ -34,31 +37,22 @@ int main()
     ios_base::sync_with_stdio(0);
     cin.tie(NULL);
     
-    int N, M;
-    cin >> N >> M;
 
-    Node n[N+1];
-    nodes = n;
+    int T;
+    cin >> T;
 
-    for(int i=0 ; i<M ; ++i)
+    int answers[T];
+
+    for(int i=0 ; i<T ; ++i)
     {
-        int a, b;
-        cin >> a >> b;
-        nodes[a].linkedIndexes.push_back(b);
-        nodes[b].linkedIndexes.push_back(a);
+        answers[i] = F();
     }
 
-    int cnt = 0;
-    for(int i=1 ; i<=N ; ++i)
+    for(int i=0 ; i<T ; ++i)
     {
-        if(!nodes[i].visited)
-        {
-            DFS(i);
-            cnt++;
-        }
+        cout << answers[i] << "\n";
     }
 
-    cout << cnt;
 
     return 0;
 }
