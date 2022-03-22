@@ -1,58 +1,37 @@
 #include <iostream>
-#include <map>
+#include <cmath>
+#include <vector>
 
 using namespace std;
 
-int F()
+int main()
 {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
     int N;
     cin >> N;
 
-    map<string, int> clothes;
-
-    for (int i = 0; i < N; ++i)
+    while(N > 1)
     {
-        string cloth, cate;
-        cin >> cloth >> cate;
-        if(clothes.count(cate) == 0)
+        int i = 2;
+        int s = (int)sqrt(N);
+        for (i = 2; i <= s; ++i)
         {
-            clothes[cate] = 2;
+            if(N%i == 0)
+            {
+                cout << i << "\n";
+                N/=i;
+                break;
+            }
         }
-        else
+        if(i == s + 1) // 위 for문에서 break되지 않음 : 소수라는 뜻.
         {
-            clothes[cate]++;
+            cout << N << "\n";
+            N = 1;
+            break;
         }
     }
-
-    int sum = 1;
-    for (map<string, int>::iterator it = clothes.begin() ; it != clothes.end() ; ++it)
-    {
-        sum *= (*it).second;
-    }
-    return sum-1;
-}
-
-int main()
-{
-    ios_base::sync_with_stdio(0);
-    cin.tie(NULL);
-    
-
-    int T;
-    cin >> T;
-
-    int answers[T];
-
-    for(int i=0 ; i<T ; ++i)
-    {
-        answers[i] = F();
-    }
-
-    for(int i=0 ; i<T ; ++i)
-    {
-        cout << answers[i] << "\n";
-    }
-
 
     return 0;
 }
