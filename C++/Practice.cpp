@@ -1,91 +1,69 @@
 #include <iostream>
+#include <vector>
 
 using namespace std;
-
-bool paper[128][128];
-int piecesCnt = 1;
-
-void InitPapers()
-{
-    for(int i=0 ; i<128 ; ++i)
-    {
-        for(int j=0 ; j<128 ; ++j)
-        {
-            paper[i][j] = false;
-        }
-    }
-}
-
-int F(int x1, int y1, int length)
-{
-    bool zeroCnt = 0;
-    bool oneCnt = 0; // Blue
-
-    for(int y=y1 ; y<y1+length ; ++y)
-    {
-        for(int x=x1 ; x<x1+length ; ++x)
-        {
-            if(paper[y][x])
-            {
-                oneCnt = 1;
-            }
-            else // 1
-            {
-                zeroCnt = 1;
-            }
-        }
-    }
-
-    int half = length/2;
-
-    if(zeroCnt == 0)
-    {
-        if(oneCnt == 0) // 0 0 : 이런건 없음
-        {
-            return 0;
-        }
-        else // 0 1 : Blue만 있음
-        {
-            return 1;
-        }
-    }
-    else
-    {
-        if(oneCnt == 0) // 1 0 : 0만 있음
-        {
-            return 0;
-        }
-        else // 1 1 : 둘 다 있음 : 자르기
-        {
-            piecesCnt += 3; // 종이 하나를 4등분 하면, 종이가 하나였던 게 네개가 된다. 즉 종이 3개 증가.
-            return F(x1, y1, half) + F(x1+half, y1, half) + F(x1, y1+half, half) + F(x1+half, y1+half, half);
-        }
-    }
-    return 0;
-}
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int N;
-    cin >> N;
+    int N, len;
+    cin >> N >> len;
 
-    for(int y=0 ; y<N ; ++y)
+    vector<int> possiblesLengths;
+
+    string ioioi;
+    cin >> ioioi;
+
+    int cnt = 0;
+    int answer = 0;
+
+    for (int i = 0; i < len; ++i)
     {
-        for(int x=0 ; x<N ; ++x)
+        if (cnt <= 0) // seq의 처음 시작은 I여야 함.
         {
-            bool b;
-            cin >> b;
-            paper[y][x] = b;
+            if (ioioi[i] == 'I')
+            {
+                cnt++;
+            }
+        }
+        else if (i > 0) // seq가 시작됨.
+        {
+            if (ioioi[i - 1] == 'I' && ioioi[i] == 'O' && i < len - 1)
+            {
+                cnt++; // 마지막이 O일 경우, 다음 I가 나올 수 없으므로, 빼야 함.
+            }
+            else if (ioioi[i - 1] == 'O' && ioioi[i] == 'I')
+            {
+                cnt++;
+            }
+            else // seq 깨짐. cnt = 0
+            {
+                if (cnt >= 2 * N + 1)
+                {
+                    int l = (cnt - 1) / 2; // seq에서 O의 개수
+                    answer += l - N + 1;
+                }
+
+                if (ioioi[i] == 'O')
+                {
+                    cnt = 0;
+                }
+                else if (ioioi[i] == 'I')
+                {
+                    cnt = 1;
+                }
+            }
         }
     }
+    if (cnt >= 2 * N + 1)
+    {
+        int l = (cnt - 1) / 2; // seq에서 O의 개수
+        answer += l - N + 1;
+    }
 
-    int blue = F(0, 0, N);
-    int white = piecesCnt - blue;
-
-    cout << white << "\n" << blue;
+    cout << answer;
 
     return 0;
 }
