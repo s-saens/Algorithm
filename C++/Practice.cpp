@@ -1,49 +1,63 @@
 #include <iostream>
-#include <functional>
-#include <queue>
-#include <vector>
+#include <algorithm>
+
+#define ull __uint128_t
 
 using namespace std;
 
-struct Number
-{
-    int value = 0;
-    int index = 0;
-};
+ull comb[101][101];
 
-struct cmp
+ull Comb(int n, int r)
 {
-    bool operator()(Number& a, Number& b)
+    if(comb[n][r] > 0)
     {
-        return (a.value > b.value);
+        return comb[n][r];
     }
-};
+    if(r == 1 || r == n-1)
+    {
+        return n;
+    }
+    if(r == 0 || r == n)
+    {
+        return 1;
+    }
+
+    comb[n][r] = Comb(n - 1, r - 1) + Comb(n - 1, r);
+    return comb[n][r];
+}
+
+string Uint128ToString(ull a)
+{
+    string ret = "";
+
+    while(a > 0)
+    {
+        ret += to_string((int)(a % 10));
+        a /= 10;
+    }
+
+    reverse(ret.begin(), ret.end());
+
+    return ret;
+}
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int N, L;
-    cin >> N >> L;
-
-    priority_queue< Number, vector<Number>, cmp > q;
-
-    for(int i=0 ; i<N ; ++i)
+    for(int i=0 ; i<101 ; ++i)
     {
-        Number n;
-        cin >> n.value;
-        n.index = i;
-
-        q.push(n);
-
-        while(q.top().index <= i - L && !q.empty())
+        for(int j=0 ; j<101 ; ++j)
         {
-            q.pop();
+            comb[i][j] = 0;
         }
-
-        cout << q.top().value << "\n";
     }
+
+    int n, r;
+    cin >> n >> r;
+
+    cout << Uint128ToString(Comb(n, r));
 
     return 0;
 }
