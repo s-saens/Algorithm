@@ -1,79 +1,49 @@
 #include <iostream>
+#include <functional>
+#include <queue>
+#include <vector>
 
 using namespace std;
 
-/* 연습장
-
-     o     
-    o o    
-   ooooo   
-  o     o  
- o o   o o 
-ooooo ooooo
-
-s1 = GetStars()
-
-*/
-
-string* map;
-
-void F(int x, int y, int length)
+struct Number
 {
-    if(length == 3)
+    int value = 0;
+    int index = 0;
+};
+
+struct cmp
+{
+    bool operator()(Number& a, Number& b)
     {
-        for(int i=y ; i>y-3 ; --i)
-        {
-            for(int j=x ; j<=x+4 ; ++j)
-            {
-                if(i % 3 == 2)
-                {
-                    map[i][j] = '*';
-                }
-                else if(i % 3 == 1 && (j == x+1 || j == x+3))
-                {
-                    map[i][j] = '*';
-                }
-                else if(i % 3 == 0 && j == x+2)
-                {
-                    map[i][j] = '*';
-                }
-            }
-        }
-        return;
+        return (a.value > b.value);
     }
-
-    F(x, y, length/2); // 왼쪽 아래
-    F(x + length, y, length/2); // 오른쪽 아래
-    F(x + (length/2), y - (length/2), length/2); // 위
-}
-
+};
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int N;
-    cin >> N;
+    int N, L;
+    cin >> N >> L;
 
-    string m[N];
-    map = m;
+    priority_queue< Number, vector<Number>, cmp > q;
 
     for(int i=0 ; i<N ; ++i)
     {
-        for(int j=0 ; j<N*2-1 ; ++j)
+        Number n;
+        cin >> n.value;
+        n.index = i;
+
+        q.push(n);
+
+        while(q.top().index <= i - L && !q.empty())
         {
-            map[i] += ' ';
+            q.pop();
         }
+
+        cout << q.top().value << "\n";
     }
-
-    F(0, N-1, N);
-
-    for(int i=0 ; i<N ; ++i)
-    {
-        cout << m[i] << "\n";
-    }
-
 
     return 0;
 }
