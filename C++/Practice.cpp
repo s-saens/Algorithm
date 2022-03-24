@@ -1,23 +1,32 @@
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
 int N, M;
+vector<int> v;
 
-void Permutation(int start, int cnt, string s)
+void Permutation(int startIndex, int cnt, string s, vector<bool> visited)
 {
     if(cnt >= M-1)
     {
-        cout << s + to_string(start) << "\n";
+        cout << s + to_string(v[startIndex]) << "\n";
         return;
     }
 
-    s += to_string(start) + ' ';
+    visited[startIndex] = true;
 
-    for(int i=start ; i<=N ; ++i)
+    s += to_string(v[startIndex]) + ' ';
+
+    for(int i=0 ; i<N ; ++i)
     {
-        Permutation(i, cnt+1, s);
+        if(!visited[i])
+        {
+            Permutation(i, cnt + 1, s, visited);
+        }
     }
+
     return;
 }
 
@@ -27,10 +36,24 @@ int main()
     cin.tie(NULL);
 
     cin >> N >> M;
-    
-    for(int i=1 ; i<=N ; ++i)
+    for(int i=0 ; i<N ; ++i)
     {
-        Permutation(i, 0, "");
+        int a;
+        cin >> a;
+        v.push_back(a);
+    }
+    sort(v.begin(), v.end());
+    
+    vector<bool> visited;
+
+    for(int i=0 ; i<10 ; ++i)
+    {
+        visited.push_back(false);
+    }
+
+    for(int i=0 ; i<N ; ++i)
+    {
+        Permutation(i, 0, "", visited);
     }
 
     return 0;
