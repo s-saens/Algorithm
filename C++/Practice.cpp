@@ -7,7 +7,8 @@ using namespace std;
 int N, M;
 vector<int> v;
 
-void Permutation(int startIndex, int cnt, string s, vector<bool> visited)
+
+void Permutation(int startIndex, int cnt, string s)
 {
     if(cnt >= M-1)
     {
@@ -15,18 +16,12 @@ void Permutation(int startIndex, int cnt, string s, vector<bool> visited)
         return;
     }
 
-    visited[startIndex] = true;
-
     s += to_string(v[startIndex]) + ' ';
 
-    for(int i=0 ; i<N ; ++i)
+    for(int i=startIndex ; i<N ; ++i)
     {
-        if(!visited[i])
-        {
-            Permutation(i, cnt + 1, s, visited);
-        }
+        Permutation(i, cnt+1, s);
     }
-
     return;
 }
 
@@ -44,16 +39,9 @@ int main()
     }
     sort(v.begin(), v.end());
     
-    vector<bool> visited;
-
-    for(int i=0 ; i<10 ; ++i)
-    {
-        visited.push_back(false);
-    }
-
     for(int i=0 ; i<N ; ++i)
     {
-        Permutation(i, 0, "", visited);
+        Permutation(i, 0, "");
     }
 
     return 0;
