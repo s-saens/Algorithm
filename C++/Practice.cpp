@@ -14,7 +14,7 @@ void Permutation(int start, int cnt, string s)
 
     s += to_string(start) + ' ';
 
-    for(int i=start+1 ; i<=N ; ++i)
+    for(int i=start ; i<=N ; ++i)
     {
         Permutation(i, cnt+1, s);
     }
