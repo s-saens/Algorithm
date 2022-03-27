@@ -1,36 +1,55 @@
 #include <iostream>
-#include <vector>
-#include <map>
 #include <algorithm>
-#include <string>
 
 using namespace std;
 
-int N, M;
-vector<int> numbers;
-vector<string> selected;
-map<string, bool> m;
+int N, K;
 
-void Combination(int startIndex, int cnt, string s)
+struct Thing
 {
-    s += to_string(numbers[startIndex]);
+    int weight = 0;
+    int value = 0;
+};
 
-    if (cnt >= M - 1)
+Thing* things;
+
+int maxValue[101][100001]; // startIndex와 cnt에 따른 최댓값을 memoization : 두 변수 모두 100 이하임.
+
+void InitMaxValue()
+{
+    for(int i=0 ; i<101 ; ++i)
     {
-        if (m.count(s) == 0)
+        for(int j=0 ; j<100001 ; ++j)
         {
-            selected.push_back(s);
-            m[s] = true;
+            maxValue[i][j] = -1;
         }
-        return;
     }
+}
 
-    s += ' ';
-
-    for (int i = startIndex; i < N; ++i)
+int MaxValueSum(int startIndex, int remainWeight)
+{
+    if (maxValue[startIndex][remainWeight] > -1)
     {
-        Combination(i, cnt + 1, s);
+        return maxValue[startIndex][remainWeight];
     }
+    if (startIndex >= N)
+    {
+        return 0;
+    }
+    if (remainWeight < things[startIndex].weight)
+    {
+        return 0;
+    }
+
+    int sum = 0;
+    for(int i=startIndex+1 ; i<N ; ++i)
+    {
+        sum = max(sum, MaxValueSum(i, remainWeight-things[startIndex].weight));
+    }
+    sum += things[startIndex].value;
+
+    maxValue[startIndex][remainWeight] = sum;
+    return sum;
 }
 
 int main()
@@ -38,38 +57,26 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    cin >> N >> M;
+    InitMaxValue();
 
-    for (int i = 0; i < N; ++i)
+    cin >> N >> K; // N: 물건 개수 // K: 최대 무게
+
+    Thing t[N];
+    things = t;
+
+    for(int i=0 ; i<N ; ++i)
     {
-        int a;
-        cin >> a;
-        numbers.push_back(a);
+        cin >> things[i].weight >> things[i].value;
     }
 
-    sort(numbers.begin(), numbers.end());
+    int maximum = -1;
 
-    vector<bool> visited;
-
-    for (int i = 0; i < 10; ++i)
+    for(int i=0 ; i<N ; ++i)
     {
-        visited.push_back(false);
+        maximum = max(maximum, MaxValueSum(i, K));
     }
 
-    for (int i = 0; i < N; ++i)
-    {
-        Combination(i, 0, "");
-    }
-
-    int i;
-    for (i = 0; i < selected.size() - 1; ++i)
-    {
-        if (selected[i].compare(selected[i + 1]) != 0) // 다음 이어질 항목이 현재 것과 다를 경우에만 출력.
-        {
-            cout << selected[i] << "\n";
-        }
-    }
-    cout << selected[i] << "\n"; // 마지막 항목 출력
+    cout << maximum;
 
     return 0;
 }
