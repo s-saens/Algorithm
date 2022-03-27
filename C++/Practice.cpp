@@ -13,7 +13,7 @@ struct Thing
 
 Thing* things;
 
-int maxValue[101][100001]; // startIndex와 cnt에 따른 최댓값을 memoization : 두 변수 모두 100 이하임.
+int maxValue[101][100001]; // startIndex와 remainWeight에 따른 최댓값을 저장
 
 void InitMaxValue()
 {
