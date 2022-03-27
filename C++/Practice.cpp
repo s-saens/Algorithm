@@ -1,45 +1,80 @@
 #include <iostream>
+#include <vector>
+#include <map>
 #include <algorithm>
+#include <string>
 
 using namespace std;
+
+int N, M;
+vector<int> numbers;
+vector<string> selected;
+map<string, bool> m;
+
+void Combination(int startIndex, int cnt, string s, vector<bool> visited)
+{
+    s += to_string(numbers[startIndex]);
+
+    if (cnt >= M - 1)
+    {
+        if(m.count(s) == 0)
+        {
+            selected.push_back(s);
+            m[s] = true;
+        }
+        return;
+    }
+
+    visited[startIndex] = true;
+
+    s += ' ';
+
+    for (int i = 0; i < N; ++i)
+    {
+        if(!visited[i])
+        {
+            Combination(i, cnt + 1, s, visited);
+        }
+    }
+}
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int T;
-    cin >> T;
+    cin >> N >> M;
 
-    int answers[T];
-
-    for(int i=0 ; i<T ; ++i)
+    for(int i=0 ; i<N ; ++i)
     {
-        answers[i] = 1;
+        int a;
+        cin >> a;
+        numbers.push_back(a);
+    }
 
-        int number[2];
-        cin >> number[0] >> number[1];
+    sort(numbers.begin(), numbers.end());
 
-        sort(number, number+2);
+    vector<bool> visited;
 
-        for(int j=2 ; j<=number[0] ; ++j)
+    for (int i = 0; i < 10; ++i)
+    {
+        visited.push_back(false);
+    }
+
+    for(int i=0 ; i<N ; ++i)
+    {
+        Combination(i, 0, "", visited);
+    }
+    
+    int i;
+    for(i=0 ; i<selected.size()-1 ; ++i)
+    {
+        if(selected[i].compare(selected[i+1]) != 0) // 다음 이어질 항목이 현재 것과 다를 경우에만 출력.
         {
-            if(number[0]%j == 0 && number[1]%j == 0)
-            {
-                answers[i] *= j;
-                number[0] /= j;
-                number[1] /= j;
-                j--;
-            }
+            cout << selected[i] << "\n";
         }
-
-        answers[i] *= number[0] * number[1];
     }
-
-    for(int i=0 ; i<T ; ++i)
-    {
-        cout << answers[i] << "\n";
-    }
+    cout << selected[i] << "\n"; // 마지막 항목 출력
 
     return 0;
 }

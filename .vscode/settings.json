@@ -3,6 +3,12 @@
         "locale": "cpp",
         "__config": "cpp",
         "algorithm": "cpp",
-        "iterator": "cpp"
+        "iterator": "cpp",
+        "compare": "cpp",
+        "memory": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp",
+        "tuple": "cpp",
+        "typeinfo": "cpp"
     }
 }
