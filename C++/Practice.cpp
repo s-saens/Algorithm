@@ -11,13 +11,13 @@ vector<int> numbers;
 vector<string> selected;
 map<string, bool> m;
 
-void Combination(int startIndex, int cnt, string s, vector<bool> visited)
+void Combination(int startIndex, int cnt, string s)
 {
     s += to_string(numbers[startIndex]);
 
     if (cnt >= M - 1)
     {
-        if(m.count(s) == 0)
+        if (m.count(s) == 0)
         {
             selected.push_back(s);
             m[s] = true;
@@ -25,16 +25,11 @@ void Combination(int startIndex, int cnt, string s, vector<bool> visited)
         return;
     }
 
-    visited[startIndex] = true;
-
     s += ' ';
 
-    for (int i = 0; i < N; ++i)
+    for (int i = startIndex; i < N; ++i)
     {
-        if(!visited[i])
-        {
-            Combination(i, cnt + 1, s, visited);
-        }
+        Combination(i, cnt + 1, s);
     }
 }
 
@@ -45,7 +40,7 @@ int main()
 
     cin >> N >> M;
 
-    for(int i=0 ; i<N ; ++i)
+    for (int i = 0; i < N; ++i)
     {
         int a;
         cin >> a;
@@ -61,15 +56,15 @@ int main()
         visited.push_back(false);
     }
 
-    for(int i=0 ; i<N ; ++i)
+    for (int i = 0; i < N; ++i)
     {
-        Combination(i, 0, "", visited);
+        Combination(i, 0, "");
     }
-    
+
     int i;
-    for(i=0 ; i<selected.size()-1 ; ++i)
+    for (i = 0; i < selected.size() - 1; ++i)
     {
-        if(selected[i].compare(selected[i+1]) != 0) // 다음 이어질 항목이 현재 것과 다를 경우에만 출력.
+        if (selected[i].compare(selected[i + 1]) != 0) // 다음 이어질 항목이 현재 것과 다를 경우에만 출력.
         {
             cout << selected[i] << "\n";
         }
