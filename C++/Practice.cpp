@@ -3,53 +3,51 @@
 
 using namespace std;
 
-int N, K;
-
-struct Thing
+int N;
+struct House
 {
-    int weight = 0;
-    int value = 0;
+    int colorCost[3];
 };
+House* houses;
 
-Thing* things;
+int minCostDP[4][1001]; // lastColor와 index에 따른 값
 
-int maxValue[101][100001]; // startIndex와 remainWeight에 따른 최댓값을 저장
-
-void InitMaxValue()
+void InitMinCostDP()
 {
-    for(int i=0 ; i<101 ; ++i)
+    for(int i=0 ; i<4 ; ++i)
     {
-        for(int j=0 ; j<100001 ; ++j)
+        for(int j=0 ; j<1001 ; ++j)
         {
-            maxValue[i][j] = -1;
+            minCostDP[i][j] = -1;
         }
     }
 }
 
-int MaxValueSum(int startIndex, int remainWeight)
+int MinCost(int lastColor, int index)
 {
-    if (maxValue[startIndex][remainWeight] > -1)
+    if(minCostDP[lastColor][index] > -1)
     {
-        return maxValue[startIndex][remainWeight];
+        return minCostDP[lastColor][index];
     }
-    if (startIndex >= N)
-    {
-        return 0;
-    }
-    if (remainWeight < things[startIndex].weight)
+    if(index == N )
     {
         return 0;
     }
 
-    int sum = 0;
-    for(int i=startIndex+1 ; i<N ; ++i)
+    int minCost = 20000000;
+    int minColor = 0;
+    for(int i=0 ; i<3 ; ++i) // i: thisColor
     {
-        sum = max(sum, MaxValueSum(i, remainWeight-things[startIndex].weight));
+        if(lastColor == i)
+        {
+            continue;
+        }
+        int cost = houses[index].colorCost[i] + MinCost(i, index + 1);
+        minCost = min(minCost, cost);
     }
-    sum += things[startIndex].value;
 
-    maxValue[startIndex][remainWeight] = sum;
-    return sum;
+    minCostDP[lastColor][index] = minCost;
+    return minCost;
 }
 
 int main()
@@ -57,26 +55,21 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    InitMaxValue();
+    InitMinCostDP();
 
-    cin >> N >> K; // N: 물건 개수 // K: 최대 무게
-
-    Thing t[N];
-    things = t;
-
-    for(int i=0 ; i<N ; ++i)
-    {
-        cin >> things[i].weight >> things[i].value;
-    }
-
-    int maximum = -1;
+    cin >> N;
+    House h[N];
+    houses = h;
 
     for(int i=0 ; i<N ; ++i)
     {
-        maximum = max(maximum, MaxValueSum(i, K));
+        for(int j=0 ; j<3 ; ++j)
+        {
+            cin >> houses[i].colorCost[j];
+        }
     }
 
-    cout << maximum;
+    cout << MinCost(3, 0);
 
     return 0;
 }
