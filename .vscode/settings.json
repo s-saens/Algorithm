@@ -9,6 +9,7 @@
         "type_traits": "cpp",
         "utility": "cpp",
         "tuple": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "__tree": "cpp"
     }
 }
