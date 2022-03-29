@@ -1,53 +1,28 @@
 #include <iostream>
-#include <algorithm>
+#define ll long long int
 
 using namespace std;
 
-int N;
-struct House
+int a, b, c;
+
+ll power(ll x, ll y) // x^y
 {
-    int colorCost[3];
-};
-House* houses;
-
-int minCostDP[4][1001]; // lastColor와 index에 따른 값
-
-void InitMinCostDP()
-{
-    for(int i=0 ; i<4 ; ++i)
+    if(y == 0)
     {
-        for(int j=0 ; j<1001 ; ++j)
-        {
-            minCostDP[i][j] = -1;
-        }
+        return 1;
     }
-}
-
-int MinCost(int lastColor, int index)
-{
-    if(minCostDP[lastColor][index] > -1)
+    if(y == 1)
     {
-        return minCostDP[lastColor][index];
-    }
-    if(index == N )
-    {
-        return 0;
+        return x;
     }
 
-    int minCost = 20000000;
-    int minColor = 0;
-    for(int i=0 ; i<3 ; ++i) // i: thisColor
+    if(y%2 == 1)
     {
-        if(lastColor == i)
-        {
-            continue;
-        }
-        int cost = houses[index].colorCost[i] + MinCost(i, index + 1);
-        minCost = min(minCost, cost);
+        return power(x, y-1) * x;
     }
+    ll h = power(x, y/2) % c;
 
-    minCostDP[lastColor][index] = minCost;
-    return minCost;
+    return (h * h) % c;
 }
 
 int main()
@@ -55,21 +30,9 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    InitMinCostDP();
+    cin >> a >> b >> c;
 
-    cin >> N;
-    House h[N];
-    houses = h;
-
-    for(int i=0 ; i<N ; ++i)
-    {
-        for(int j=0 ; j<3 ; ++j)
-        {
-            cin >> houses[i].colorCost[j];
-        }
-    }
-
-    cout << MinCost(3, 0);
+    cout << power(a, b) % c;
 
     return 0;
 }
