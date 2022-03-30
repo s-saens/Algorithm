@@ -1,28 +1,49 @@
 #include <iostream>
-#define ll long long int
+#include <algorithm>
+#include <vector>
+#include <queue>
 
 using namespace std;
 
-int a, b, c;
+int N, E, K;
+int INF = 10;
+int MAX = 30000000;
 
-ll power(ll x, ll y) // x^y
+struct Edge
 {
-    if(y == 0)
+    int next;
+    int cost;
+};
+
+struct Node
+{
+    int index;
+    vector<Edge> nexts;
+};
+
+Node *nodes;
+int *answer;
+priority_queue<int, greater<int> > pq;
+
+void Init()
+{
+    for(int i=0 ; i<N ; ++i)
     {
-        return 1;
+        pq.push(MAX);
     }
-    if(y == 1)
+}
+
+void Dijkstra(int start)
+{
+    Init();
+
+    int index = start;
+
+    for(int i=0 ; i<N ; ++i)
     {
-        return x;
+        
     }
 
-    if(y%2 == 1)
-    {
-        return power(x, y-1) * x;
-    }
-    ll h = power(x, y/2) % c;
-
-    return (h * h) % c;
 }
 
 int main()
@@ -30,9 +51,35 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    cin >> a >> b >> c;
+    cin >> N >> E >> K;
 
-    cout << power(a, b) % c;
+    Node n[N + 1];
+    nodes = n;
+    int a[N + 1];
+    answer = a;
+
+    for (int i = 0; i < E; ++i)
+    {
+        int a, b, c;
+        cin >> a >> b >> c;
+        Edge e;
+        e.cost = c;
+        e.next = b;
+
+        nodes[a].nexts.push_back(e);
+    }
+
+    Dijkstra(K);
+
+    for (int i = 1; i <= N; ++i)
+    {
+        if (answer[i] == INF)
+        {
+            cout << "INF" << "\n";
+            continue;
+        }
+        cout << answer[i] << "\n";
+    }
 
     return 0;
 }
