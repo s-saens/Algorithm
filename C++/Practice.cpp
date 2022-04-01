@@ -1,55 +1,47 @@
 #include <iostream>
-#include <algorithm>
 #include <vector>
-#include <queue>
 
 using namespace std;
 
-int V, E, start;
-int INF = 30000000;
-
-struct Edge
+struct Node
 {
-    int destination = 0;
-    int weight = 1;
+    int index = 0;
+    int number = 1;
+    Node* left = nullptr;
+    Node* right = nullptr;
 };
 
-struct Vertex
-{
-    vector<Edge> links;
-};
+vector<int> dp;
 
-struct EdgeCompare
+int FindMaximum(Node node)
 {
-    bool operator() (Edge& e1, Edge& e2)
+    if(dp[node.index] > 0)
     {
-        return e1.weight > e2.weight;
+        return dp[node.index];
     }
-};
 
-priority_queue<Edge, vector<Edge>, EdgeCompare> pq;
-Vertex* vertexes;
-int* answer;
+    int l = -1;
+    int r = -1;
 
-void Dijkstra()
-{
-    while(!pq.empty())
+    if(node.left != nullptr)
     {
-        Edge poppedEdge = pq.top(); pq.pop(); // 간선 선택
-        Vertex v = vertexes[poppedEdge.destination]; // 현재 정점
-
-        for(int i=0 ; i<v.links.size() ; ++i)
-        {
-            int d = v.links[i].destination;
-            int w = v.links[i].weight + poppedEdge.weight;
-            if (w <= answer[d])
-            {
-                v.links[i].weight = w;
-                pq.push(v.links[i]);
-                answer[d] = w;
-            }
-        }
+        l = FindMaximum(*node.left);
     }
+    if(node.right != nullptr)
+    {
+        r = FindMaximum(*node.right);
+    }
+
+    if(l == -1 && r == -1)
+    {
+        dp[node.index] = node.number;
+    }
+    else
+    {
+        dp[node.index] = node.number + max(l, r);
+    }
+
+    return dp[node.index];
 }
 
 int main()
@@ -57,40 +49,38 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    cin >> V >> E >> start;
-    Vertex v[V+1];
-    vertexes = v;
-    int a[V+1];
-    answer = a;
-    for(int i=0 ; i<=V ; ++i)
+    int N;
+    cin >> N;
+    int numbersCnt = N * (N+1) / 2;
+
+    vector<Node> triangle[N];
+
+    int index = 0;
+    for(int i=0 ; i<N ; ++i)
     {
-        if(i == start) answer[i] = 0;
-        else answer[i] = INF;
+        for(int j=0 ; j<=i ; ++j)
+        {
+            int n;
+            cin >> n;
+            Node node;
+            node.number = n;
+            node.index = index;
+            triangle[i].push_back(node);
+            dp.push_back(0);
+            index++;
+        }
     }
 
-    for(int i=0 ; i<E ; ++i)
+    for(int i=0 ; i<N-1 ; ++i)
     {
-        int s, d, w; // start -> destination : weight
-        cin >> s >> d >> w;
-        Edge e;
-        e.destination = d;
-        e.weight = w;
-
-        vertexes[s].links.push_back(e);
+        for (int j = 0; j <= i; ++j)
+        {
+            triangle[i][j].left = &triangle[i+1][j];
+            triangle[i][j].right = &triangle[i+1][j+1];
+        }
     }
 
-    Edge startEdge; // start->start : weigth 0
-    startEdge.destination = start;
-    startEdge.weight = 0 ;
-    pq.push(startEdge);
-
-    Dijkstra();
-
-    for(int i=1 ; i<=V ; ++i)
-    {
-        if(answer[i] == INF) cout << "INF\n";
-        else cout << answer[i] << "\n";
-    }
+    cout << FindMaximum(triangle[0][0]);
 
     return 0;
 }
