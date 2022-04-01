@@ -1,86 +1,59 @@
 #include <iostream>
-#include <vector>
 
 using namespace std;
-
-struct Node
-{
-    int index = 0;
-    int number = 1;
-    Node* left = nullptr;
-    Node* right = nullptr;
-};
-
-vector<int> dp;
-
-int FindMaximum(Node node)
-{
-    if(dp[node.index] > 0)
-    {
-        return dp[node.index];
-    }
-
-    int l = -1;
-    int r = -1;
-
-    if(node.left != nullptr)
-    {
-        l = FindMaximum(*node.left);
-    }
-    if(node.right != nullptr)
-    {
-        r = FindMaximum(*node.right);
-    }
-
-    if(l == -1 && r == -1)
-    {
-        dp[node.index] = node.number;
-    }
-    else
-    {
-        dp[node.index] = node.number + max(l, r);
-    }
-
-    return dp[node.index];
-}
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int N;
-    cin >> N;
-    int numbersCnt = N * (N+1) / 2;
+    int N, M;
+    cin >> N >> M;
 
-    vector<Node> triangle[N];
+    int m[N][N];
 
-    int index = 0;
-    for(int i=0 ; i<N ; ++i)
+    for(int x=0 ; x<N ; ++x)
     {
-        for(int j=0 ; j<=i ; ++j)
+        for(int y=0 ; y<N ; ++y)
         {
-            int n;
-            cin >> n;
-            Node node;
-            node.number = n;
-            node.index = index;
-            triangle[i].push_back(node);
-            dp.push_back(0);
-            index++;
+            cin >> m[x][y];
+            if(y > 0)
+            {
+                m[x][y] += m[x][y-1];
+            }
+            if(x > 0)
+            {
+                m[x][y] += m[x-1][y];
+            }
+            if(y>0 && x>0)
+            {
+                m[x][y] -= m[x-1][y-1];
+            }
         }
     }
 
-    for(int i=0 ; i<N-1 ; ++i)
+    for(int i=0 ; i<M ; ++i)
     {
-        for (int j = 0; j <= i; ++j)
+        int x1, x2, y1, y2;
+        cin >> x1 >> y1 >> x2 >> y2;
+        x1--; y1--; x2--; y2--;
+
+        int answer = m[x2][y2];
+        if(y1 > 0)
         {
-            triangle[i][j].left = &triangle[i+1][j];
-            triangle[i][j].right = &triangle[i+1][j+1];
+            answer -= m[x2][y1-1];
         }
+        if(x1 > 0)
+        {
+            answer -= m[x1-1][y2];
+        }
+        if(y1>0 && x1>0)
+        {
+            answer += m[x1-1][y1-1];
+        }
+        cout << answer << "\n";
     }
 
-    cout << FindMaximum(triangle[0][0]);
 
     return 0;
 }
