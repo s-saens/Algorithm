@@ -1,59 +1,104 @@
 #include <iostream>
+#include <vector>
 
 using namespace std;
+
+class Node
+{
+    public:
+    int number = 0;
+    Node* left = nullptr;
+    Node* right = nullptr;
+
+    Node()
+    {
+
+    }
+    Node(int n, Node* l, Node* r)
+    {
+        number = n;
+        left = l;
+        right = r;
+    }
+};
+
+void RCL(Node* start)
+{
+    if(start->left != nullptr) RCL(start->left);
+    if(start->right != nullptr) RCL(start->right);
+    cout << start->number << "\n";
+}
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int N, M;
-    cin >> N >> M;
 
-    int m[N][N];
+    int newNumber;
+    cin >> newNumber;
 
-    for(int x=0 ; x<N ; ++x)
+    Node* rootNode;
+    Node r; r.number = newNumber;
+    rootNode = &r;
+
+    // 루트노드에 연결 추가해서, 트리 만들기.
+    while(cin >> newNumber && newNumber > 0)
     {
-        for(int y=0 ; y<N ; ++y)
+        Node *nowNode; // 최근노드
+        nowNode = &r; // 처음엔 root부터
+
+        // 자식 없는 놈 찾기
+        while (true)
         {
-            cin >> m[x][y];
-            if(y > 0)
+            if (newNumber < nowNode->number) // 왼쪽으로 가야하는데,
             {
-                m[x][y] += m[x][y-1];
+                if(nowNode->left == nullptr) break; // 왼쪽이 없으면 멈춤
+                else nowNode = nowNode->left; // 왼쪽 있으면 왼쪽으로 감. nowNode 갱신
             }
-            if(x > 0)
+            else // 오른쪽으로 가야하는데,
             {
-                m[x][y] += m[x-1][y];
+                if (nowNode->right == nullptr) break; // 오른쪽이 없으면 멈춤
+                else nowNode = nowNode->right; // 오른쪽 있으면 오른쪽으로 감. nowNode 갱신
             }
-            if(y>0 && x>0)
+        }
+
+        Node *l;
+        Node *r;
+
+        if (newNumber < nowNode->number) // 왼쪽에 추가해야 함.
+        {
+            if(nowNode->left != nullptr)
             {
-                m[x][y] -= m[x-1][y-1];
+                if (nowNode->left->number < newNumber)
+                {
+                    l = nowNode->left;
+                }
+                else
+                {
+                    r = nowNode->left;
+                }
             }
+            nowNode->left = new Node(newNumber, l, r);
+        }
+        else
+        {
+            if (nowNode->right != nullptr)
+            {
+                if (nowNode->right->number < newNumber)
+                {
+                    l = nowNode->right;
+                }
+                else
+                {
+                    r = nowNode->right;
+                }
+            }
+            nowNode->right = new Node(newNumber, l, r);
         }
     }
 
-    for(int i=0 ; i<M ; ++i)
-    {
-        int x1, x2, y1, y2;
-        cin >> x1 >> y1 >> x2 >> y2;
-        x1--; y1--; x2--; y2--;
-
-        int answer = m[x2][y2];
-        if(y1 > 0)
-        {
-            answer -= m[x2][y1-1];
-        }
-        if(x1 > 0)
-        {
-            answer -= m[x1-1][y2];
-        }
-        if(y1>0 && x1>0)
-        {
-            answer += m[x1-1][y1-1];
-        }
-        cout << answer << "\n";
-    }
-
+    RCL(rootNode);
 
     return 0;
 }
