@@ -1,48 +1,45 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
-class Node
+struct Node
 {
-    public:
-    char character = 0;
-    Node* left = nullptr;
-    Node* right = nullptr;
-
-    Node()
-    {
-
-    }
-    Node(int c, Node* l, Node* r)
-    {
-        character = c;
-        left = l;
-        right = r;
-    }
+    short num = 0;
+    int dist = 0;    // distance from root node
+    short level = 0; // = parents.size();
+    vector<short> parents;
+    vector<short> children;
 };
 
+Node *nodes;
 
-Node tree[27];
+int FindSameParent(int a, int b)
+{
+    int longer;  // has more parents
+    int shorter; // has less parents
+    if (nodes[a].level > nodes[b].level)
+    {
+        longer = a;
+        shorter = b;
+    }
+    else
+    {
+        longer = b;
+        shorter = a;
+    }
 
-void LRC(Node* start)
-{
-    if(start->left != nullptr) LRC(start->left);
-    if(start->right != nullptr) LRC(start->right);
-    cout << start->character;
-}
-void LCR(Node* start)
-{
-    if(start->left != nullptr)
-        LCR(start->left);
-    cout << start->character;
-    if(start->right != nullptr) LCR(start->right);
-}
-void CLR(Node* start)
-{
-    cout << start->character;
-    if(start->left != nullptr) CLR(start->left);
-    if(start->right != nullptr) CLR(start->right);
+    int i;
+    for (i = 0; i < nodes[shorter].level; ++i)
+    {
+        if (nodes[shorter].parents[i] != nodes[longer].parents[i])
+        {
+            return nodes[shorter].parents[i - 1];
+        }
+    }
+
+    return nodes[shorter].parents[i - 1];
 }
 
 int main()
@@ -53,20 +50,51 @@ int main()
     int N;
     cin >> N;
 
-    for(int i=0 ; i<N ; ++i)
+    Node n[N + 1];
+    nodes = n;
+
+    vector<short> leaves;
+
+    for (int i = 0; i <= N; ++i)
     {
-        char c, l, r;
-        cin >> c >> l >> r;
-        tree[c-'A'].character = c;
-        if(l != '.') tree[c-'A'].left = &tree[l-'A'];
-        if(r != '.') tree[c-'A'].right = &tree[r-'A'];
+        nodes[i].num = i;
     }
 
-    CLR(&tree[0]); // 전위
-    cout << "\n";
-    LCR(&tree[0]); // 중위
-    cout << "\n";
-    LRC(&tree[0]); // 후위
+    for (int i = 1; i < N; ++i)
+    {
+        int p, c, d;
+        cin >> p >> c >> d;
+        nodes[c].dist = d + nodes[p].dist;
+        nodes[c].level = nodes[p].level + 1;
+        nodes[c].parents = nodes[p].parents;
+        nodes[c].parents.push_back(p);
+        nodes[p].children.push_back(c);
+    }
+
+    int maxDistNode = 0;
+    for (int i = 1; i <= N; ++i)
+    {
+        if (nodes[maxDistNode].dist < nodes[i].dist)
+        {
+            maxDistNode = i;
+        }
+        if (nodes[i].children.empty())
+        {
+            leaves.push_back(i);
+        }
+    }
+
+    int maximum = 0;
+    for (int i = 0; i < leaves.size(); ++i)
+    {
+        if (nodes[leaves[i]].num == nodes[maxDistNode].num)
+            continue;
+
+        int distance = nodes[leaves[i]].dist + nodes[maxDistNode].dist - (2 * nodes[FindSameParent(leaves[i], maxDistNode)].dist);
+        maximum = max(maximum, distance);
+    }
+
+    cout << maximum;
 
     return 0;
 }
