@@ -9,7 +9,7 @@ struct Node
     short num = 0;
     int dist = 0;    // distance from root node
     short level = 0; // = parents.size();
-    vector<short> parents;
+    short parent = -1;
     vector<short> children;
 };
 
@@ -30,16 +30,20 @@ int FindSameParent(int a, int b)
         shorter = a;
     }
 
-    int i;
-    for (i = 0; i < nodes[shorter].level; ++i)
+    Node *sParent = &nodes[shorter];
+    Node *lParent = &nodes[longer];
+    while (nodes[shorter].level < nodes[longer].level)
     {
-        if (nodes[shorter].parents[i] != nodes[longer].parents[i])
-        {
-            return nodes[shorter].parents[i - 1];
-        }
+        lParent = &nodes[lParent->parent];
     }
 
-    return nodes[shorter].parents[i - 1];
+    while (nodes[sParent->num].num != nodes[lParent->num].num)
+    {
+        sParent = &nodes[sParent->parent];
+        lParent = &nodes[lParent->parent];
+    }
+
+    return lParent->num;
 }
 
 int main()
@@ -66,8 +70,7 @@ int main()
         cin >> p >> c >> d;
         nodes[c].dist = d + nodes[p].dist;
         nodes[c].level = nodes[p].level + 1;
-        nodes[c].parents = nodes[p].parents;
-        nodes[c].parents.push_back(p);
+        nodes[c].parent = p;
         nodes[p].children.push_back(c);
     }
 
