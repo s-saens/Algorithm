@@ -9,7 +9,7 @@ struct Node
     short num = 0;
     int dist = 0;    // distance from root node
     short level = 0; // = parents.size();
-    short parent = -1;
+    short parent = 1;
     vector<short> children;
 };
 
@@ -30,20 +30,22 @@ int FindSameParent(int a, int b)
         shorter = a;
     }
 
-    Node *sParent = &nodes[shorter];
-    Node *lParent = &nodes[longer];
-    while (nodes[shorter].level < nodes[longer].level)
+    int sParent = nodes[shorter].num;
+    int lParent = nodes[longer].num;
+
+    int cnt = nodes[lParent].level - nodes[sParent].level;
+    for(int i=0 ; i<cnt ; ++i)
     {
-        lParent = &nodes[lParent->parent];
+        lParent = nodes[lParent].parent;
     }
 
-    while (nodes[sParent->num].num != nodes[lParent->num].num)
+    while (sParent != lParent)
     {
-        sParent = &nodes[sParent->parent];
-        lParent = &nodes[lParent->parent];
+        sParent = nodes[sParent].parent;
+        lParent = nodes[lParent].parent;
     }
 
-    return lParent->num;
+    return lParent;
 }
 
 int main()
@@ -56,8 +58,6 @@ int main()
 
     Node n[N + 1];
     nodes = n;
-
-    vector<short> leaves;
 
     for (int i = 0; i <= N; ++i)
     {
@@ -81,19 +81,15 @@ int main()
         {
             maxDistNode = i;
         }
-        if (nodes[i].children.empty())
-        {
-            leaves.push_back(i);
-        }
     }
 
     int maximum = 0;
-    for (int i = 0; i < leaves.size(); ++i)
+    for (int i = 1; i <= N; ++i)
     {
-        if (nodes[leaves[i]].num == nodes[maxDistNode].num)
+        if (nodes[i].num == nodes[maxDistNode].num)
             continue;
 
-        int distance = nodes[leaves[i]].dist + nodes[maxDistNode].dist - (2 * nodes[FindSameParent(leaves[i], maxDistNode)].dist);
+        int distance = nodes[i].dist + nodes[maxDistNode].dist - (2 * nodes[FindSameParent(i, maxDistNode)].dist);
         maximum = max(maximum, distance);
     }
 
