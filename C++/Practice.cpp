@@ -13,7 +13,7 @@ void InitDP()
         dp[i] = -1;
     }
     dp[1] = 1;
-    dp[2] = 2;
+    dp[2] = 3;
 }
 
 ll Tile(int n)
@@ -23,7 +23,7 @@ ll Tile(int n)
         return dp[n];
     }
 
-    ll answer = Tile(n-1) + Tile(n-2);
+    ll answer = Tile(n-1) + 2 * Tile(n-2);
     dp[n] = answer % 10007;
     return dp[n];
 }
