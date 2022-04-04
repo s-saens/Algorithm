@@ -1,36 +1,43 @@
 #include <iostream>
+#define ll long long
 
 using namespace std;
 
+const int dpSize = 1001;
+ll dp[dpSize];
+
+void InitDP()
+{
+    for(int i=0 ; i<dpSize ; ++i)
+    {
+        dp[i] = -1;
+    }
+    dp[1] = 1;
+    dp[2] = 2;
+}
+
+ll Tile(int n)
+{
+    if(dp[n] > -1)
+    {
+        return dp[n];
+    }
+
+    ll answer = Tile(n-1) + Tile(n-2);
+    dp[n] = answer % 10007;
+    return dp[n];
+}
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int N, M;
-    cin >> N >> M;
+    InitDP();
 
-    int numbers[N];
+    int N; cin >> N;
 
-    for(int i=0 ; i<N ; ++i)
-    {
-        cin >> numbers[i];
-        if(i>0)
-        {
-            numbers[i] += numbers[i-1];
-        }
-    }
-
-    for(int i=0 ; i<M ; ++i)
-    {
-        int l, r;
-        cin >> l >> r; l--; r--;
-
-        int answer = numbers[r];
-        if(l>0) answer -= numbers[l-1];
-        cout << answer << "\n";
-    }
+    cout << Tile(N);
 
     return 0;
 }
