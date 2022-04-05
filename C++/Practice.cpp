@@ -1,43 +1,53 @@
 #include <iostream>
-#define ll long long
+#include <string>
 
 using namespace std;
-
-const int dpSize = 1001;
-ll dp[dpSize];
-
-void InitDP()
-{
-    for(int i=0 ; i<dpSize ; ++i)
-    {
-        dp[i] = -1;
-    }
-    dp[1] = 1;
-    dp[2] = 3;
-}
-
-ll Tile(int n)
-{
-    if(dp[n] > -1)
-    {
-        return dp[n];
-    }
-
-    ll answer = Tile(n-1) + 2 * Tile(n-2);
-    dp[n] = answer % 10007;
-    return dp[n];
-}
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    InitDP();
+    string sik;
+    cin >> sik;
 
-    int N; cin >> N;
+    int startIndex = 0;
+    int length = 0;
 
-    cout << Tile(N);
+    int answer = 0;
+    bool minusAppeared = false;
+
+    int sLen = sik.length();
+
+    for(int i=0 ; i<sLen ; ++i)
+    {        
+        if(sik[i] == '-' || sik[i] == '+' || i == sLen-1)
+        {
+            if(i==sLen-1) length++;
+
+            string numberString = sik.substr(startIndex, length);
+            int number = stoi(numberString);
+
+            if(minusAppeared)
+            {
+                answer -= number;
+            }
+            else
+            {
+                answer += number;
+            }
+            startIndex = i+1;
+        }
+
+        if (sik[i] == '-')
+        {
+            minusAppeared = true;
+        }
+
+        length++;
+    }
+
+    cout << answer;
 
     return 0;
 }
