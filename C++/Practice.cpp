@@ -1,5 +1,4 @@
 #include <iostream>
-#include <string>
 
 using namespace std;
 
@@ -8,46 +7,30 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    string sik;
-    cin >> sik;
+    int N;
+    cin >> N;
 
-    int startIndex = 0;
-    int length = 0;
+    int cnt = 1;
+    int sum = 0;
+    int r = N/2 + 1;
 
-    int answer = 0;
-    bool minusAppeared = false;
-
-    int sLen = sik.length();
-
-    for(int i=0 ; i<sLen ; ++i)
-    {        
-        if(sik[i] == '-' || sik[i] == '+' || i == sLen-1)
+    for(int l=r ; l>=1 ; --l)
+    {
+        sum += l;
+        if(sum >= N)
         {
-            if(i==sLen-1) length++;
-
-            string numberString = sik.substr(startIndex, length);
-            int number = stoi(numberString);
-
-            if(minusAppeared)
-            {
-                answer -= number;
-            }
-            else
-            {
-                answer += number;
-            }
-            startIndex = i+1;
+            if(sum == N) cnt++;
+            sum -= r;
+            r--;
         }
-
-        if (sik[i] == '-')
-        {
-            minusAppeared = true;
-        }
-
-        length++;
     }
 
-    cout << answer;
+    if(N <= 2)
+    {
+        cnt = 1;
+    }
+
+    cout << cnt;
 
     return 0;
 }
