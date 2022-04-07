@@ -1,6 +1,24 @@
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
+
+struct Number
+{
+    int index = 0;
+    int number = 0;
+    int compressedNumber = 0;
+};
+
+bool cmp1(Number& n1, Number& n2)
+{
+    return n1.number < n2.number;
+}
+
+bool cmp2(Number& n1, Number& n2)
+{
+    return n1.index < n2.index;
+}
 
 int main()
 {
@@ -9,28 +27,34 @@ int main()
 
     int N;
     cin >> N;
+    Number numbers[N];
 
-    int cnt = 1;
-    int sum = 0;
-    int r = N/2 + 1;
-
-    for(int l=r ; l>=1 ; --l)
+    for(int i=0 ; i<N ; ++i)
     {
-        sum += l;
-        if(sum >= N)
+        cin >> numbers[i].number;
+        numbers[i].index = i;
+    }
+
+    sort(numbers, numbers+N, cmp1);
+
+    for(int i=1 ; i<N ; ++i)
+    {
+        if(numbers[i].number > numbers[i-1].number)
         {
-            if(sum == N) cnt++;
-            sum -= r;
-            r--;
+            numbers[i].compressedNumber = numbers[i-1].compressedNumber + 1;
+        }
+        else if(numbers[i].number == numbers[i-1].number)
+        {
+            numbers[i].compressedNumber = numbers[i - 1].compressedNumber;
         }
     }
 
-    if(N <= 2)
-    {
-        cnt = 1;
-    }
+    sort(numbers, numbers+N, cmp2);
 
-    cout << cnt;
+    for(int i=0 ; i<N ; ++i)
+    {
+        cout << numbers[i].compressedNumber << ' ';
+    }
 
     return 0;
 }
