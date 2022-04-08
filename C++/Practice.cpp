@@ -10,7 +10,7 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    priority_queue<int, vector<int>, greater<int> > pq;
+    priority_queue<int> pq;
 
     int N; cin >> N;
     vector<int> answer;
