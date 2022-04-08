@@ -1,37 +1,67 @@
 #include <iostream>
 #include <queue>
-#include <vector>
-#include <functional>
+#include <utility>
 
 using namespace std;
+
+int dirX[4] = {0, 0, 1, -1};
+int dirY[4] = {1, -1, 0, 0};
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    priority_queue<int> pq;
+    int X, Y; cin >> X >> Y;
+    int tomatos[Y][X];
+    int total = X * Y;
 
-    int N; cin >> N;
-    vector<int> answer;
+    queue<pair<pair<int, int>, int> > q;
 
-    for(int i=0 ; i<N ; ++i)
+    for(int y=0 ; y<Y ; ++y)
     {
-        int num; cin >> num;
-        if(num == 0)
+        for(int x=0 ; x<X ; ++x)
         {
-            if(pq.empty())
+            cin >> tomatos[y][x];
+            if(tomatos[y][x] == 1) q.push(make_pair(make_pair(x, y), 0));
+            else if(tomatos[y][x] == -1) total--;
+        }
+    }
+
+    int days = 0;
+    int rippedCnt = 0;
+    while(!q.empty())
+    {
+        pair<pair<int, int>, int> f = q.front();
+        q.pop();
+        rippedCnt++;
+        days = f.second;
+
+        for(int i=0 ; i<4 ; ++i)
+        {
+            int newIndexY = f.first.second + dirY[i];
+            int newIndexX = f.first.first + dirX[i];
+            if(newIndexY >= Y || newIndexY < 0 || newIndexX >= X || newIndexX < 0)
             {
-                cout << 0 << "\n";
                 continue;
             }
-            cout << pq.top() << "\n";
-            pq.pop();
+
+            int *state = &tomatos[newIndexY][newIndexX];
+
+            if(*state == 0)
+            {
+                *state = 1;
+                q.push(make_pair(make_pair(newIndexX, newIndexY), f.second + 1));
+            }
         }
-        else
-        {
-            pq.push(num);
-        }
+    }
+    if(rippedCnt == total)
+    {
+        cout << days;
+    }
+    else
+    {
+        cout << -1;
     }
 
     return 0;
