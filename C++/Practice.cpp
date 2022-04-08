@@ -1,59 +1,37 @@
 #include <iostream>
-#include <algorithm>
+#include <queue>
+#include <vector>
+#include <functional>
 
 using namespace std;
-
-struct Number
-{
-    int index = 0;
-    int number = 0;
-    int compressedNumber = 0;
-};
-
-bool cmp1(Number& n1, Number& n2)
-{
-    return n1.number < n2.number;
-}
-
-bool cmp2(Number& n1, Number& n2)
-{
-    return n1.index < n2.index;
-}
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int N;
-    cin >> N;
-    Number numbers[N];
+    priority_queue<int, vector<int>, greater<int> > pq;
+
+    int N; cin >> N;
+    vector<int> answer;
 
     for(int i=0 ; i<N ; ++i)
     {
-        cin >> numbers[i].number;
-        numbers[i].index = i;
-    }
-
-    sort(numbers, numbers+N, cmp1);
-
-    for(int i=1 ; i<N ; ++i)
-    {
-        if(numbers[i].number > numbers[i-1].number)
+        int num; cin >> num;
+        if(num == 0)
         {
-            numbers[i].compressedNumber = numbers[i-1].compressedNumber + 1;
+            if(pq.empty())
+            {
+                cout << 0 << "\n";
+                continue;
+            }
+            cout << pq.top() << "\n";
+            pq.pop();
         }
-        else if(numbers[i].number == numbers[i-1].number)
+        else
         {
-            numbers[i].compressedNumber = numbers[i - 1].compressedNumber;
+            pq.push(num);
         }
-    }
-
-    sort(numbers, numbers+N, cmp2);
-
-    for(int i=0 ; i<N ; ++i)
-    {
-        cout << numbers[i].compressedNumber << ' ';
     }
 
     return 0;
