@@ -1,60 +1,87 @@
 #include <iostream>
 #include <queue>
-#include <utility>
 
 using namespace std;
 
-int dirX[4] = {0, 0, 1, -1};
-int dirY[4] = {1, -1, 0, 0};
+int dirX[6] = {0, 0, 1, -1, 0, 0};
+int dirY[6] = {1, -1, 0, 0, 0, 0};
+int dirZ[6] = {0, 0, 0, 0, 1 ,-1};
+
+struct Vector3
+{
+    int x, y, z;
+    int days = 0;
+};
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int X, Y; cin >> X >> Y;
-    int tomatos[Y][X];
-    int total = X * Y;
+    int X, Y, Z; cin >> X >> Y >> Z;
+    int tomatos[Z][Y][X];
+    int total = X * Y * Z;
 
-    queue<pair<pair<int, int>, int> > q;
+    queue<Vector3> q;
 
-    for(int y=0 ; y<Y ; ++y)
+    for(int z=0 ; z<Z ; ++z)
     {
-        for(int x=0 ; x<X ; ++x)
+        for(int y=0 ; y<Y ; ++y)
         {
-            cin >> tomatos[y][x];
-            if(tomatos[y][x] == 1) q.push(make_pair(make_pair(x, y), 0));
-            else if(tomatos[y][x] == -1) total--;
+            for(int x=0 ; x<X ; ++x)
+            {
+                cin >> tomatos[z][y][x];
+                Vector3 v;
+                v.x = x;
+                v.y = y;
+                v.z = z;
+                v.days = 0;
+
+                if(tomatos[z][y][x] == 1) q.push(v);
+                else if(tomatos[z][y][x] == -1) total--;
+            }
         }
     }
 
     int days = 0;
     int rippedCnt = 0;
+
     while(!q.empty())
     {
-        pair<pair<int, int>, int> f = q.front();
+        Vector3 f = q.front();
         q.pop();
         rippedCnt++;
-        days = f.second;
+        days = f.days;
 
-        for(int i=0 ; i<4 ; ++i)
+        for(int i=0 ; i<6 ; ++i)
         {
-            int newIndexY = f.first.second + dirY[i];
-            int newIndexX = f.first.first + dirX[i];
-            if(newIndexY >= Y || newIndexY < 0 || newIndexX >= X || newIndexX < 0)
+            int newIndexX = f.x + dirX[i];
+            int newIndexY = f.y + dirY[i];
+            int newIndexZ = f.z + dirZ[i];
+
+            if(newIndexX >= X || newIndexX < 0
+            || newIndexY >= Y || newIndexY < 0
+            || newIndexZ >= Z || newIndexZ < 0)
             {
                 continue;
             }
 
-            int *state = &tomatos[newIndexY][newIndexX];
+
+            int *state = &tomatos[newIndexZ][newIndexY][newIndexX];
 
             if(*state == 0)
             {
                 *state = 1;
-                q.push(make_pair(make_pair(newIndexX, newIndexY), f.second + 1));
+                Vector3 v;
+                v.x = newIndexX;
+                v.y = newIndexY;
+                v.z = newIndexZ;
+                v.days = f.days + 1;
+                q.push(v);
             }
         }
     }
+
     if(rippedCnt == total)
     {
         cout << days;
