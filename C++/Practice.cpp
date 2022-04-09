@@ -62,17 +62,20 @@ int main()
         rippedCnt++;
         days = f.days;
 
-        cout << f.linearIndex << "\n";
-
         for(int i=0 ; i<dimension*2 ; ++i)
         {
+            bool minus = i%2; // i%2가 짝수면 양수, 홀수면 음수.
             int newIndex = f.linearIndex + dir[i];
 
             int movingDist = abs(dir[i]);
             int dimSize = movingDist * size[i/2];
             int fmod = f.linearIndex % dimSize;
             int nmod = newIndex % dimSize;
-            if(newIndex < 0 || newIndex >= totalCnt || abs(fmod-nmod) != movingDist) continue;
+            if(newIndex < 0 || newIndex >= totalCnt
+            || abs(fmod-nmod) != movingDist
+            || minus && nmod > fmod
+            || !minus && nmod < fmod
+            ) continue;
 
             if(tomatos[newIndex].state == 0)
             {

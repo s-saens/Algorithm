@@ -53,8 +53,10 @@ int main()
         qu.pop();
         rippedCnt++;
         days = f.days;
+        cout << f.m + f.n*M + f.o*M*N + f.p*M*N*O + f.q*M*N*O*P + f.r*M*N*O*P*Q + f.s*M*N*O*P*Q*R + f.t*M*N*O*P*Q*R*S
+                + f.u*M*N*O*P*Q*R*S*T + f.v*M*N*O*P*Q*R*S*T*U + f.w*M*N*O*P*Q*R*S*T*U*V << ' ';
 
-        for (int i = 0; i < 6; ++i)
+        for (int i = 0; i < 22; ++i)
         {
             int newIndexM = f.m + dirM[i];
             int newIndexN = f.n + dirN[i];
@@ -108,6 +110,8 @@ int main()
             }
         }
     }
+
+    cout << "\n";
 
     if (rippedCnt == total)
     {
