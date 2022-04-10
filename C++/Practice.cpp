@@ -1,41 +1,35 @@
 #include <iostream>
-#include <queue>
+#include <set>
 using namespace std;
-
-int K;
-
-int t[100001] = {-1};
-
-int F(int N)
-{
-    queue<int> q;
-    q.push(N);
-    t[N] = 0;
-
-    while(!q.empty())
-    {
-        int f = q.front(); q.pop();
-        if(f == K) return t[f];
-
-        if(f+1 <= 100000 && f+1 >= 0 && t[f+1] == -1) { q.push(f+1); t[f+1] = t[f]+1; }
-        if(f-1 <= 100000 && f-1 >= 0 && t[f-1] == -1) { q.push(f-1); t[f-1] = t[f]+1; }
-        if(f*2 <= 100000 && f*2 > 0 && t[f*2] == -1) { q.push(f*2); t[f*2] = t[f]+1; }
-    }
-
-    return -1;
-}
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    for(int i=0 ; i<100001 ; ++i) t[i] = -1;
+    int T; cin >> T;
 
-    int N;
-    cin >> N >> K;
+    for(int t=0 ; t<T ; ++t)
+    {
+        int N; cin >> N;
+        
+        multiset<int> dpq;
 
-    cout << F(N);
+        for(int i=0 ; i<N ; ++i)
+        {
+            char op; int num;
+            cin >> op >> num;
+            if (op == 'I') dpq.insert(num);
+            else if (op == 'D' && !dpq.empty())
+            {
+                if(num == 1) dpq.erase(--dpq.end());
+                if(num == -1) dpq.erase(dpq.begin());
+            }
+        }
+
+        if(dpq.empty()) cout << "EMPTY\n";
+        else cout << *(--dpq.end()) << ' ' << *dpq.begin() << "\n";
+    }
 
     return 0;
 }
