@@ -1,110 +1,79 @@
 #include <iostream>
-#include <deque>
+#include <cmath>
+#define ll unsigned long long int
 using namespace std;
 
-deque<int> StringToDeque(string s)
+struct Position
 {
-    deque<int> dq;
-    string temp = "";
-
-    for(int i=0 ; i<s.length() ; ++i)
+    ll x = 0;
+    ll y = 0;
+    Position(ll _x, ll _y)
     {
-        if(s[i] == '[') continue;
-
-        if(temp.length() > 0 && (s[i] == ',' || s[i] == ']'))
-        {
-            dq.push_back(stoi(temp));
-            temp = "";
-            continue;
-        }
-
-        temp += s[i];
+        x = _x;
+        y = _y;
     }
-
-    return dq;
-}
-
-void PrintDeque(deque<int>* dq, bool atFirst)
-{
-    int len = dq->size();
-    cout << '[';
-    if(atFirst)
+    bool operator == (Position& p)
     {
-        for(int i=0 ; i<len-1 ; ++i) cout << dq->at(i) << ',';
-        if(len > 0) cout << dq->at(len - 1);
-        cout << "]\n";
+        return this->x == p.x && this->y == p.y;
     }
-    else
-    {
-        for(int i=len-1 ; i>0 ; --i) cout << dq->at(i) << ',';
-        if(len > 0) cout << dq->at(0);
-        cout << "]\n";
-    }
-}
+};
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int T; cin >> T;
+    int N, r, c;
+    cin >> N >> r >> c; // row:y좌표, column:x좌표
+    ll pN = pow(2,N);
 
-    for(int t=0 ; t<T ; ++t)
+    Position lt = Position(0, 0);
+    Position rb = Position(pN-1, pN-1);
+
+    ll cnt = 0;
+    ll size = pN;
+
+    while(!(lt == rb))
     {
-        string operation;
-        cin >> operation;
-        int opLen = operation.length();
-
-        int arrLenTemp;
-        cin >> arrLenTemp;
-
-        string arr;
-        cin >> arr;
-        int arrLen = arr.length();
-        
-        deque<int> dq = StringToDeque(arr);
-        bool atFirst = true;
-        bool err = false;
-
-        for(int i=0 ; i<opLen ; ++i)
+        ll size2D;
+        if(size >= 4) size2D = size / 4 * size;
+        else size2D = size * size / 4;
+        // 왼쪽
+        if(lt.x <= c && c <= rb.x - size/2)
         {
-            if(operation[i] == 'R')
+            rb.x -= size/2;
+            // 위 : 1
+            if(lt.y <= r && r <= rb.y - size/2)
             {
-                atFirst = !atFirst;
+                rb.y -= size/2;
             }
-            else // 'D'
+            // 아래 : 3
+            else
             {
-                if(dq.size() <= 0)
-                {
-                    cout << "error" << "\n";
-                    err = true;
-                    break;
-                }
-                if(atFirst) dq.pop_front();
-                else dq.pop_back();
+                cnt += size2D * 2;
+                lt.y += size/2;
             }
         }
-
-        if(!err) PrintDeque(&dq, atFirst);
+        else
+        {
+            lt.x += size/2;
+            // 위 : 2
+            if (lt.y <= r && r <= rb.y / 2)
+            {
+                cnt += size2D * 1;
+                rb.y -= size/2;
+            }
+            // 아래 : 4
+            else
+            {
+                cnt += size2D * 3;
+                lt.y += size/2;
+            }
+        }
+        size /= 2;
     }
+
+    cout << cnt;
 
     return 0;
 }
-
-/*
-
-4
-RDD
-4
-[1,2,3,4]
-DD
-1
-[42]
-RRD
-6
-[1,1,2,3,5,8]
-D
-0
-[]
-
-*/
