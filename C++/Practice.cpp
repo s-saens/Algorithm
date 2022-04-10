@@ -1,53 +1,41 @@
 #include <iostream>
-#include <algorithm>
+#include <queue>
 using namespace std;
 
-struct Conference
+int K;
+
+int t[100001] = {-1};
+
+int F(int N)
 {
-    int start = 0;
-    int end = 0;
-};
-bool cmp(Conference& c1, Conference& c2)
-{
-    if(c1.end < c2.end)
+    queue<int> q;
+    q.push(N);
+    t[N] = 0;
+
+    while(!q.empty())
     {
-        return true;
+        int f = q.front(); q.pop();
+        if(f == K) return t[f];
+
+        if(f+1 <= 100000 && f+1 >= 0 && t[f+1] == -1) { q.push(f+1); t[f+1] = t[f]+1; }
+        if(f-1 <= 100000 && f-1 >= 0 && t[f-1] == -1) { q.push(f-1); t[f-1] = t[f]+1; }
+        if(f*2 <= 100000 && f*2 > 0 && t[f*2] == -1) { q.push(f*2); t[f*2] = t[f]+1; }
     }
-    else if(c1.end == c2.end)
-    {
-        return c1.start < c2.start;
-    }
-    return false;
+
+    return -1;
 }
+
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int N; cin >>N;
-    Conference conferences[N];
+    for(int i=0 ; i<100001 ; ++i) t[i] = -1;
 
-    for(int i=0 ; i<N ; ++i)
-    {
-        cin >> conferences[i].start >> conferences[i].end;
-    }
+    int N;
+    cin >> N >> K;
 
-    sort(conferences, conferences + N, cmp);
-
-    int cnt = 1;
-    Conference lastC = conferences[0];
-    for(int i=1 ; i<N ; ++i)
-    {
-        Conference c = conferences[i];
-
-        if(c.start >= lastC.end)
-        {
-            cnt++;
-            lastC = c;
-        }
-    }
-
-    cout << cnt;
+    cout << F(N);
 
     return 0;
 }
