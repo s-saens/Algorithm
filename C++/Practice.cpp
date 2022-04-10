@@ -1,99 +1,110 @@
 #include <iostream>
-#include <vector>
-#include <queue>
-#include <cmath>
-
+#include <deque>
 using namespace std;
 
-struct Tomato
+deque<int> StringToDeque(string s)
 {
-    int linearIndex = 0;
-    int state = 0;
-    int days = 0; // 이 위치에 도달할 때까지 걸린 최소 시간
-};
+    deque<int> dq;
+    string temp = "";
+
+    for(int i=0 ; i<s.length() ; ++i)
+    {
+        if(s[i] == '[') continue;
+
+        if(temp.length() > 0 && (s[i] == ',' || s[i] == ']'))
+        {
+            dq.push_back(stoi(temp));
+            temp = "";
+            continue;
+        }
+
+        temp += s[i];
+    }
+
+    return dq;
+}
+
+void PrintDeque(deque<int>* dq, bool atFirst)
+{
+    int len = dq->size();
+    cout << '[';
+    if(atFirst)
+    {
+        for(int i=0 ; i<len-1 ; ++i) cout << dq->at(i) << ',';
+        if(len > 0) cout << dq->at(len - 1);
+        cout << "]\n";
+    }
+    else
+    {
+        for(int i=len-1 ; i>0 ; --i) cout << dq->at(i) << ',';
+        if(len > 0) cout << dq->at(0);
+        cout << "]\n";
+    }
+}
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int dimension = 11;
-    int rippedCnt = 0; // 1이 차 있는 공간의 개수 : totalCnt - emptyCnt와 같아야 출력 가능
-    int emptyCnt = 0; // -1이 차 있는 공간의 개수
-    int totalCnt = 1; // 전체 배열 공간 크기
-    int days = 0;
+    int T; cin >> T;
 
-
-    // 각 차원의 크기를 입력
-    int size[dimension];
-    for(int i=0 ; i<dimension ; ++i)
+    for(int t=0 ; t<T ; ++t)
     {
-        cin >> size[i];
-        totalCnt *= size[i];
-    }
+        string operation;
+        cin >> operation;
+        int opLen = operation.length();
 
-    // 방향 배열 초기화
-    int dir[dimension * 2];
-    for (int i = 0; i < dimension; ++i)
-    {
-        int mul = 1;
-        for(int j=0 ; j<i ; ++j)
+        int arrLenTemp;
+        cin >> arrLenTemp;
+
+        string arr;
+        cin >> arr;
+        int arrLen = arr.length();
+        
+        deque<int> dq = StringToDeque(arr);
+        bool atFirst = true;
+        bool err = false;
+
+        for(int i=0 ; i<opLen ; ++i)
         {
-            mul *= size[j];
-        }
-        dir[i * 2] = mul;
-        dir[i * 2 + 1] = -mul;
-    }
-
-    // 토마토 배열 입력 : 1차원으로 표현
-    Tomato tomatos[totalCnt];
-    queue<Tomato> q;
-    for(int i=0 ; i<totalCnt; ++i)
-    {
-        cin >> tomatos[i].state;
-        tomatos[i].linearIndex = i;
-        if(tomatos[i].state == 1) q.push(tomatos[i]);
-        else if(tomatos[i].state == -1) emptyCnt++;
-    }
-
-    while(!q.empty())
-    {
-        Tomato f = q.front(); q.pop();
-        rippedCnt++;
-        days = f.days;
-
-        for(int i=0 ; i<dimension*2 ; ++i)
-        {
-            bool minus = i%2; // i%2가 짝수면 양수, 홀수면 음수.
-            int newIndex = f.linearIndex + dir[i];
-
-            int movingDist = abs(dir[i]);
-            int dimSize = movingDist * size[i/2];
-            int fmod = f.linearIndex % dimSize;
-            int nmod = newIndex % dimSize;
-            if(newIndex < 0 || newIndex >= totalCnt
-            || abs(fmod-nmod) != movingDist
-            || minus && nmod > fmod
-            || !minus && nmod < fmod
-            ) continue;
-
-            if(tomatos[newIndex].state == 0)
+            if(operation[i] == 'R')
             {
-                tomatos[newIndex].state = 1;
-                tomatos[newIndex].days = f.days + 1;
-                q.push(tomatos[newIndex]);
+                atFirst = !atFirst;
+            }
+            else // 'D'
+            {
+                if(dq.size() <= 0)
+                {
+                    cout << "error" << "\n";
+                    err = true;
+                    break;
+                }
+                if(atFirst) dq.pop_front();
+                else dq.pop_back();
             }
         }
-    }
 
-    if(rippedCnt == totalCnt - emptyCnt && rippedCnt > 0)
-    {
-        cout << days;
-    }
-    else
-    {
-        cout << -1;
+        if(!err) PrintDeque(&dq, atFirst);
     }
 
     return 0;
 }
+
+/*
+
+4
+RDD
+4
+[1,2,3,4]
+DD
+1
+[42]
+RRD
+6
+[1,1,2,3,5,8]
+D
+0
+[]
+
+*/
