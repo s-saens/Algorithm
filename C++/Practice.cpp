@@ -58,7 +58,7 @@ int main()
         {
             lt.x += size/2;
             // 위 : 2
-            if (lt.y <= r && r <= rb.y / 2)
+            if (lt.y <= r && r <= rb.y - size/2)
             {
                 cnt += size2D * 1;
                 rb.y -= size/2;
