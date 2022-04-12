@@ -1,51 +1,65 @@
 #include <iostream>
 #include <algorithm>
 using namespace std;
+#define ll long long int
+
+struct Line
+{
+    ll start = 0;
+    ll end = 0;
+    Line()
+    {
+        start = 0; end = 0;
+    }
+    Line(int s, int e)
+    {
+        if(s < e) { start = s; end = e; }
+        else { start = e; end = s;}
+    }
+    ll Length()
+    {
+        return end - start;
+    }
+};
+
+bool cmp(Line& l1, Line& l2)
+{
+    return l1.start < l2.start;
+}
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int N, M;
-    cin >> N >> M;
-
-    int nodes[N][N];
+    int N;
+    cin >> N;
+    Line lines[N];
     for(int i=0 ; i<N ; ++i)
-        for(int j=0 ; j<N ; ++j)
-            nodes[i][j] = i==j ? 0 : 50000;
-
-    for(int i=0 ; i<M ; ++i)
     {
         int a, b;
-        cin >> a >> b; a--; b--;
-        nodes[a][b] = 1;
-        nodes[b][a] = 1;
+        cin >> a >> b;
+        lines[i] = Line(a, b);
     }
+    sort(lines, lines + N, cmp);
 
-    for(int i=0 ; i<N ; ++i)
-        for(int s=0 ; s<N ; ++s)
-            for(int e=0 ; e<N ; ++e)
-                nodes[s][e] = min(nodes[s][e], nodes[s][i] + nodes[i][e]);
-
-    int minimum = 50000;
-    int minIndex = 0;
-    for(int i=N-1 ; i>=0 ; --i)
+    Line lastLine = lines[0];
+    ll sum = 0;
+    for(int i=1 ; i<N ; ++i)
     {
-        int sum = 0;
-        for(int j=0 ; j<N ; ++j)
+        if(lines[i].start <= lastLine.end && lines[i].end >= lastLine.end)
         {
-            sum += nodes[i][j];
+            lastLine = Line(lastLine.start, lines[i].end);
         }
-        
-        if(minimum >= sum)
+        else if(lines[i].start > lastLine.end)
         {
-            minimum = sum;
-            minIndex = i+1;
+            sum += lastLine.Length();
+            lastLine = lines[i];
         }
     }
+    sum += lastLine.Length();
 
-    cout << minIndex;
+    cout << sum;
 
     return 0;
 }
