@@ -1,44 +1,33 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 using namespace std;
-#define ll long long int
 
-vector<ll> lis;
-ll *numbers;
+int N;
+int* dp;
+int* numbers;
 
-void UpdateLDS(int index)
+void Init()
 {
-    ll len = lis.size();
-    if (len == 0)
+    numbers = new int[N];
+    dp = new int[N];
+    for(int i=0 ; i<N ; ++i)
     {
-        lis.push_back(numbers[index]);
-        return;
+        dp[i] = -1;
     }
+}
 
-    ll l = 0;
-    ll r = len - 1;
+int BIS(int index)
+{
+    if(dp[index] > -1) return dp[index];
 
-    while (l < r)
+    int maximum = numbers[index];
+    for(int i=index+1 ; i<N ; ++i)
     {
-        ll mid = (l + r) / 2;
-        if (lis[mid] < numbers[index])
-            l = mid + 1;
-        else if (lis[mid] > numbers[index])
-            r = mid;
-        else
-        {
-            l = mid;
-            break;
-        }
+        if(numbers[index] < numbers[i]) maximum = max(maximum, numbers[index] + BIS(i));
     }
-
-    if (l == len - 1 && lis[l] < numbers[index])
-    {
-        lis.push_back(numbers[index]);
-        return;
-    }
-
-    lis[l] = numbers[index];
+    dp[index] = maximum;
+    return dp[index];
 }
 
 int main()
@@ -46,22 +35,18 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    ll N;
     cin >> N;
-    numbers = new ll[N];
+    Init();
 
-    for (int i = 0; i < N; ++i)
+    for(int i=0 ; i<N ; ++i) cin >> numbers[i];
+
+    int maximum = 0;
+    for(int i=0 ; i<N ; ++i)
     {
-        cin >> numbers[i];
-    }
-    for(int i=N-1 ; i>=0 ; --i)
-    {
-        UpdateLDS(i);
+        maximum = max(maximum, BIS(i));
     }
 
-    ll len = lis.size();
-
-    cout << len;
+    cout << maximum;
 
     return 0;
 }
