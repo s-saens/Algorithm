@@ -1,30 +1,41 @@
 #include <iostream>
-#include <algorithm>
+#include <vector>
 using namespace std;
 #define ll long long int
 
-struct Line
-{
-    ll start = 0;
-    ll end = 0;
-    Line()
-    {
-        start = 0; end = 0;
-    }
-    Line(int s, int e)
-    {
-        if(s < e) { start = s; end = e; }
-        else { start = e; end = s;}
-    }
-    ll Length()
-    {
-        return end - start;
-    }
-};
+vector<ll> lis;
+ll *numbers;
+ll* newIndexes;
 
-bool cmp(Line& l1, Line& l2)
+void UpdateLIS(int index)
 {
-    return l1.start < l2.start;
+    ll len = lis.size();
+    if(len == 0)
+    {
+        lis.push_back(numbers[index]);
+        return;
+    }
+
+    ll l = 0;
+    ll r = len - 1;
+
+    while(l < r)
+    {
+        ll mid = (l + r) / 2;
+        if(lis[mid] < numbers[index]) l = mid+1;
+        else if(lis[mid] > numbers[index]) r = mid;
+        else { l = mid; break; }
+    }
+
+    if(l == len-1 && lis[l] < numbers[index])
+    {
+        lis.push_back(numbers[index]);
+        newIndexes[index] = len;
+        return;
+    }
+
+    lis[l] = numbers[index];
+    newIndexes[index] = l;
 }
 
 int main()
@@ -32,34 +43,35 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int N;
-    cin >> N;
-    Line lines[N];
+    ll N; cin >> N;
+    numbers = new ll[N];
+    newIndexes = new ll[N];
+
     for(int i=0 ; i<N ; ++i)
     {
-        int a, b;
-        cin >> a >> b;
-        lines[i] = Line(a, b);
+        cin >> numbers[i];
+        UpdateLIS(i);
     }
-    sort(lines, lines + N, cmp);
 
-    Line lastLine = lines[0];
-    ll sum = 0;
-    for(int i=1 ; i<N ; ++i)
+    ll len = lis.size();
+    int answers[len];
+
+    int cnt = len-1;
+    for(int i=N-1 ; i>=0 ; --i)
     {
-        if(lines[i].start <= lastLine.end && lines[i].end >= lastLine.end)
+        if(newIndexes[i] == cnt)
         {
-            lastLine = Line(lastLine.start, lines[i].end);
+            answers[cnt] = numbers[i];
+            cnt--;
         }
-        else if(lines[i].start > lastLine.end)
-        {
-            sum += lastLine.Length();
-            lastLine = lines[i];
-        }
+        if(cnt < 0) break;
     }
-    sum += lastLine.Length();
 
-    cout << sum;
+    cout << len << "\n";
+    for(int i=0 ; i<len ; ++i)
+    {
+        cout << answers[i] << ' ';
+    }
 
     return 0;
 }
