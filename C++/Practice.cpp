@@ -5,12 +5,11 @@ using namespace std;
 
 vector<ll> lis;
 ll *numbers;
-ll* newIndexes;
 
-void UpdateLIS(int index)
+void UpdateLDS(int index)
 {
     ll len = lis.size();
-    if(len == 0)
+    if (len == 0)
     {
         lis.push_back(numbers[index]);
         return;
@@ -19,23 +18,27 @@ void UpdateLIS(int index)
     ll l = 0;
     ll r = len - 1;
 
-    while(l < r)
+    while (l < r)
     {
         ll mid = (l + r) / 2;
-        if(lis[mid] < numbers[index]) l = mid+1;
-        else if(lis[mid] > numbers[index]) r = mid;
-        else { l = mid; break; }
+        if (lis[mid] < numbers[index])
+            l = mid + 1;
+        else if (lis[mid] > numbers[index])
+            r = mid;
+        else
+        {
+            l = mid;
+            break;
+        }
     }
 
-    if(l == len-1 && lis[l] < numbers[index])
+    if (l == len - 1 && lis[l] < numbers[index])
     {
         lis.push_back(numbers[index]);
-        newIndexes[index] = len;
         return;
     }
 
     lis[l] = numbers[index];
-    newIndexes[index] = l;
 }
 
 int main()
@@ -43,35 +46,22 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    ll N; cin >> N;
+    ll N;
+    cin >> N;
     numbers = new ll[N];
-    newIndexes = new ll[N];
 
-    for(int i=0 ; i<N ; ++i)
+    for (int i = 0; i < N; ++i)
     {
         cin >> numbers[i];
-        UpdateLIS(i);
+    }
+    for(int i=N-1 ; i>=0 ; --i)
+    {
+        UpdateLDS(i);
     }
 
     ll len = lis.size();
-    int answers[len];
 
-    int cnt = len-1;
-    for(int i=N-1 ; i>=0 ; --i)
-    {
-        if(newIndexes[i] == cnt)
-        {
-            answers[cnt] = numbers[i];
-            cnt--;
-        }
-        if(cnt < 0) break;
-    }
-
-    cout << len << "\n";
-    for(int i=0 ; i<len ; ++i)
-    {
-        cout << answers[i] << ' ';
-    }
+    cout << len;
 
     return 0;
 }
