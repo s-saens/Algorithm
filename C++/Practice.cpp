@@ -1,33 +1,31 @@
 #include <iostream>
-#include <vector>
-#include <algorithm>
 using namespace std;
 
-int N;
-int* dp;
-int* numbers;
+bool** screen;
 
-void Init()
+string QT(int sX, int sY, int len)
 {
-    numbers = new int[N];
-    dp = new int[N];
-    for(int i=0 ; i<N ; ++i)
-    {
-        dp[i] = -1;
-    }
-}
+    int cnt0 = 0;
+    int cnt1 = 0;
+    int unified = true;
 
-int BIS(int index)
-{
-    if(dp[index] > -1) return dp[index];
-
-    int maximum = numbers[index];
-    for(int i=index+1 ; i<N ; ++i)
+    for(int y=sY ; y<sY+len && unified ; ++y)
     {
-        if(numbers[index] < numbers[i]) maximum = max(maximum, numbers[index] + BIS(i));
+        for(int x=sX ; x<sX+len && unified ; ++x)
+        {
+            if(screen[y][x] == 0) cnt0++;
+            else if(screen[y][x] == 1) cnt1++;
+            if(cnt0 > 0 && cnt1 > 0) unified = false;
+        }
     }
-    dp[index] = maximum;
-    return dp[index];
+
+    int h = len / 2;
+    string ret = "";
+
+    if(unified) return (cnt0 > 0) ? "0" : "1";
+    else ret += "(" + QT(sX, sY, h) + QT(sX+h, sY, h) + QT(sX, sY+h, h) + QT(sX+h, sY+h, h) + ")";
+
+    return ret;
 }
 
 int main()
@@ -35,18 +33,21 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    cin >> N;
-    Init();
-
-    for(int i=0 ; i<N ; ++i) cin >> numbers[i];
-
-    int maximum = 0;
+    int N; cin >> N;
+    screen = new bool*[N];
     for(int i=0 ; i<N ; ++i)
     {
-        maximum = max(maximum, BIS(i));
+        screen[i] = new bool[N];
     }
 
-    cout << maximum;
+    for(int y=0 ; y<N ; ++y)
+    {
+        string s; cin >> s;
+        for(int x=0 ; x<N ; ++x)
+            screen[y][x] = s[x]-'0';
+    }
+
+    cout << QT(0, 0, N);
 
     return 0;
 }
