@@ -1,31 +1,66 @@
 #include <iostream>
+#include <vector>
+#define ll long long int
 using namespace std;
 
-bool** screen;
-
-string QT(int sX, int sY, int len)
+struct Node
 {
-    int cnt0 = 0;
-    int cnt1 = 0;
-    int unified = true;
+    ll sum, l, r, cL, cR;
+    Node() {}
+    Node(ll _s, ll _l, ll _r, ll _cL, ll _cR)
+    { sum = _s; l = _l; r = _r; cL = _cL; cR = _cR; }
+};
 
-    for(int y=sY ; y<sY+len && unified ; ++y)
+ll* numbers;
+Node* segTree;
+
+ll Sum(ll l, ll r, ll nI)
+{
+    Node *n = &segTree[nI];
+    if(r < n->l || l > n->r) return 0;
+    if(l <= n->l && r >= n->r) return n->sum;
+    return Sum(l, r, n->cL) + Sum(l, r, n->cR);
+}
+
+ll Modify(ll i, ll number, ll nI) // 변화량 반환
+{
+    Node *n = &segTree[nI];
+    if(n->l == n->r)
     {
-        for(int x=sX ; x<sX+len && unified ; ++x)
-        {
-            if(screen[y][x] == 0) cnt0++;
-            else if(screen[y][x] == 1) cnt1++;
-            if(cnt0 > 0 && cnt1 > 0) unified = false;
-        }
+        ll lastNumber = n->sum;
+        n->sum = number;
+        return number - lastNumber; // 변화량
     }
 
-    int h = len / 2;
-    string ret = "";
+    ll nMid = (n->l + n->r)/2;
+    ll delta = 0;
+    if(i > nMid) delta = Modify(i, number, n->cR);
+    else delta = Modify(i, number, n->cL);
+    n->sum += delta;
+    return delta;
+}
 
-    if(unified) return (cnt0 > 0) ? "0" : "1";
-    else ret += "(" + QT(sX, sY, h) + QT(sX+h, sY, h) + QT(sX, sY+h, h) + QT(sX+h, sY+h, h) + ")";
+ll SetSegTree(ll l, ll r, ll nI)
+{
+    if(l == r)
+    {
+        segTree[nI] = Node(numbers[l], l, r, -1, -1);
+        return numbers[l];
+    }
 
-    return ret;
+    ll mid = (l+r)/2;
+    ll cR = (nI+1)*2;
+    ll cL = cR - 1;
+    ll sum = SetSegTree(l, mid, cL) + SetSegTree(mid+1, r, cR);
+    segTree[nI] = Node(sum, l, r, cL, cR);
+    return segTree[nI].sum;
+}
+
+ll FindSize(ll N)
+{
+    ll ret = 1;
+    while(ret < N) ret *= 2;
+    return ret * 2;
 }
 
 int main()
@@ -33,21 +68,32 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int N; cin >> N;
-    screen = new bool*[N];
-    for(int i=0 ; i<N ; ++i)
-    {
-        screen[i] = new bool[N];
-    }
+    ll N, M, K; cin >> N >> M >> K;
+    ll treeSize = FindSize(N);
+    numbers = new ll[N];
+    segTree = new Node[treeSize];
+    
+    for(int i=0 ; i<N ; ++i) cin >> numbers[i];
 
-    for(int y=0 ; y<N ; ++y)
-    {
-        string s; cin >> s;
-        for(int x=0 ; x<N ; ++x)
-            screen[y][x] = s[x]-'0';
-    }
+    SetSegTree(0, N-1, 0);
 
-    cout << QT(0, 0, N);
+    while(M > 0 || K > 0)
+    {
+        short op;
+        ll a, b;
+        cin >> op >> a >> b;
+
+        if(op == 1)
+        {
+            M--;
+            Modify(a-1, b, 0);
+        }
+        else if(op == 2)
+        {
+            K--;
+            cout << Sum(a-1, b-1, 0) << "\n";
+        }
+    }
 
     return 0;
 }
