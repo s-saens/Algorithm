@@ -10,6 +10,7 @@
         "utility": "cpp",
         "tuple": "cpp",
         "typeinfo": "cpp",
-        "__tree": "cpp"
+        "__tree": "cpp",
+        "iostream": "cpp"
     }
 }

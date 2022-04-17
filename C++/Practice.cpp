@@ -1,57 +1,80 @@
 #include <iostream>
+#include <queue>
 
 #define ll long long int
 using namespace std;
 
-int** paper;
+char dX[4] = {-1, 1, 0, 0};
+char dY[4] = {0, 0, -1, 1};
 
-int cntm1 = 0;
-int cntp1 = 0;
-int cnt0 = 0;
-
-void CountPapers(int sx, int sy, int len)
+struct Point
 {
-    int size = len * len;
-    int cm1 = 0;
-    int cp1 = 0;
-    int c0 = 0;
-    for(int y=sy ; y<sy+len ; ++y)
-        for(int x=sx ; x<sx+len ; ++x)
-        {
-            if(paper[y][x] == -1) cm1++;
-            else if(paper[y][x] == 0) c0++;
-            else if(paper[y][x] == 1) cp1++;
-        }
-            
-    
-    if(cm1 == size) { cntm1++; return; }
-    if(cp1 == size) { cntp1++; return; }
-    if(c0 == size) { cnt0++; return; }
-
-    int newLen = len/3;
-    for(int y=0 ; y<3 ; ++y)
-        for(int x=0 ; x<3 ; ++x)
-            CountPapers(sx + x*newLen, sy + y*newLen, newLen);
-}
+    short x, y, d;
+    Point() {}
+    Point(int _x, int _y, int _d)
+    {
+        x = _x;
+        y = _y;
+        d = _d;
+    }
+};
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int N; cin >> N;
-    paper = new int*[N];
-    for(int i=0 ; i<N ; ++i) paper[i] = new int[N];
+    int X, Y;
+    cin >> Y >> X;
 
-    for(int y=0 ; y<N ; ++y)
-        for(int x=0 ; x<N ; ++x)
-            cin >> paper[y][x];
+    bool p[Y][X];
+    bool v[Y][X];
 
-    CountPapers(0, 0, N);
+    for(int y=0 ; y<Y ; ++y)
+    {
+        for(int x=0 ; x<X ; ++x)
+        {
+            p[y][x] = false;
+            v[y][x] = false;
+        }
+    }
 
-    cout << cntm1 << "\n";
-    cout << cnt0 << "\n";
-    cout << cntp1 << "\n";
+    for (int y = 0; y < Y; ++y)
+    {
+        string input; cin >> input;
+        for (int x = 0; x < X; ++x) p[y][x] = input[x] - '0';
+    }
+
+    queue<Point> q;
+    q.push(Point(0,0,1));
+
+    int d;
+
+    while(!q.empty())
+    {
+        Point f = q.front(); q.pop();
+        if(v[f.y][f.x]) continue;
+        v[f.y][f.x] = true;
+        d = f.d;
+
+        if(f.x == X-1 && f.y == Y-1) break;
+
+        for(int i=0 ; i<4 ; ++i)
+        {
+            int nX = f.x + dX[i];
+            int nY = f.y + dY[i];
+
+            if(nX < 0 || nX >= X || nY < 0 || nY >= Y) continue;
+
+
+            if(!v[nY][nX] && p[nY][nX])
+            {
+                q.push(Point(nX, nY, f.d+1));
+            }
+        }
+    }
+
+    cout << d;
 
     return 0;
 }
