@@ -1,26 +1,23 @@
 #include <iostream>
 #include <set>
+#include <cmath>
 
 using namespace std;
 
 #define FOR(i, N) for(int i=0 ; i<N ; ++i)
 
-class Score
+class Number
 {
 public:
     int value = 0;
-    int index = 0;
 
-    Score() {}
-    Score(int v, int i)
-    {
-        value = v;
-        index = i;
-    }
+    Number(int n) { value = n; }
 
-    bool operator < (const Score &s1) const
+    bool operator < (const Number &s1) const
     {
-        return s1.value < this->value;
+        if(abs(s1.value) > abs(this->value)) return true;
+        else if(abs(s1.value) == abs(this->value) && s1.value > this->value) return true;
+        return false;
     }
 };
 
@@ -29,29 +26,28 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    set<Score> scores;
-    set<int> indexes;
+    multiset<Number> numbers;
 
-    FOR(i, 8)
+    int N; cin >> N;
+    FOR(i, N)
     {
-        int v; cin >> v;
-        scores.insert(Score(v, i));
-    }
-
-    int sum =0;
-    FOR(i, 5)
-    {
-        Score s = (*scores.begin());
-        sum += s.value;
-        indexes.insert(s.index);
-        scores.erase(scores.begin());
-    }
-    cout << sum << "\n";
-
-    FOR(i, 5)
-    {
-        cout << *indexes.begin() + 1 << ' ';
-        indexes.erase(indexes.begin());
+        int x; cin >> x;
+        if(x == 0)
+        {
+            if(numbers.empty())
+            {
+                cout << "0\n";
+            }
+            else
+            {
+                cout << numbers.begin()->value << "\n";
+                numbers.erase(numbers.begin());
+            }
+        }
+        else
+        {
+            numbers.insert(Number(x));
+        }
     }
 
     return 0;
