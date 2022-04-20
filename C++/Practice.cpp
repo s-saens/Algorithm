@@ -1,53 +1,35 @@
 #include <iostream>
-#include <set>
 #include <cmath>
 
 using namespace std;
 
 #define FOR(i, N) for(int i=0 ; i<N ; ++i)
-
-class Number
-{
-public:
-    int value = 0;
-
-    Number(int n) { value = n; }
-
-    bool operator < (const Number &s1) const
-    {
-        if(abs(s1.value) > abs(this->value)) return true;
-        else if(abs(s1.value) == abs(this->value) && s1.value > this->value) return true;
-        return false;
-    }
-};
+#define INF 50000
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    multiset<Number> numbers;
-
     int N; cin >> N;
-    FOR(i, N)
+    int answer[N][N];
+    FOR(y, N) FOR(x, N)
     {
-        int x; cin >> x;
-        if(x == 0)
+        cin >> answer[y][x];
+        if(answer[y][x] == 0) answer[y][x] = INF;
+    }
+    FOR(i, N) FOR(f, N) FOR(t, N)
+    {
+        answer[f][t] = min(answer[f][t], answer[f][i] + answer[i][t]);
+    }
+    FOR(y, N)
+    {
+        FOR(x, N)
         {
-            if(numbers.empty())
-            {
-                cout << "0\n";
-            }
-            else
-            {
-                cout << numbers.begin()->value << "\n";
-                numbers.erase(numbers.begin());
-            }
+            if(answer[y][x] == INF) cout << 0 << ' ';
+            else cout << 1 << ' ';
         }
-        else
-        {
-            numbers.insert(Number(x));
-        }
+        cout << "\n";
     }
 
     return 0;
