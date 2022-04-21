@@ -1,36 +1,33 @@
 #include <iostream>
-#include <cmath>
+#include <algorithm>
+#define MIN -100000
 
 using namespace std;
 
-#define FOR(i, N) for(int i=0 ; i<N ; ++i)
-#define INF 50000
+int N;
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int N; cin >> N;
-    int answer[N][N];
-    FOR(y, N) FOR(x, N)
+    cin >> N;
+
+    int number;
+    cin >> number;
+
+    int seqSum = number;
+    int maxSum = seqSum;
+
+    for(int i=1 ; i<N ; ++i)
     {
-        cin >> answer[y][x];
-        if(answer[y][x] == 0) answer[y][x] = INF;
+        cin >> number;
+        if(seqSum + number < number) seqSum = number;
+        else seqSum += number;
+        maxSum = max(maxSum, seqSum);
     }
-    FOR(i, N) FOR(f, N) FOR(t, N)
-    {
-        answer[f][t] = min(answer[f][t], answer[f][i] + answer[i][t]);
-    }
-    FOR(y, N)
-    {
-        FOR(x, N)
-        {
-            if(answer[y][x] == INF) cout << 0 << ' ';
-            else cout << 1 << ' ';
-        }
-        cout << "\n";
-    }
+
+    cout << maxSum;
 
     return 0;
 }
