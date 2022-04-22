@@ -1,54 +1,27 @@
 #include <iostream>
-#include <algorithm>
 
 using namespace std;
 
 #define FOR(i, N) for(int i=0 ; i<N ; ++i)
 
-int dx[4] = {-1, 1, 0, 0};
-int dy[4] = {0, 0, -1, 1};
-
-int Y, X;
-
-int** numbers;
-
-int GetFuckingMax(int x, int y)
+void Swap(int& a, int& b)
 {
-    int maxSum = 0;
-    FOR(i, 4)
-    {
-        int sum = numbers[y][x];
-        FOR(j, 3)
-        {
-            int nd = (i+j)%4;
-            int nx = x + dx[nd];
-            int ny = y + dy[nd];
-            if(nx < 0 || nx >= X || ny < 0 || ny >= Y) continue;
-            sum += numbers[ny][nx];
-        }
-        maxSum = max(maxSum, sum);
-    }
-    return maxSum;
+    int temp = a;
+    a = b;
+    b = temp;
 }
 
-int GetMax(int x, int y, int cnt, int lastI)
+int GCD(int a, int b)
 {
-    if(cnt == 3) 
-    {
-        return numbers[y][x];
-    }
-    int maximum = 0;
-    FOR(i, 4)
-    {
-        if(lastI%2 == 0 && i == lastI + 1) continue;
-        if(lastI%2 == 1 && i == lastI - 1) continue;
+    int r = a % b;
+    if(r == 0) return b;
+    else return GCD(b, r);
+}
 
-        int nx = x + dx[i];
-        int ny = y + dy[i];
-        if(nx < 0 || nx >= X || ny < 0 || ny >= Y) continue;
-        maximum = max(maximum, numbers[y][x] + GetMax(nx, ny, cnt+1, i));
-    }
-    return maximum;
+int LCM(int a, int b)
+{
+    if (a < b) Swap(a, b);
+    return a * b / GCD(a,b);
 }
 
 int main()
@@ -56,24 +29,27 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    cin >> Y >> X;
-
-    numbers = new int*[Y];
-    FOR(y, Y) FOR(x, X) numbers[y] = new int[X];
-
-    FOR(y, Y) FOR(x, X)
+    int T;
+    cin >> T;
+    FOR(t, T)
     {
-        cin >> numbers[y][x];
-    }
+        int X, Y, x, y;
+        cin >> X >> Y >> x >> y;
 
-    int sum = 0;
-    FOR(y, Y) FOR(x, X)
-    {
-        sum = max(sum, GetMax(x, y, 0, -1));
-        sum = max(sum, GetFuckingMax(x, y));
-    }
+        int lcm = LCM(X, Y);
 
-    cout << sum;
+        int cnt;
+        for (cnt = x; cnt <= lcm; cnt += X)
+        {
+            int temp = (cnt % Y == 0) ? Y : cnt % Y;
+            if (temp == y)
+            {
+                cout << cnt << "\n";
+                break;
+            }
+        }
+        if (cnt > lcm) cout << -1 << "\n";
+    }
 
     return 0;
 }
