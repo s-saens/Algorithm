@@ -38,17 +38,19 @@ int main()
 
         int lcm = LCM(X, Y);
 
-        int cnt;
-        for (cnt = x; cnt <= lcm; cnt += X)
+        int cnt = x;
+        while(cnt <= lcm)
         {
-            int temp = (cnt % Y == 0) ? Y : cnt % Y;
-            if (temp == y)
-            {
-                cout << cnt << "\n";
-                break;
-            }
+            int k = cnt % Y;
+            if(cnt % Y == 0) k = Y;
+
+            if(k == y) break;
+
+            cnt += X;
         }
+
         if (cnt > lcm) cout << -1 << "\n";
+        else cout << cnt << "\n";
     }
 
     return 0;
