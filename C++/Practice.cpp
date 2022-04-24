@@ -1,28 +1,7 @@
 #include <iostream>
-
-using namespace std;
-
 #define FOR(i, N) for(int i=0 ; i<N ; ++i)
 
-void Swap(int& a, int& b)
-{
-    int temp = a;
-    a = b;
-    b = temp;
-}
-
-int GCD(int a, int b)
-{
-    int r = a % b;
-    if(r == 0) return b;
-    else return GCD(b, r);
-}
-
-int LCM(int a, int b)
-{
-    if (a < b) Swap(a, b);
-    return a * b / GCD(a,b);
-}
+using namespace std;
 
 int main()
 {
@@ -31,27 +10,30 @@ int main()
 
     int T;
     cin >> T;
+
+    int answer[T];
+
     FOR(t, T)
     {
-        int X, Y, x, y;
-        cin >> X >> Y >> x >> y;
+        int x1, y1, r1, x2, y2, r2;
+        cin >> x1 >> y1 >> r1 >> x2 >> y2 >> r2;
 
-        int lcm = LCM(X, Y);
+        int dx = x2-x1;
+        int dy = y2-y1;
 
-        int cnt = x;
-        while(cnt <= lcm)
-        {
-            int k = cnt % Y;
-            if(cnt % Y == 0) k = Y;
+        if(x1 == x2 && y1 == y2 && r1 == r2) { answer[t] = -1; continue; }
 
-            if(k == y) break;
+        int d2 = dx * dx + dy * dy;
 
-            cnt += X;
-        }
+        int rm = r1 > r2 ? r1 - r2 : r2 - r1; rm *= rm;
+        int rp = r1 + r2; rp *= rp;
 
-        if (cnt > lcm) cout << -1 << "\n";
-        else cout << cnt << "\n";
+        if(rm > d2 || rp < d2) { answer[t] = 0; continue; }
+        if(rm == d2 || rp == d2) { answer[t] = 1; continue; }
+        answer[t] = 2;
     }
+
+    FOR(t, T) cout << answer[t] << "\n";
 
     return 0;
 }
