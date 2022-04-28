@@ -1,56 +1,108 @@
 #include <iostream>
+#include <vector>
 #include <cmath>
-#include <algorithm>
-#include <stack>
-#define ll long long
-#define FOR(i, s, e) for(int i=s ; i<e ; ++i)
 
 using namespace std;
 
-struct Vector2
+bool buttons[10] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+
+int SmallestBigger(int length)
 {
-    ll x, y;
-    double size;
-    double theta;
+    string channel = "";
+    int i = 0;
+    for(i = 1 ; i < 10 ; ++i) if(buttons[i]) break;
 
-    Vector2()
-    {
-        x = 500000;
-        y = 500000;
-    }
+    int k = i;
 
-    Vector2(int _x, int _y)
-    {
-        x = _x;
-        y = _y;
-        size = (x * x) + (y * y);
-        theta = x == 0 && y == 0 ? -1 : acos( (double)x / sqrt((double)size) );
-    }
+    channel += k + '0';
 
-    Vector2 operator - (Vector2 v)
-    {
-        return Vector2(x - v.x, y - v.y);
-    }
+    if(buttons[0]) for(i=1 ; i<length ; ++i) channel += '0';
+    else for(i=1 ; i<length ; ++i) channel += k + '0';
 
-    ll operator * (Vector2 v)
-    {
-        return (x * v.x) + (y * v.y);
-    }
-
-    short operator >> (Vector2 v)  // 외적 z값의 sign 반환. 양수이면 왼쪽 벡터에 대해 오른쪽 벡터는 CCW (왼쪽)
-    {
-        ll c = (x * v.y) - (y * v.x);
-        if(c < 0) return -1;
-        if(c > 0) return 1;
-        return 0;
-    }
-};
-
-bool CompareTheta(Vector2& v1, Vector2& v2)
+    return stoi(channel);
+}
+string BiggestSmaller(int length)
 {
-    ll dot = v1 * v2;
-    if(dot * dot == v1.size * v2.size) return v1.size < v2.size;
-    return v1.theta < v2.theta;
+    string channel = "";
+    int cnt = 0;
+    int first = -1;
+    int second = 0;
+    int i = 0;
+    for(i = 9 ; i > 0 ; --i)
+    {
+        if(buttons[i])
+        {
+            if(first > -1)
+            {
+                first = i;
+            }
+            else
+            {
+                second = i;
+            }
+        }
+    }
+
+    channel += second + '0';
+
+    for(i=1 ; i<length ; ++i) channel += first + '0';
+
+    return channel;
+}
+
+vector<int> ClosestButton(int number)
+{
+    vector<int> c;
+    if(buttons[number])
+    {
+        c.push_back(number);
+        return c;
+    }
+
+    bool canReturn = false;
+
+    for(int i=1 ; i<11 ; ++i)
+    {
+        int up = number + i;
+        int down = number - i;
+
+        if(up < 10 && buttons[up]) { c.push_back(up); canReturn = true; }
+        if(down >= 0 && buttons[down]) { c.push_back(down); canReturn = true; }
+
+        if(canReturn) return c;
+    }
+    return c;
+}
+
+string SelectChannel(string channel, string lastSelected, short sign)
+{
+    if(channel.length() == 0) return lastSelected;
+
+    int number = channel[0] - '0';
+    vector<int> cb;
+
+    if(sign > 0) number = 0;
+    else if(sign < 0) number = 10;
+
+    cb = ClosestButton(number);
+
+    int channelInt = stoi(channel);
+
+    string closestChannel = "0";
+    for(int i=0 ; i<cb.size() ; ++i)
+    {
+        string nextChannel = channel.substr(1, channel.length() - 1);
+
+        if(cb[i] < number) sign = -1;
+        else if(cb[i] > number) sign = 1;
+        else sign = 0;
+
+        string selected = SelectChannel(nextChannel, lastSelected + (char)(cb[i] + '0'), sign);
+        if(closestChannel.compare("0") == 0) closestChannel = selected;
+        else if(abs(stoi(channel) - stoi(selected)) > abs(stoi(channel) - stoi(closestChannel))) closestChannel = selected;
+    }
+
+    return closestChannel;
 }
 
 int main()
@@ -58,53 +110,61 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int pointCnt; cin >> pointCnt;
+    string channel;
+    cin >> channel;
+    int chanLen = channel.length();
 
-    Vector2 p[pointCnt];
-    Vector2 b = p[0];
+    int N;
+    cin >> N;
 
-    FOR(i, 0, pointCnt)
+    int buttonsCnt = 10;
+    for(int i=0 ; i<N ; ++i)
     {
-        int x, y;
-        cin >> x >> y;
-        p[i] = Vector2(x, y);
-        if(b.y > y) b = p[i];
-        else if(b.y == y && b.x < x) b = p[i];
+        int broken; cin >> broken;
+        buttons[broken] = false;
+        buttonsCnt--;
     }
 
-    FOR(i, 0, pointCnt) p[i] = p[i] - b;
-
-    sort(p, p+pointCnt, CompareTheta);
-
-    stack<int> s;
-    s.push(0);
-    s.push(1);
-
-    FOR(i, 2, pointCnt)
+    if(buttonsCnt == 0) // 다 고장난 경우 : 0으로도 못감.
     {
-        while(s.size() > 1)
-        {
-            int second = s.top(); s.pop();
-            int first = s.top();
-
-            if((p[second] - p[first]) >> (p[i] - p[first]) > 0) // p[i]가 왼쪽에 있으면 첫번째거 다시 집어넣고 break;
-            {
-                s.push(second);
-                break;
-            }
-        }
-        s.push(i);
+        cout << abs(100 - stoi(channel));
+        return 0;
+    }
+    
+    if(buttonsCnt == 1 && buttons[0]) // 0 빼고 다 고장난 경우 : 0으로 갈 수 있음.
+    {
+        int chanInt = stoi(channel);
+        int ans = min( chanInt, abs(100 - chanInt) + 1 );
+        cout << ans + 1;
+        return 0;
     }
 
-    int first = s.top(); s.pop();
-    int second = s.top();
+    string closestChannel = SelectChannel(channel, "", 0);
 
-    if ((p[second] - p[first]) >> (p[0] - p[first]) != 0)
-    {
-        s.push(first);
-    }
+    int channelInt = stoi(channel);
+    int closestChannelInt = stoi(closestChannel);
 
-    cout << s.size();
+    int moveButtonCnt = abs(channelInt - closestChannelInt);
+    int numberButtonCnt = closestChannel.length();
+    if (closestChannel[0] == '0') numberButtonCnt--;
+
+    int clickCnt = moveButtonCnt + numberButtonCnt;
+
+    int answer = min( clickCnt, abs(channelInt - 100) );
+
+    int smallestBiggerChannelInt = min(abs(SmallestBigger(chanLen + 1) - channelInt), abs(channelInt - 100));
+    smallestBiggerChannelInt += chanLen + 1;
+    answer = min(answer, smallestBiggerChannelInt);
+
+    // if(chanLen > 1)
+    // {
+    //     string biggestSmallerChannel = BiggestSmaller(chanLen);
+    //     cout << '>' << biggestSmallerChannel << "\n";
+    //     answer = min(answer, stoi(biggestSmallerChannel) + (int)biggestSmallerChannel.length());
+    // }
+
+
+    cout << answer;
 
     return 0;
 }
