@@ -1,56 +1,46 @@
 #include <iostream>
-#include <vector>
-#include <cmath>
+#define FOR(i,N) for(int i=0 ; i<N ; ++i)
+
 
 using namespace std;
 
-bool buttons[10] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-string c;
 
-vector<int> FindClosest3(int number)
+short dx[4] = {0, 0, -1, 1};
+short dy[4] = {-1, 1, 0, 0};
+
+int N;
+char **nodes;
+bool **visited1;
+bool **visited2;
+
+void Find1(int x, int y, char last)
 {
-    vector<int> v;
-    if(buttons[number]) v.push_back(number);
-    for(int i=number-1 ; i>=0 ; --i) { if(buttons[i]) { v.push_back(i); break; } }
-    for(int i=number+1 ; i<10 ; ++i) { if(buttons[i]) { v.push_back(i); break; } }
+    if(x<0 || x>=N || y<0 || y>=N || visited1[y][x] || last != nodes[y][x]) return;
 
-    return v;
+    visited1[y][x] = true;
+
+    FOR(i, 4)
+    {
+        int nx = x + dx[i];
+        int ny = y + dy[i];
+        Find1(nx, ny, nodes[y][x]);
+    }
 }
 
-string ClickButtons(string remain, string lastClicked, int sign, bool start)
+void Find2(int x, int y, char last)
 {
-    if(remain.length() == 0) return "";
-    int number;
-    if(sign == 0) number = remain[0] - '0';
-    else if(sign < 0) number = 10;
-    else if(sign > 0) number = -1;
+    if (x < 0 || x >= N || y < 0 || y >= N || visited2[y][x]) return;
+    if(last == 'B' && nodes[y][x] != 'B') return;
+    if(last != 'B' && nodes[y][x] == 'B') return;
 
-    vector<int> closest3 = FindClosest3(number);
+    visited2[y][x] = true;
 
-    if(!buttons[0] && start && remain.length() > 1) closest3.push_back(0);
-
-    string minClicked = "-5000000";
-
-
-    for(int i=0 ; i<closest3.size() ; ++i)
+    FOR(i, 4)
     {
-        if(closest3[i] == number) sign = 0;
-        else if(closest3[i] < number) sign = -1;
-        else if(closest3[i] > number) sign = 1;
-
-        string clicked = to_string(closest3[i]);
-
-        string nextRemain = remain.substr(1, remain.length()-1);
-        clicked += ClickButtons(nextRemain, lastClicked + (char)(closest3[i]+'0'), sign, false);
-
-        if (abs(stoi(clicked) - stoi(remain)) + to_string(stoi(clicked)).length()
-        < abs(stoi(minClicked) - stoi(remain)) + to_string(stoi(minClicked)).length())
-        {
-            minClicked = clicked;
-        }
+        int nx = x + dx[i];
+        int ny = y + dy[i];
+        Find2(nx, ny, nodes[y][x]);
     }
-
-    return minClicked;
 }
 
 int main()
@@ -58,58 +48,36 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    string c_big = "0";
-    cin >> c;
-    c_big += c;
-
-    int N;
     cin >> N;
-    for(int i=0 ; i<N ; ++i)
+
+    nodes = new char*[N];
+    visited1 = new bool *[N];
+    visited2 = new bool *[N];
+    FOR(i, N)
     {
-        int broken;
-        cin >> broken;
-        buttons[broken] = false;
+        nodes[i] = new char[N];
+        visited1[i] = new bool[N];
+        visited2[i] = new bool[N];
     }
 
-    if(N == 10) // 다 고장난 경우
+
+    FOR(y, N) FOR(x, N) cin >> nodes[y][x];
+
+    int cnt1 = 0;
+    int cnt2 = 0;
+
+    FOR(y, N) FOR(x, N) if(!visited1[y][x])
     {
-        cout << abs(stoi(c) - 100);
-        return 0;
+        cnt1++;
+        Find1(x, y, nodes[y][x]);
     }
-    if(N == 9 && buttons[0]) // 0만 안고장난 경우
+    FOR(y, N) FOR(x, N) if(!visited2[y][x])
     {
-        int cInt = stoi(c);
-        if(cInt > 100)
-        {
-            cout << cInt - 100;
-        }
-        else
-        {
-            cout << min(100-cInt, 1+cInt);
-        }
-        return 0;
+        cnt2++;
+        Find2(x, y, nodes[y][x]);
     }
 
-    string clicked[3];
-
-    clicked[0] = ClickButtons(c_big, "", 0, false);
-    clicked[1] = ClickButtons(c, "", 0, true);
-    clicked[2] = "100";
-
-    int answer = 50000000;
-
-    for(int i=0 ; i<3 ; ++i)
-    {
-        clicked[i] = to_string(stoi(clicked[i]));
-
-        int moveCnt = abs(stoi(clicked[i]) - stoi(c)); // +- 누른 횟수
-        int clickCnt = clicked[i].length(); // 채널버튼 누른 횟수
-        if(i == 2) clickCnt = 0; // 처음 채널 100인 경우 고려
-
-        answer = min(answer, moveCnt + clickCnt);
-    }
-    
-    cout << answer;
+    cout << cnt1 << "\n" << cnt2;
 
     return 0;
 }
