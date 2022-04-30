@@ -1,46 +1,40 @@
 #include <iostream>
+#include <cmath>
 #define FOR(i,N) for(int i=0 ; i<N ; ++i)
-
 
 using namespace std;
 
-
-short dx[4] = {0, 0, -1, 1};
-short dy[4] = {-1, 1, 0, 0};
-
+int *s[2];
+int *dp[3];
 int N;
-char **nodes;
-bool **visited1;
-bool **visited2;
 
-void Find1(int x, int y, char last)
+void Init()
 {
-    if(x<0 || x>=N || y<0 || y>=N || visited1[y][x] || last != nodes[y][x]) return;
-
-    visited1[y][x] = true;
-
-    FOR(i, 4)
+    FOR(i, 2)
     {
-        int nx = x + dx[i];
-        int ny = y + dy[i];
-        Find1(nx, ny, nodes[y][x]);
+        delete s[i];
+        s[i] = new int[N];
+    }
+
+    FOR(i, 3)
+    {
+        delete dp[i];
+        dp[i] = new int[N];
+        FOR(j, N) dp[i][j] = -1;
     }
 }
 
-void Find2(int x, int y, char last)
+int F(int x, int y)
 {
-    if (x < 0 || x >= N || y < 0 || y >= N || visited2[y][x]) return;
-    if(last == 'B' && nodes[y][x] != 'B') return;
-    if(last != 'B' && nodes[y][x] == 'B') return;
+    if(x >= N) return 0;
+    if(dp[y][x] > -1) return dp[y][x];
 
-    visited2[y][x] = true;
+    if(y == 2) dp[y][x] = max(s[1][x] + F(x + 1, 1), s[0][x] + F(x + 1, 0));
+    else if(y == 1) dp[y][x] = s[0][x] + F(x + 1, 0);
+    else if(y == 0) dp[y][x] = s[1][x] + F(x + 1, 1);
+    dp[y][x] = max(dp[y][x], F(x + 1, 2));
 
-    FOR(i, 4)
-    {
-        int nx = x + dx[i];
-        int ny = y + dy[i];
-        Find2(nx, ny, nodes[y][x]);
-    }
+    return dp[y][x];
 }
 
 int main()
@@ -48,36 +42,20 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    cin >> N;
+    int T; cin >> T;
 
-    nodes = new char*[N];
-    visited1 = new bool *[N];
-    visited2 = new bool *[N];
-    FOR(i, N)
+    int a[T];
+    FOR(t, T)
     {
-        nodes[i] = new char[N];
-        visited1[i] = new bool[N];
-        visited2[i] = new bool[N];
+        cin >> N;
+        Init();
+        
+        FOR(y, 2) FOR(x, N) cin >> s[y][x];
+
+        a[t] = F(0, 2);
     }
 
-
-    FOR(y, N) FOR(x, N) cin >> nodes[y][x];
-
-    int cnt1 = 0;
-    int cnt2 = 0;
-
-    FOR(y, N) FOR(x, N) if(!visited1[y][x])
-    {
-        cnt1++;
-        Find1(x, y, nodes[y][x]);
-    }
-    FOR(y, N) FOR(x, N) if(!visited2[y][x])
-    {
-        cnt2++;
-        Find2(x, y, nodes[y][x]);
-    }
-
-    cout << cnt1 << "\n" << cnt2;
+    FOR(t, T) cout << a[t] << "\n";
 
     return 0;
 }
