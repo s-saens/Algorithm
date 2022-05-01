@@ -1,61 +1,36 @@
 #include <iostream>
 #include <cmath>
-#define FOR(i,N) for(int i=0 ; i<N ; ++i)
+#include <algorithm>
+#define ll long long int
 
 using namespace std;
 
-int *s[2];
-int *dp[3];
-int N;
-
-void Init()
+struct V2
 {
-    FOR(i, 2)
-    {
-        delete s[i];
-        s[i] = new int[N];
-    }
-
-    FOR(i, 3)
-    {
-        delete dp[i];
-        dp[i] = new int[N];
-        FOR(j, N) dp[i][j] = -1;
-    }
-}
-
-int F(int x, int y)
-{
-    if(x >= N) return 0;
-    if(dp[y][x] > -1) return dp[y][x];
-
-    if(y == 2) dp[y][x] = max(s[1][x] + F(x + 1, 1), s[0][x] + F(x + 1, 0));
-    else if(y == 1) dp[y][x] = s[0][x] + F(x + 1, 0);
-    else if(y == 0) dp[y][x] = s[1][x] + F(x + 1, 1);
-    dp[y][x] = max(dp[y][x], F(x + 1, 2));
-
-    return dp[y][x];
-}
+    int x, y;
+};
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int T; cin >> T;
+    int N; cin >> N;
+    V2 p[N+1];
+    for(int i=0 ; i<N ; ++i)cin >> p[i].x >> p[i].y;
+    p[N] = p[0];
 
-    int a[T];
-    FOR(t, T)
+    double sum = 0;
+    for(int i=0 ; i<N ; ++i)
     {
-        cin >> N;
-        Init();
-        
-        FOR(y, 2) FOR(x, N) cin >> s[y][x];
-
-        a[t] = F(0, 2);
+        sum += p[i].x * p[i+1].y;
+        sum -= p[i+1].x * p[i].y;
+        cout << '>' << sum << "\n";
     }
+    sum *= 0.5;
+    sum = abs(sum);
 
-    FOR(t, T) cout << a[t] << "\n";
+    printf("%.1f", sum);
 
     return 0;
 }
