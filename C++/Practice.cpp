@@ -1,5 +1,5 @@
-#include <stdio.h>
-#include <set>
+#include <iostream>
+#include <queue>
 #include <vector>
 #include <algorithm>
 #define ll long long int
@@ -18,10 +18,13 @@ public:
         next = n;
         weight = w;
     }
+};
 
-    bool operator < (const Edge& e) const
+struct CompareEdges
+{
+    bool operator() (Edge& e1, Edge& e2)
     {
-        return weight < e.weight;
+        return e1.weight > e2.weight;
     }
 };
 
@@ -32,16 +35,23 @@ struct Node
 };
 
 Node* nodes;
-set<Edge> edges;
+priority_queue<Edge, vector<Edge>, CompareEdges> edges;
 
 void Insert(int n)
 {
     nodes[n].visited = true;
-    FOR(i, 0, nodes[n].edges.size()) edges.insert(nodes[n].edges[i]);
+    FOR(i, 0, nodes[n].edges.size())
+    {
+        Edge* e = &nodes[n].edges[i];
+        if(!nodes[e->next].visited) edges.push(*e);
+    }
 }
 
 int main()
 {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
     int V, E;
     scanf("%d %d", &V, &E);
     nodes = new Node[V];
@@ -55,23 +65,21 @@ int main()
         nodes[b].edges.push_back(Edge(a, w));
     }
 
-    int nowNode = 0;
-    Insert(nowNode);
+    Insert(0);
 
     ll sum = 0;
 
     FOR(v, 1, V)
     {
-        Edge e = *(edges.begin());
-        edges.erase(edges.begin());
+        Edge e = edges.top(); edges.pop();
+
         while(nodes[e.next].visited)
         {
-            e = *(edges.begin());
-            edges.erase(edges.begin());
+            e = edges.top(); edges.pop();
         }
+
         sum += e.weight;
-        nowNode = e.next;
-        Insert(nowNode);
+        Insert(e.next);
     }
 
     printf("%lld", sum);
