@@ -1,99 +1,80 @@
-#include <iostream>
-#include <cmath>
+#include <stdio.h>
+#include <set>
+#include <vector>
 #include <algorithm>
 #define ll long long int
+#define FOR(i, s, e) for(int i=s ; i<e ; ++i)
 
 using namespace std;
 
-struct V2
+class Edge
 {
-    ll x, y;
-    double size;
-    double theta;
+public:
+    int next;
+    int weight;
 
-    V2()
+    Edge(int n, int w)
     {
-        x = 0;
-        y = 0;
-    }
-    V2(int _x, int _y)
-    {
-        x = _x;
-        y = _y;
-        size = sqrt(x * x + y * y);
-        theta = x == 0 && y == 0 ? -1 : acos((double)x / sqrt((double)size));
+        next = n;
+        weight = w;
     }
 
-    V2 operator-(V2 v)
+    bool operator < (const Edge& e) const
     {
-        return V2(x - v.x, y - v.y);
-    }
-
-    ll operator*(V2 v) // 내적
-    {
-        return x * v.x + y * v.y;
-    }
-
-    short operator >> (V2 v) // 외적
-    {
-        ll c = (x * v.y) - (y * v.x);
-        if(c < 0) return -1;
-        if(c > 0) return 1;
-        else return 0;
+        return weight < e.weight;
     }
 };
 
-bool CompareTheta(V2 &v1, V2 &v2)
+struct Node
 {
-    return v1.theta < v2.theta;
-}
+    vector<Edge> edges;
+    bool visited = false;
+};
 
-double S(V2 v1, V2 v2, V2 v3)
+Node* nodes;
+set<Edge> edges;
+
+void Insert(int n)
 {
-    double a = (v2-v1).size;
-    double b = (v3-v2).size;
-    double c = (v1-v3).size;
-    double s = (a + b + c) * 0.5;
-    return sqrt(s * (s-a) * (s-b) * (s-c));
+    nodes[n].visited = true;
+    FOR(i, 0, nodes[n].edges.size()) edges.insert(nodes[n].edges[i]);
 }
 
 int main()
 {
-    ios::sync_with_stdio(false);
-    cin.tie(NULL);
+    int V, E;
+    scanf("%d %d", &V, &E);
+    nodes = new Node[V];
 
-    int N;
-    cin >> N;
-    V2 p[N];
-    for(int i=0 ; i<N ; ++i)
+    FOR(e, 0, E)
     {
-        int x, y;
-        cin >> x >> y;
-        p[i] = V2(x, y);
+        int a, b, w;
+        scanf("%d %d %d", &a, &b, &w);
+        a--; b--;
+        nodes[a].edges.push_back(Edge(b, w));
+        nodes[b].edges.push_back(Edge(a, w));
     }
 
-    double sum = 0;
-    for(int i=2 ; i<N ; ++i)
-    {
-        V2 O = p[0];
-        V2 A1 = p[i-2];
-        V2 A = p[i-1];
-        V2 B = p[i];
-        V2 C = p[(i+1)%N];
+    int nowNode = 0;
+    Insert(nowNode);
 
-        if((B-A) >> (C-B) < 0) // B가 오목한 경우
+    ll sum = 0;
+
+    FOR(v, 1, V)
+    {
+        Edge e = *(edges.begin());
+        edges.erase(edges.begin());
+        while(nodes[e.next].visited)
         {
-            sum -= S(O, A1, A);
-            sum += S(A, B, A1);
-            sum += S(A1, B, O);
+            e = *(edges.begin());
+            edges.erase(edges.begin());
         }
-        else
-        {
-            sum += S(O, A, B);
-        }
+        sum += e.weight;
+        nowNode = e.next;
+        Insert(nowNode);
     }
 
-    printf("%.1f", sum);
+    printf("%lld", sum);
 
     return 0;
 }
