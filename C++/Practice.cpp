@@ -1,88 +1,52 @@
 #include <iostream>
-#include <queue>
-#include <vector>
 #include <algorithm>
-#define ll long long int
 #define FOR(i, s, e) for(int i=s ; i<e ; ++i)
 
 using namespace std;
-
-class Edge
-{
-public:
-    int next;
-    int weight;
-
-    Edge(int n, int w)
-    {
-        next = n;
-        weight = w;
-    }
-};
-
-struct CompareEdges
-{
-    bool operator() (Edge& e1, Edge& e2)
-    {
-        return e1.weight > e2.weight;
-    }
-};
-
-struct Node
-{
-    vector<Edge> edges;
-    bool visited = false;
-};
-
-Node* nodes;
-priority_queue<Edge, vector<Edge>, CompareEdges> edges;
-
-void Insert(int n)
-{
-    nodes[n].visited = true;
-    FOR(i, 0, nodes[n].edges.size())
-    {
-        Edge* e = &nodes[n].edges[i];
-        if(!nodes[e->next].visited) edges.push(*e);
-    }
-}
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int V, E;
-    scanf("%d %d", &V, &E);
-    nodes = new Node[V];
+    int MAX = 1000000000;
 
-    FOR(e, 0, E)
+    int N, S;
+    cin >> N >> S;
+
+    int sums[N+1];
+    sums[0] = 0;
+
+    cin >> sums[1];
+
+    FOR(i, 2, N+1)
     {
-        int a, b, w;
-        scanf("%d %d %d", &a, &b, &w);
-        a--; b--;
-        nodes[a].edges.push_back(Edge(b, w));
-        nodes[b].edges.push_back(Edge(a, w));
+        int number;
+        cin >> number;
+        sums[i] = sums[i-1] + number;
     }
 
-    Insert(0);
+    int l = 1; // inclusive
+    int r = 1; // inclusive
 
-    ll sum = 0;
-
-    FOR(v, 1, V)
+    int minRL = MAX;
+    
+    while(l <= r && r <= N && l >= 0)
     {
-        Edge e = edges.top(); edges.pop();
+        int sum = sums[r] - sums[l-1];
 
-        while(nodes[e.next].visited)
+        // cout << '>' << l << ',' << r << ':' << sum << " ... " << minRL << "\n";
+
+        if(sum < S) r++;
+        else if(sum >= S)
         {
-            e = edges.top(); edges.pop();
+            minRL = min(minRL, r - l);
+            l++;
         }
-
-        sum += e.weight;
-        Insert(e.next);
     }
 
-    printf("%lld", sum);
+    if(minRL == MAX) cout << 0;
+    else cout << minRL + 1;
 
     return 0;
 }
