@@ -1,41 +1,52 @@
 #include <iostream>
+#include <vector>
+#include <queue>
 #include <algorithm>
 #define FOR(i, s, e) for(int i=s ; i<e ; ++i)
+#define ll long long int
 
 using namespace std;
 
-int X, Y;
+int N, M;
 
-int dx[4] = {0, 0, -1, 1};
-int dy[4] = {-1, 1, 0, 0};
-
-string* alphabets;
-
-int DFS(int x, int y, unsigned int flagBits)
+struct Edge
 {
-    if (x < 0 || x >= X || y < 0 || y >= Y) return 0;
-
-
-    char c = alphabets[y][x];
-    int index = c - 'A';
-
-    if(index < 0)
+    int to = 0;
+    ll weight = 0;
+    Edge(int t, int w)
     {
-        cout << x << ',' << y << "\n";
+        to = t;
+        weight = w;
     }
+};
 
-    if (flagBits & (1 << index)) return 0;
+struct Node
+{
+    vector<Edge> edges;
+    bool visited = false;
 
-    int maximum = 0;
+    Node() {}
+};
 
-    flagBits |= (1 << index);
-    FOR(d, 0, 4)
+struct CompareEdges
+{
+    bool operator() (Edge& e1, Edge& e2)
     {
-        int nx = x + dx[d];
-        int ny = y + dy[d];
-        maximum = max(maximum, 1 + DFS(nx, ny, flagBits));
+        return e1.weight > e2.weight;
     }
-    return maximum;
+};
+
+Node* nodes;
+priority_queue<Edge, vector<Edge>, CompareEdges> edges;
+
+void Insert(int n)
+{
+    nodes[n].visited = true;
+    FOR(i, 0, nodes[n].edges.size())
+    {
+        Edge* e = &nodes[n].edges[i];
+        if(!nodes[e->to].visited) edges.push(*e);
+    }
 }
 
 int main()
@@ -43,15 +54,34 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    cin >> Y >> X;
+    cin >> N >> M;
 
-    alphabets = new string[Y];
+    nodes = new Node[N];
 
-    FOR(y, 0, Y) cin >> alphabets[y];
+    FOR(i, 0, M)
+    {
+        int a, b, w; cin >> a >> b >> w;
+        a--; b--;
+        nodes[a].edges.push_back(Edge(b, w));
+        nodes[b].edges.push_back(Edge(a, w));
+    }
 
-    int d = DFS(0, 0, 0);
+    ll sum = 0;
+    ll maxW = 0;
 
-    cout << d;
+    Insert(0);
+
+    FOR(v, 1, N)
+    {
+        Edge e = edges.top(); edges.pop();
+        while(nodes[e.to].visited) { e = edges.top(); edges.pop(); }
+
+        sum += e.weight;
+        maxW = max(maxW, e.weight);
+        Insert(e.to);
+    }
+
+    cout << sum - maxW;
 
     return 0;
 }
