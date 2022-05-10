@@ -1,52 +1,30 @@
 #include <iostream>
-#include <vector>
-#include <queue>
+#include <cmath>
 #include <algorithm>
-#define FOR(i, s, e) for(int i=s ; i<e ; ++i)
 #define ll long long int
+#define FOR(i, s, e) for (int i = s; i < e; ++i)
+#define MAX 214748364700
 
 using namespace std;
 
-int N, M;
+ll minimum = MAX;
+ll minL = 0;
+ll minC = 1;
+ll minR = 2;
 
-struct Edge
+ll *numbers;
+
+ll Min(ll l, ll c, ll r)
 {
-    int to = 0;
-    ll weight = 0;
-    Edge(int t, int w)
+    ll sum = numbers[l] + numbers[r] + numbers[c];
+    if (abs(minimum) > abs(sum))
     {
-        to = t;
-        weight = w;
+        minimum = sum;
+        minL = l;
+        minC = c;
+        minR = r;
     }
-};
-
-struct Node
-{
-    vector<Edge> edges;
-    bool visited = false;
-
-    Node() {}
-};
-
-struct CompareEdges
-{
-    bool operator() (Edge& e1, Edge& e2)
-    {
-        return e1.weight > e2.weight;
-    }
-};
-
-Node* nodes;
-priority_queue<Edge, vector<Edge>, CompareEdges> edges;
-
-void Insert(int n)
-{
-    nodes[n].visited = true;
-    FOR(i, 0, nodes[n].edges.size())
-    {
-        Edge* e = &nodes[n].edges[i];
-        if(!nodes[e->to].visited) edges.push(*e);
-    }
+    return sum;
 }
 
 int main()
@@ -54,34 +32,47 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    cin >> N >> M;
+    int N;
+    cin >> N;
+    numbers = new ll[N];
 
-    nodes = new Node[N];
+    FOR(i, 0, N) cin >> numbers[i];
 
-    FOR(i, 0, M)
+    sort(numbers, numbers+N);
+
+    if (N == 3)
     {
-        int a, b, w; cin >> a >> b >> w;
-        a--; b--;
-        nodes[a].edges.push_back(Edge(b, w));
-        nodes[b].edges.push_back(Edge(a, w));
+        cout << numbers[0] << ' ' << numbers[1] << ' ' << numbers[2];
+        return 0;
     }
 
-    ll sum = 0;
-    ll maxW = 0;
-
-    Insert(0);
-
-    FOR(v, 1, N)
+    FOR(i, 1, N-1)
     {
-        Edge e = edges.top(); edges.pop();
-        while(nodes[e.to].visited) { e = edges.top(); edges.pop(); }
-
-        sum += e.weight;
-        maxW = max(maxW, e.weight);
-        Insert(e.to);
+        ll c = i;
+        ll l = i-1;
+        ll r = i+1;
+        while (l > 0 || r < N - 1)
+        {
+            int sum = Min(l, c, r);
+            if (sum > 0)
+            {
+                if (l > 0) l--;
+                else if (r < N - 1) r++;
+            }
+            else if (sum < 0)
+            {
+                if (r < N - 1) r++;
+                else if (l > 0) l--;
+            }
+            else break;
+        }
+        Min(l, c, r);
     }
 
-    cout << sum - maxW;
+    ll answers[3] = {numbers[minL], numbers[minC], numbers[minR]};
+    sort(answers, answers+3);
+
+    FOR(i, 0, 3) cout << answers[i] << ' ';
 
     return 0;
 }
