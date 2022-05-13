@@ -1,127 +1,107 @@
 #include <iostream>
-#include <cmath>
 #include <queue>
-#include <algorithm>
-#define ll long long int
+#include <cstring>
+#include <string>
+
 #define FOR(i, s, e) for (int i = s; i < e; ++i)
 
 using namespace std;
 
-int dx[4] = {0, -1, 1, 0};
-int dy[4] = {-1, 0, 0, 1};
+char c[4] = {'D', 'S', 'L', 'R'};
 
-struct Vector2
+struct Snapshot
 {
-    int x, y, t;
-    Vector2() {}
-    Vector2(int _x, int _y, int _t)
+    int number;
+    string history;
+
+    Snapshot(int n, string h)
     {
-        x = _x;
-        y = _y;
-        t = _t;
+        number = n;
+        history = h;
     }
 };
 
-struct CompareVector2
+int D(int number)
 {
-    bool operator()(Vector2 &v1, Vector2 &v2)
+    return (number * 2) % 10000;
+}
+
+int S(int number)
+{
+    return number == 0 ? 9999 : number-1;
+}
+
+int L(int number)
+{
+    return (number % 1000) * 10 + (number / 1000);
+}
+
+int R(int number)
+{
+    return number / 10 + (number % 10) * 1000;
+}
+
+int Operate(int op, int num)
+{
+    switch (op)
     {
-        if(v1.t > v2.t) return true;
-        else if(v1.t < v2.t) return false;
-
-        if (v1.y > v2.y) return true;
-        else if(v1.y < v2.y) return false;
-
-        if(v1.x > v2.x) return true;
-        else if(v1.x < v2.x) return false;
-        return false;
+        case 0: return D(num);
+        case 1: return S(num);
+        case 2: return L(num);
+        case 3: return R(num);
     }
-};
+    return -1;
+}
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
+    cout.tie(NULL);
 
-    int N;
-    cin >> N;
+    int T; cin >> T;
 
-    int p[N][N];
-    int passFlag[N][N]; // passFlag < 2 - (nowSize + eatenCnt)
-
-    Vector2 start;
-    FOR(y, 0, N) FOR(x, 0, N)
+    FOR(t, 0, T)
     {
-        passFlag[y][x] = 0;
-        cin >> p[y][x];
-        if(p[y][x] == 9) start = Vector2(x, y, 0);
-    }
+        bool visited[10000];
+        memset(visited, 0, sizeof(visited));
 
-    priority_queue<Vector2, vector<Vector2>, CompareVector2> q;
-    q.push(start);
+        int start, target;
+        cin >> start >> target;
 
-    passFlag[start.y][start.x] = -1;
-    p[start.y][start.x] = 0;
+        queue<Snapshot> q1;
 
-    int nowSize = 2;
-    int eatenCnt = 0;
-    int totalEatenCnt = 0;
+        string s;
 
-    int time = 0;
+        FOR(i, 0, 4) q1.push(Snapshot(Operate(i, start), s + c[i]));
 
-    while(true)
-    {
-        priority_queue<Vector2, vector<Vector2>, CompareVector2> fishes;
+        visited[start] = true;
 
-        while(!q.empty())
+        string answer;
+
+        while(!q1.empty())
         {
-            Vector2 now = q.top(); q.pop();
-            int x = now.x;
-            int y = now.y;
+            Snapshot ss = q1.front(); q1.pop();
+
+            if(visited[ss.number]) continue;
+
+            visited[ss.number] = true;
+
+            if(ss.number == target)
+            {
+                answer = ss.history;
+                break;
+            }
 
             FOR(i, 0, 4)
             {
-                int nx = x + dx[i];
-                int ny = y + dy[i];
-
-                if(nx < 0 || nx >= N || ny < 0 || ny >= N || p[ny][nx] > nowSize) continue;
-                if(passFlag[ny][nx] < 2 - (nowSize + totalEatenCnt)) continue;
-
-                passFlag[ny][nx] = 1 - (nowSize + totalEatenCnt);
-
-                if(p[ny][nx] == 0 || p[ny][nx] == nowSize) // 지나가기!
-                {
-                    if(fishes.empty()) q.push(Vector2(nx, ny, now.t + 1));
-                }
-                else if(p[ny][nx] < nowSize) // 잡아먹기 후보 추가
-                {
-                    fishes.push(Vector2(nx, ny, now.t + 1));
-                }
+                int operated = Operate(i, ss.number);
+                if(!visited[operated])q1.push(Snapshot(operated, ss.history + c[i]));
             }
         }
-
-        if(!fishes.empty())
-        {
-            Vector2 fish = fishes.top();
-            q.push(fish);
-
-            eatenCnt++;
-            totalEatenCnt++;
-            if (eatenCnt >= nowSize) // Size 갱신
-            {
-                eatenCnt = 0;
-                nowSize++;
-            }
-
-            passFlag[fish.y][fish.x]--;
-            p[fish.y][fish.x] = 0;
-
-            time = fish.t;
-        }
-        else break;
+        
+        cout << answer << "\n";
     }
-
-    cout << time;
 
     return 0;
 }
