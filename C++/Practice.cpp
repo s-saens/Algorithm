@@ -83,8 +83,6 @@ int main()
         {
             Snapshot ss = q1.front(); q1.pop();
 
-            if(visited[ss.number]) continue;
-
             visited[ss.number] = true;
 
             if(ss.number == target)
@@ -96,7 +94,11 @@ int main()
             FOR(i, 0, 4)
             {
                 int operated = Operate(i, ss.number);
-                if(!visited[operated])q1.push(Snapshot(operated, ss.history + c[i]));
+                if(!visited[operated])
+                {
+                    visited[operated] = true;
+                    q1.push(Snapshot(operated, ss.history + c[i]));
+                }
             }
         }
         
