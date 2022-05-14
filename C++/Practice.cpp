@@ -1,57 +1,19 @@
 #include <iostream>
 #include <queue>
 #include <cstring>
-#include <string>
-
-#define FOR(i, s, e) for (int i = s; i < e; ++i)
 
 using namespace std;
 
-char c[4] = {'D', 'S', 'L', 'R'};
-
-struct Snapshot
+struct Point
 {
-    int number;
-    string history;
-
-    Snapshot(int n, string h)
+    int x;
+    int cnt;
+    Point(int _x, int _cnt)
     {
-        number = n;
-        history = h;
+        x = _x;
+        cnt = _cnt;
     }
 };
-
-int D(int number)
-{
-    return (number * 2) % 10000;
-}
-
-int S(int number)
-{
-    return number == 0 ? 9999 : number-1;
-}
-
-int L(int number)
-{
-    return (number % 1000) * 10 + (number / 1000);
-}
-
-int R(int number)
-{
-    return number / 10 + (number % 10) * 1000;
-}
-
-int Operate(int op, int num)
-{
-    switch (op)
-    {
-        case 0: return D(num);
-        case 1: return S(num);
-        case 2: return L(num);
-        case 3: return R(num);
-    }
-    return -1;
-}
 
 int main()
 {
@@ -59,50 +21,60 @@ int main()
     cin.tie(NULL);
     cout.tie(NULL);
 
-    int T; cin >> T;
+    int nexts[100];
+    memset(nexts, -1, sizeof(nexts));
 
-    FOR(t, 0, T)
+    int N, M;
+    cin >> N >> M;
+
+    for(int i=0 ; i<N+M ; ++i)
     {
-        bool visited[10000];
-        memset(visited, 0, sizeof(visited));
+        int f, t;
+        cin >> f >> t;
 
-        int start, target;
-        cin >> start >> target;
+        nexts[f-1] = t-1;
+    }
 
-        queue<Snapshot> q1;
+    queue<Point> q;
+    q.push(Point(0, 0));
 
-        string s;
+    while(!q.empty())
+    {
+        Point p = q.front(); q.pop();
+        int x = p.x;
+        int cnt = p.cnt;
 
-        FOR(i, 0, 4) q1.push(Snapshot(Operate(i, start), s + c[i]));
-
-        visited[start] = true;
-
-        string answer;
-
-        while(!q1.empty())
+        if(x == 99)
         {
-            Snapshot ss = q1.front(); q1.pop();
+            cout << cnt;
+            return 0;
+        }
 
-            visited[ss.number] = true;
+        if(nexts[x] > -1) q.push(Point(nexts[x], cnt + 1));
+        
+        bool normal = false;
+        for(int i=6 ; i>0 ; --i)
+        {
+            int nx = x + i;
 
-            if(ss.number == target)
+            if (nx == 99)
             {
-                answer = ss.history;
-                break;
+                cout << cnt + 1;
+                return 0;
             }
 
-            FOR(i, 0, 4)
+            if(nx > 99) continue;
+            
+            if(nexts[nx] > -1)
             {
-                int operated = Operate(i, ss.number);
-                if(!visited[operated])
-                {
-                    visited[operated] = true;
-                    q1.push(Snapshot(operated, ss.history + c[i]));
-                }
+                q.push(Point(nexts[nx], cnt + 1));
+            }
+            else if(!normal)
+            {
+                normal = true;
+                q.push(Point(nx, cnt + 1));
             }
         }
-        
-        cout << answer << "\n";
     }
 
     return 0;
