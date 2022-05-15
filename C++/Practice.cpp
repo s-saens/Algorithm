@@ -1,17 +1,33 @@
 #include <iostream>
 #include <queue>
-#include <cstring>
+#include <vector>
+
+#define FOR(i, s, e) for (int i = s; i < e; ++i)
 
 using namespace std;
 
-struct Point
+struct Node
 {
-    int x;
-    int cnt;
-    Point(int _x, int _cnt)
+    int inCnt = 0; // 진입차수
+    int number = 0;
+    vector<int> nexts; // 다음 Node의 index 집합
+};
+
+Node *nodes;
+
+struct CompareNodeInCnt
+{
+    bool operator()(int n1, int n2)
     {
-        x = _x;
-        cnt = _cnt;
+        if (nodes[n1].inCnt > nodes[n2].inCnt)
+        {
+            return true;
+        }
+        else if (nodes[n1].inCnt == nodes[n2].inCnt)
+        {
+            return n1 > n2;
+        }
+        return false;
     }
 };
 
@@ -21,61 +37,72 @@ int main()
     cin.tie(NULL);
     cout.tie(NULL);
 
-    int nexts[100];
-    memset(nexts, -1, sizeof(nexts));
-
     int N, M;
     cin >> N >> M;
 
-    for(int i=0 ; i<N+M ; ++i)
-    {
-        int f, t;
-        cin >> f >> t;
+    nodes = new Node[N];
 
-        nexts[f-1] = t-1;
+    FOR(i, 0, N)
+    nodes[i].number = i + 1;
+
+    FOR(i, 0, M)
+    {
+        int n;
+        cin >> n; // 보조 pd가 맡은 가수(Node)의 수
+
+        if (n == 0)
+            continue;
+
+        int last;
+        cin >> last;
+        last--;
+
+        FOR(j, 1, n)
+        {
+            int index;
+            cin >> index;
+            index--;
+            nodes[last].nexts.push_back(index);
+            nodes[index].inCnt++;
+            last = index;
+        }
     }
 
-    queue<Point> q;
-    q.push(Point(0, 0));
+    priority_queue<int, vector<int>, CompareNodeInCnt> pq;
 
-    while(!q.empty())
+    FOR(i, 0, N)
+    pq.push(i);
+
+    vector<int> answer;
+
+    while (!pq.empty())
     {
-        Point p = q.front(); q.pop();
-        int x = p.x;
-        int cnt = p.cnt;
+        Node node = nodes[pq.top()];
 
-        if(x == 99)
+        if (node.inCnt > 0)
         {
-            cout << cnt;
+            cout << 0;
             return 0;
         }
 
-        if(nexts[x] > -1) q.push(Point(nexts[x], cnt + 1));
-        
-        bool normal = false;
-        for(int i=6 ; i>0 ; --i)
+        answer.push_back(node.number);
+
+        FOR(i, 0, node.nexts.size())
         {
-            int nx = x + i;
-
-            if (nx == 99)
-            {
-                cout << cnt + 1;
-                return 0;
-            }
-
-            if(nx > 99) continue;
-            
-            if(nexts[nx] > -1)
-            {
-                q.push(Point(nexts[nx], cnt + 1));
-            }
-            else if(!normal)
-            {
-                normal = true;
-                q.push(Point(nx, cnt + 1));
-            }
+            int next = node.nexts[i];
+            nodes[next].inCnt--;
         }
+
+        pq.pop();
     }
+
+    if (answer.size() != N)
+    {
+        cout << 0;
+        return 0;
+    }
+    FOR(i, 0, answer.size())
+        cout << answer[i] << "\n";
 
     return 0;
 }
