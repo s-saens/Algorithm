@@ -31,78 +31,41 @@ struct CompareNodeInCnt
     }
 };
 
+int SQ(int num)
+{
+    return num * num;
+}
+
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
     cout.tie(NULL);
 
-    int N, M;
-    cin >> N >> M;
-
-    nodes = new Node[N];
-
-    FOR(i, 0, N)
-    nodes[i].number = i + 1;
-
-    FOR(i, 0, M)
+    int T; cin >> T;
+    FOR(t, 0, T)
     {
-        int n;
-        cin >> n; // 보조 pd가 맡은 가수(Node)의 수
+        int x1, y1, x2, y2;
+        cin >> x1 >> y1 >> x2 >> y2;
 
-        if (n == 0)
-            continue;
+        int C; cin >> C;
 
-        int last;
-        cin >> last;
-        last--;
+        int cnt = 0;
 
-        FOR(j, 1, n)
+        FOR(c, 0, C)
         {
-            int index;
-            cin >> index;
-            index--;
-            nodes[last].nexts.push_back(index);
-            nodes[index].inCnt++;
-            last = index;
-        }
-    }
+            int cx, cy, cr;
+            cin >> cx >> cy >> cr;
 
-    priority_queue<int, vector<int>, CompareNodeInCnt> pq;
+            bool containsA = SQ(cx-x1) + SQ(cy-y1) <= SQ(cr);
 
-    FOR(i, 0, N)
-    pq.push(i);
+            bool containsB = SQ(cx-x2) + SQ(cy-y2) <= SQ(cr);
 
-    vector<int> answer;
-
-    while (!pq.empty())
-    {
-        Node node = nodes[pq.top()];
-
-        if (node.inCnt > 0)
-        {
-            cout << 0;
-            return 0;
+            if(containsA != containsB) cnt++;
         }
 
-        answer.push_back(node.number);
-
-        FOR(i, 0, node.nexts.size())
-        {
-            int next = node.nexts[i];
-            nodes[next].inCnt--;
-        }
-
-        pq.pop();
+        cout << cnt << "\n";
     }
-
-    if (answer.size() != N)
-    {
-        cout << 0;
-        return 0;
-    }
-    FOR(i, 0, answer.size())
-        cout << answer[i] << "\n";
 
     return 0;
 }
