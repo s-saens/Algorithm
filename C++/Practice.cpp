@@ -2,7 +2,7 @@
 #include <queue>
 #include <vector>
 
-#define FOR(i, s, e) for (int i = s; i < e; ++i)
+#define FOR(i, s, e) for(int i=s ; i<e ; ++i)
 
 using namespace std;
 
@@ -13,17 +13,17 @@ struct Node
     vector<int> nexts; // 다음 Node의 index 집합
 };
 
-Node *nodes;
+Node* nodes;
 
 struct CompareNodeInCnt
 {
-    bool operator()(int n1, int n2)
+    bool operator() (int n1, int n2)
     {
-        if (nodes[n1].inCnt > nodes[n2].inCnt)
+        if(nodes[n1].inCnt > nodes[n2].inCnt)
         {
             return true;
         }
-        else if (nodes[n1].inCnt == nodes[n2].inCnt)
+        else if(nodes[n1].inCnt == nodes[n2].inCnt)
         {
             return n1 > n2;
         }
@@ -31,41 +31,60 @@ struct CompareNodeInCnt
     }
 };
 
-int SQ(int num)
-{
-    return num * num;
-}
-
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
     cout.tie(NULL);
 
-    int T; cin >> T;
-    FOR(t, 0, T)
+    int N, M;
+    cin >> N >> M;
+
+    nodes = new Node[N];
+
+    FOR(i, 0, N) nodes[i].number = i+1;
+
+    FOR(i, 0, M)
     {
-        int x1, y1, x2, y2;
-        cin >> x1 >> y1 >> x2 >> y2;
+        int n; cin >> n; // 보조 pd가 맡은 가수(Node)의 수
 
-        int C; cin >> C;
+        if(n == 0) continue;
 
-        int cnt = 0;
+        int last; cin >> last; last--;
 
-        FOR(c, 0, C)
+        FOR(j, 1, n)
         {
-            int cx, cy, cr;
-            cin >> cx >> cy >> cr;
-
-            bool containsA = SQ(cx-x1) + SQ(cy-y1) <= SQ(cr);
-
-            bool containsB = SQ(cx-x2) + SQ(cy-y2) <= SQ(cr);
-
-            if(containsA != containsB) cnt++;
+            int index; cin >> index; index--;
+            nodes[last].nexts.push_back(index);
+            nodes[index].inCnt++;
+            last = index;
         }
-
-        cout << cnt << "\n";
     }
+
+    queue<int> q;
+    vector<int> answer;
+
+    FOR(i, 0, N) if (nodes[i].inCnt == 0) q.push(i);
+
+    while (!q.empty())
+    {
+        int cur = q.front();
+        q.pop();
+        answer.push_back(cur+1);
+
+        FOR(i, 0, nodes[cur].nexts.size())
+        {
+            int next = nodes[cur].nexts[i];
+            nodes[next].inCnt--;
+            if (nodes[next].inCnt == 0)
+            {
+                q.push(next);
+            }
+        }
+    }
+
+    if(answer.size() < N) cout << 0;
+    else FOR(i, 0, answer.size()) cout << answer[i] << "\n";
 
     return 0;
 }
