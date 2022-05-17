@@ -15,22 +15,6 @@ struct Node
 
 Node* nodes;
 
-struct CompareNodeInCnt
-{
-    bool operator() (int n1, int n2)
-    {
-        if(nodes[n1].inCnt > nodes[n2].inCnt)
-        {
-            return true;
-        }
-        else if(nodes[n1].inCnt == nodes[n2].inCnt)
-        {
-            return n1 > n2;
-        }
-        return false;
-    }
-};
-
 int main()
 {
     ios::sync_with_stdio(false);
@@ -46,19 +30,11 @@ int main()
 
     FOR(i, 0, M)
     {
-        int n; cin >> n; // 보조 pd가 맡은 가수(Node)의 수
+        int a, b; cin >> a >> b;
+        a--; b--;
 
-        if(n == 0) continue;
-
-        int last; cin >> last; last--;
-
-        FOR(j, 1, n)
-        {
-            int index; cin >> index; index--;
-            nodes[last].nexts.push_back(index);
-            nodes[index].inCnt++;
-            last = index;
-        }
+        nodes[a].nexts.push_back(b);
+        nodes[b].inCnt++;
     }
 
     queue<int> q;
@@ -83,8 +59,8 @@ int main()
         }
     }
 
-    if(answer.size() < N) cout << 0;
-    else FOR(i, 0, answer.size()) cout << answer[i] << "\n";
+    // if(answer.size() < N) cout << 0;
+    FOR(i, 0, answer.size()) cout << answer[i] << " ";
 
     return 0;
 }
