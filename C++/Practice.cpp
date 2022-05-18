@@ -1,19 +1,34 @@
 #include <iostream>
 #include <queue>
+#include <cmath>
 #include <vector>
 
+#define ll long long int
 #define FOR(i, s, e) for(int i=s ; i<e ; ++i)
 
 using namespace std;
 
-struct Node
+struct V2
 {
-    int inCnt = 0; // 진입차수
-    int number = 0;
-    vector<int> nexts; // 다음 Node의 index 집합
-};
+    ll x = 0;
+    ll y = 0;
 
-Node* nodes;
+    V2 operator-(V2 v)
+    {
+        V2 newV;
+        newV.x = x - v.x;
+        newV.y = y - v.y;
+        return newV;
+    }
+
+    short operator >> (V2 v) // 외적
+    {
+        ll c = (x * v.y) - (y * v.x);
+        if(c < 0) return -1;
+        if(c > 0) return 1;
+        else return 0;
+    }
+};
 
 int main()
 {
@@ -21,46 +36,13 @@ int main()
     cin.tie(NULL);
     cout.tie(NULL);
 
-    int N, M;
-    cin >> N >> M;
-
-    nodes = new Node[N];
-
-    FOR(i, 0, N) nodes[i].number = i+1;
-
-    FOR(i, 0, M)
+    V2 P[3];
+    FOR(i, 0, 3)
     {
-        int a, b; cin >> a >> b;
-        a--; b--;
-
-        nodes[a].nexts.push_back(b);
-        nodes[b].inCnt++;
+        cin >> P[i].x >> P[i].y;
     }
 
-    queue<int> q;
-    vector<int> answer;
-
-    FOR(i, 0, N) if (nodes[i].inCnt == 0) q.push(i);
-
-    while (!q.empty())
-    {
-        int cur = q.front();
-        q.pop();
-        answer.push_back(cur+1);
-
-        FOR(i, 0, nodes[cur].nexts.size())
-        {
-            int next = nodes[cur].nexts[i];
-            nodes[next].inCnt--;
-            if (nodes[next].inCnt == 0)
-            {
-                q.push(next);
-            }
-        }
-    }
-
-    // if(answer.size() < N) cout << 0;
-    FOR(i, 0, answer.size()) cout << answer[i] << " ";
+    cout << ((P[1] - P[0]) >> (P[2] - P[1])) << "\n";
 
     return 0;
 }
