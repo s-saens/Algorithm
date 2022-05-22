@@ -1,32 +1,8 @@
 #include <iostream>
+#include <algorithm>
 #define FOR(i, s, e) for(int i=s ; i<e ; ++i)
 
 using namespace std;
-
-short result[1001]; // SK가 이기면 1, 아니면 2
-
-void Init()
-{
-    FOR(i, 0, 1001)
-    {
-        result[i] = 0;
-    }
-}
-
-bool Solve(int N, bool skTurn)
-{
-    if(result[N] > 0) return result[N] == 1;
-    bool nextTurn = !skTurn;
-
-    // 기저
-    if(N == 1 || N == 3) return skTurn;
-    if(N == 2) return !skTurn;
-
-    bool answer = (Solve(N - 1, !skTurn) || Solve(N - 3, !skTurn));
-    if(answer) result[N] = 1;
-    else result[N] = 2;
-    return answer;
-}
 
 int main()
 {
@@ -34,11 +10,26 @@ int main()
     cin.tie(NULL);
     cout.tie(NULL);
 
-    int N;
-    cin >> N;
+    string S1, S2;
+    cin >> S1 >> S2;
 
-    bool answer = Solve(N, true);
-    cout << (answer ? "SK" : "CY");
+    int l1 = S1.length()+1; // 가로
+    int l2 = S2.length()+1; // 세로
+    int k[l2][l1];
+
+    FOR(x, 0, l1) k[0][x] = 0;
+    FOR(y, 0, l2) k[y][0] = 0;
+
+    int answer = 0;
+
+    FOR(y, 1, l2) FOR(x, 1, l1)
+    {
+        if(S1[x-1] == S2[y-1]) k[y][x] = k[y-1][x-1] + 1;
+        else k[y][x] = max(k[y][x-1], k[y-1][x]);
+        answer = max(answer, k[y][x]);
+    }
+
+    cout << answer;
 
     return 0;
 }
