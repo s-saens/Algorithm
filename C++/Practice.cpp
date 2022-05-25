@@ -1,61 +1,63 @@
 #include <iostream>
-#include <algorithm>
+#include <vector>
+#include <queue>
+
 #define FOR(i, s, e) for(int i=s ; i<e ; ++i)
 
 using namespace std;
 
-int* nexts;
-bool* visited;
-bool* done;
-
-int cnt = 0;
-
-void Set(int n)
+struct Node 
 {
-    visited[n] = true;
-    int next = nexts[n];
-    
-    if(!visited[next]) Set(next);
-    else if(!done[next])
-    {
-        for(int i=next ; i!=n ; i=nexts[i]) cnt++;
-        cnt++;
-    }
+    vector<int> nexts;
+    int inCnt = 0;
+};
 
-    done[n] = true;
+Node* nodes;
+
+void Connect(int a, int b)
+{
+    nodes[a].nexts.push_back(b);
+    nodes[b].inCnt++;
 }
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
+    cout.tie(NULL);
 
-    int T; cin >> T;
-    int answers[T];
+    int N, M; cin >> N >> M;
+    nodes = new Node[N];
 
-    FOR(t, 0, T)
+    int startNode = 0;
+
+    FOR(i, 0, M) 
     {
-        cnt = 0;
-        int N; cin >> N;
-        nexts = new int[N];
-        visited = new bool[N];
-        done = new bool[N];
+        int a, b; cin >> a >> b;
+        a--; b--;
 
-        FOR(i, 0, N)
-        {
-            int n; cin >> n;
-            nexts[i] = n - 1;
-            visited[i] = 0;
-            done[i] = 0;
-        }
-
-        FOR(i, 0, N) if(!visited[i]) Set(i);
-
-        answers[t] = N - cnt;
+        Connect(a, b);
     }
 
-    FOR(t, 0, T) cout << answers[t] << "\n";
+    priority_queue<int, vector<int>, greater<int> > pq;
+    vector<int> answers;
 
+    FOR(i, 0, N) if (nodes[i].inCnt == 0) pq.push(i);
+
+    while(!pq.empty())
+    {
+        int now = pq.top(); pq.pop();
+        answers.push_back(now+1);
+
+        FOR(i, 0, nodes[now].nexts.size())
+        {
+            int next = nodes[now].nexts[i];
+            nodes[next].inCnt--;
+            if(nodes[next].inCnt == 0) pq.push(next);
+        }
+    }
+
+    FOR(i, 0, N) cout << answers[i] << ' ';
 
     return 0;
 }
