@@ -1,80 +1,61 @@
 #include <iostream>
-#include <vector>
-#include <stack>
 #include <algorithm>
 using namespace std;
 
-#define FOR(i,s,e) for(int i=s; i<e; ++i)
-#define FOR_R(i,s,e) for(int i=s; i>=e; --i) // both inclusive
+#define FOR(i, s, e) for(int i=s; i<e ; ++i)
+#define MAX 20000000
 
-struct Point
+int N;
+struct House
 {
-    int x, y, w;
-    char c;
-    Point(int _x, int _y, int _w, char _c)
-    {
-        x = _x;
-        y = _y;
-        w = _w;
-        c = _c;
-    }
+    int colorCost[3];
 };
+House *houses;
 
-bool cmp(Point& p1, Point& p2)
+int minCostDP[4][4][1001]; // startColor, lastColor와 index에 따른 값
+
+void InitMinCostDP()
 {
-    return p1.w > p2.w;
+    FOR(k, 0, 4) FOR(i, 0, 4) FOR(j, 0, 1001) minCostDP[k][i][j] = -1;
+}
+
+int MinCost(int startColor, int lastColor, int index)
+{
+    if (index == N) return 0;
+    if (minCostDP[startColor][lastColor][index] > -1) return minCostDP[startColor][lastColor][index];
+
+
+
+    int minCost = MAX;
+    for (int i = 0; i < 3; ++i) // i: thisColor
+    {
+        if (lastColor == i) continue;
+        if (index == N-1 && startColor == i) continue;
+        int cost = houses[index].colorCost[i] + MinCost(startColor, i, index + 1);
+        minCost = min(minCost, cost);
+    }
+
+    minCostDP[startColor][lastColor][index] = minCost;
+    return minCost;
 }
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    cout.tie(NULL);
 
-    string s1, s2; cin >> s1 >> s2;
-    int len1 = s1.length()+1, len2 = s2.length()+1;
+    InitMinCostDP();
 
-    int weight[len2][len1];
-    FOR(y, 0, len2) weight[y][0] = 0;
-    FOR(x, 1, len1) weight[0][x] = 0;
+    cin >> N;
+    House h[N];
+    houses = h;
 
-    int maximum = 0;
+    FOR(i, 0, N) FOR(j, 0, 3) cin >> houses[i].colorCost[j];
 
-    vector<Point> s;
-    stack<char> answer;
+    int minimum = MAX;
+    FOR(i, 0, 3) minimum = min(minimum, houses[0].colorCost[i] + MinCost(i, i, 1));
 
-    FOR(y, 1, len2) FOR(x, 1, len1)
-    {
-        weight[y][x] = max(weight[y-1][x], weight[y][x-1]);
-        if(s1[x-1] == s2[y-1])
-        {
-            weight[y][x] = weight[y-1][x-1] + 1;
-            maximum = max(maximum, weight[y][x]);
-        }
-
-        if (weight[y][x] > weight[y - 1][x] && weight[y][x] > weight[y][x - 1])
-            s.push_back(Point(x, y, weight[y][x], s1[x - 1]));
-    }
-    cout << maximum << "\n";
-
-    if(s.size() == 0) return 0;
-
-    sort(s.begin(), s.end(), cmp);
-
-    int lx = s[0].x + 1, ly = s[0].y + 1;
-    FOR(i, 0, s.size())
-    {
-        Point p = s[i];
-        // cout << p.x << ',' << p.y << "\n";
-        if(p.y >= ly || p.x >= lx) continue;
-        lx = p.x; ly = p.y;
-        answer.push(p.c);
-    }
-
-    while(!answer.empty())
-    {
-        cout << answer.top(); answer.pop();
-    }
+    cout << minimum;
 
     return 0;
 }
