@@ -1,29 +1,28 @@
 #include <iostream>
-#include <cstring>
 #include <vector>
-#include <cmath>
+#include <stack>
+#include <algorithm>
 using namespace std;
 
 #define FOR(i,s,e) for(int i=s; i<e; ++i)
-#define ll long long int
+#define FOR_R(i,s,e) for(int i=s; i>=e; --i) // both inclusive
 
-int N;
-vector<int> primes;
-
-const int MAX = 4000000;
-bool visited[MAX+1];
-
-int l, r, cnt;
-ll sum=2;
-void L()
+struct Point
 {
-    sum -= primes[l];
-    l++;
-}
-void R()
+    int x, y, w;
+    char c;
+    Point(int _x, int _y, int _w, char _c)
+    {
+        x = _x;
+        y = _y;
+        w = _w;
+        c = _c;
+    }
+};
+
+bool cmp(Point& p1, Point& p2)
 {
-    r++;
-    sum += primes[r];
+    return p1.w > p2.w;
 }
 
 int main()
@@ -32,41 +31,50 @@ int main()
     cin.tie(NULL);
     cout.tie(NULL);
 
-    cin >> N;
-    memset(visited, 0, sizeof(visited));
+    string s1, s2; cin >> s1 >> s2;
+    int len1 = s1.length()+1, len2 = s2.length()+1;
 
-    visited[0] = 1;
-    visited[1] = 1;
-    visited[2] = 0;
-    visited[3] = 0;
+    int weight[len2][len1];
+    FOR(y, 0, len2) weight[y][0] = 0;
+    FOR(x, 1, len1) weight[0][x] = 0;
 
-    FOR(i, 2, MAX)
+    int maximum = 0;
+
+    vector<Point> s;
+    stack<char> answer;
+
+    FOR(y, 1, len2) FOR(x, 1, len1)
     {
-        if(!visited[i])
+        weight[y][x] = max(weight[y-1][x], weight[y][x-1]);
+        if(s1[x-1] == s2[y-1])
         {
-            visited[i] = 1;
-            primes.push_back(i);
-            for(int j=i+i ; j<=MAX ; j += i) visited[j] = 1;
+            weight[y][x] = weight[y-1][x-1] + 1;
+            maximum = max(maximum, weight[y][x]);
         }
+
+        if (weight[y][x] > weight[y - 1][x] && weight[y][x] > weight[y][x - 1])
+            s.push_back(Point(x, y, weight[y][x], s1[x - 1]));
+    }
+    cout << maximum << "\n";
+
+    if(s.size() == 0) return 0;
+
+    sort(s.begin(), s.end(), cmp);
+
+    int lx = s[0].x + 1, ly = s[0].y + 1;
+    FOR(i, 0, s.size())
+    {
+        Point p = s[i];
+        // cout << p.x << ',' << p.y << "\n";
+        if(p.y >= ly || p.x >= lx) continue;
+        lx = p.x; ly = p.y;
+        answer.push(p.c);
     }
 
-    int s = primes.size();
-
-    l = 0;
-    r = 0;
-    cnt = 0;
-
-    while(r < s && l <= r)
+    while(!answer.empty())
     {
-        if(sum == N) { cnt++; R(); }
-        else if(sum < N)
-        {
-            if(r < s-1) R();
-            else L();
-        }
-        else if(sum > N) L();
+        cout << answer.top(); answer.pop();
     }
 
-    cout << cnt;
-    
+    return 0;
 }
