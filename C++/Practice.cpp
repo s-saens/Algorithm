@@ -1,42 +1,28 @@
 #include <iostream>
-#include <algorithm>
+#include <queue>
 using namespace std;
 
-#define FOR(i, s, e) for(int i=s; i<e ; ++i)
-#define MAX 20000000
+int K;
 
-int N;
-struct House
+int t[100001];
+
+int F(int N)
 {
-    int colorCost[3];
-};
-House *houses;
+    queue<int> q;
+    q.push(N);
+    t[N] = 0;
 
-int minCostDP[4][4][1001]; // startColor, lastColor와 index에 따른 값
-
-void InitMinCostDP()
-{
-    FOR(k, 0, 4) FOR(i, 0, 4) FOR(j, 0, 1001) minCostDP[k][i][j] = -1;
-}
-
-int MinCost(int startColor, int lastColor, int index)
-{
-    if (index == N) return 0;
-    if (minCostDP[startColor][lastColor][index] > -1) return minCostDP[startColor][lastColor][index];
-
-
-
-    int minCost = MAX;
-    for (int i = 0; i < 3; ++i) // i: thisColor
+    while(!q.empty())
     {
-        if (lastColor == i) continue;
-        if (index == N-1 && startColor == i) continue;
-        int cost = houses[index].colorCost[i] + MinCost(startColor, i, index + 1);
-        minCost = min(minCost, cost);
+        int f = q.front(); q.pop();
+        if(f == K) return t[f];
+
+        if(f*2 <= 100000 && f*2 > 0 && t[f*2] == -1) { q.push(f*2); t[f*2] = t[f]; }
+        if(f-1 <= 100000 && f-1 >= 0 && t[f-1] == -1) { q.push(f-1); t[f-1] = t[f]+1; }
+        if(f+1 <= 100000 && f+1 >= 0 && t[f+1] == -1) { q.push(f+1); t[f+1] = t[f]+1; }
     }
 
-    minCostDP[startColor][lastColor][index] = minCost;
-    return minCost;
+    return -1;
 }
 
 int main()
@@ -44,18 +30,12 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    InitMinCostDP();
+    for(int i=0 ; i<100001 ; ++i) t[i] = -1;
 
-    cin >> N;
-    House h[N];
-    houses = h;
+    int N;
+    cin >> N >> K;
 
-    FOR(i, 0, N) FOR(j, 0, 3) cin >> houses[i].colorCost[j];
-
-    int minimum = MAX;
-    FOR(i, 0, 3) minimum = min(minimum, houses[0].colorCost[i] + MinCost(i, i, 1));
-
-    cout << minimum;
+    cout << F(N);
 
     return 0;
 }
