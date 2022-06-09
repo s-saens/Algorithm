@@ -1,8 +1,20 @@
 #include <iostream>
-#include <vector>
-#include <algorithm>
+#include <queue>
 using namespace std;
-#define FOR(i, s, e) for(int i=s;i<e;++i)
+
+queue<pair<int, int> > st;
+
+int F(int w, int s, int e)
+{
+    if (w == 1)
+    {
+        st.push(make_pair(s, e));
+        return 1;
+    }
+
+    int r = 6-s-e;
+    return F(w-1, s, r) + F(1, s, e) + F(w-1, r, e);
+}
 
 int main()
 {
@@ -10,36 +22,13 @@ int main()
     cin.tie(NULL);
 
     int N; cin >> N;
-    vector<int> s;
+    cout << F(N, 1, 3) << '\n';
 
-    FOR(i, 0, N)
+    while(!st.empty())
     {
-        int a; cin >> a;
-        s.push_back(a);
+        pair<int, int> t = st.front(); st.pop();
+        cout << t.first << ' ' << t.second << '\n';
     }
-
-    sort(s.begin(), s.end());
-
-    int len = s.size();
-    int M; cin >> M;
-    FOR(i, 0, M)
-    {
-        int k; cin >> k;
-        bool hasM = false;
-
-        int l=0, r=len-1, m;
-        while(l < r)
-        {
-            m = (l+r)/2;
-            if(s[m] == k) { hasM = true; break;}
-            else if(k < s[m]) r = m;
-            else l = m+1;
-        }
-
-        hasM = hasM || (s[l] == k);
-        cout << hasM << ' ';
-    }
-
 
     return 0;
 }
