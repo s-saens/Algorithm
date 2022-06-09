@@ -1,41 +1,45 @@
 #include <iostream>
-#include <queue>
+#include <vector>
+#include <algorithm>
 using namespace std;
-
-int K;
-
-int t[100001];
-
-int F(int N)
-{
-    queue<int> q;
-    q.push(N);
-    t[N] = 0;
-
-    while(!q.empty())
-    {
-        int f = q.front(); q.pop();
-        if(f == K) return t[f];
-
-        if(f*2 <= 100000 && f*2 > 0 && t[f*2] == -1) { q.push(f*2); t[f*2] = t[f]; }
-        if(f-1 <= 100000 && f-1 >= 0 && t[f-1] == -1) { q.push(f-1); t[f-1] = t[f]+1; }
-        if(f+1 <= 100000 && f+1 >= 0 && t[f+1] == -1) { q.push(f+1); t[f+1] = t[f]+1; }
-    }
-
-    return -1;
-}
+#define FOR(i, s, e) for(int i=s;i<e;++i)
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    for(int i=0 ; i<100001 ; ++i) t[i] = -1;
+    int N; cin >> N;
+    vector<int> s;
 
-    int N;
-    cin >> N >> K;
+    FOR(i, 0, N)
+    {
+        int a; cin >> a;
+        s.push_back(a);
+    }
 
-    cout << F(N);
+    sort(s.begin(), s.end());
+
+    int len = s.size();
+    int M; cin >> M;
+    FOR(i, 0, M)
+    {
+        int k; cin >> k;
+        bool hasM = false;
+
+        int l=0, r=len-1, m;
+        while(l < r)
+        {
+            m = (l+r)/2;
+            if(s[m] == k) { hasM = true; break;}
+            else if(k < s[m]) r = m;
+            else l = m+1;
+        }
+
+        hasM = hasM || (s[l] == k);
+        cout << hasM << ' ';
+    }
+
 
     return 0;
 }
