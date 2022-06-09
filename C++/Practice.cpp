@@ -1,6 +1,7 @@
 #include <iostream>
 #include <queue>
 using namespace std;
+#define ll long long
 
 queue<pair<int, int> > st;
 
@@ -16,12 +17,25 @@ int F(int w, int s, int e)
     return F(w-1, s, r) + F(1, s, e) + F(w-1, r, e);
 }
 
+ll f(int w)
+{
+    if(w == 1) return 1;
+    return 2 * f(w-1) + 1;
+}
+
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
     int N; cin >> N;
+
+    if(N > 20)
+    {
+        cout << f(N);
+        return 0;
+    }
+
     cout << F(N, 1, 3) << '\n';
 
     while(!st.empty())
