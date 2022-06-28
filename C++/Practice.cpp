@@ -4,29 +4,39 @@
 #define MIN -2147483648
 using namespace std;
 
+int cnt = 0;
 int N;
-string ex;
-int answer;
+bool** isWall;
+int dX[3] = {1, 0, 1};
+int dY[3] = {0, 1, 1};
 
-int cal(int a, char op, int b)
+/*
+dir
+0: →
+1: ↓
+2: ↘︎
+*/
+void DFS(int x, int y, int lastDir, int c)
 {
-    switch (op)
-    {
-        case '+': return a + b;
-        case '-': return a - b;
-        case '*': return a * b;
-    }
-}
+    if (x == N-1 && y == N-1) { cnt++; return; }
 
-void F(int i, int lastResult)
-{
-    if(i >= N-1)
+    FOR(i, 0, 3)
     {
-        answer = max(answer, lastResult);
-        return;
+        int nx = x + dX[i];
+        int ny = y + dY[i];
+        if((lastDir * i == 0 && lastDir + i == 1)
+        || (nx >= N)
+        || (ny >= N)
+        || (isWall[ny][nx])
+        ) continue;
+
+        if( i == 2 && (isWall[ny][x] || isWall[y][nx]) )
+        {
+            continue;
+        }
+
+        DFS(nx, ny, i, c+1);
     }
-    if(i+4 < N) F(  i+4, cal( lastResult, ex[i+1], cal(ex[i+2]-'0', ex[i+3], ex[i+4]-'0') )  );
-    if(i+2 < N) F(  i+2, cal( lastResult, ex[i+1], ex[i+2]-'0')  );
 }
 
 int main()
@@ -34,9 +44,14 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    answer = MIN;
-    cin >> N >> ex;
-    F(0, ex[0]-'0');
+    cin >> N;
+    isWall = new bool*[N];
+    FOR(i,0,N) isWall[i] = new bool[N];
 
-    cout << answer;
+
+    FOR(y, 0, N) FOR(x, 0, N) cin >> isWall[y][x];
+
+    DFS(1, 0, 0, 0);
+
+    cout << cnt;
 }
