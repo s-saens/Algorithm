@@ -1,69 +1,89 @@
 #include <iostream>
-#define ll long long int
-#define DIV 1000000007
+#include <algorithm>
+#define FOR(i, s, e) for(int i=s ; i<e ; ++i)
+#define MIN 0
+#define MAX 1000000001
 using namespace std;
+
+struct Pair
+{
+    int minimum, maximum;
+    Pair() {}
+    Pair(int m, int M)
+    {
+        minimum = m;
+        maximum = M;
+    }
+};
 
 struct Node
 {
-    bool zero = false;
-    ll sum, l, r, cL, cR;
+    Pair minmax;
+    int left, right;
+    Node *childL, *childR;
+
     Node() {}
-    Node(ll _s, ll _l, ll _r, ll _cL, ll _cR)
-    { sum = _s; l = _l; r = _r; cL = _cL; cR = _cR; }
+    Node(Pair p, int l, int r, Node* cL, Node* cR)
+    {
+        minmax = p;
+        left = l;
+        right = r;
+        childL = cL;
+        childR = cR;
+    }
 };
 
-ll* numbers;
-Node* segTree;
+int* numbers;
+Node* segtree;
 
-ll Sum(ll l, ll r, ll nI)
+int FindSize(int N)
 {
-    Node *n = &segTree[nI];
-    if(r < n->l || l > n->r) return 1;
-    if(l <= n->l && r >= n->r) return n->sum;
-    return (Sum(l, r, n->cL) * Sum(l, r, n->cR)) % DIV;
+    int ret = 1;
+    while (ret < N) ret *= 2;
+    return ret * 2;
 }
 
-ll Modify(ll i, ll number, ll nI) // 변화량 Fraction 반환
+int FindMin(int l, int r)
 {
-    Node *n = &segTree[nI];
-
-    if(n->l == n->r)
-    {
-        n->sum = number;
-        return number;
-    }
-
-    ll nMid = (n->l + n->r)/2;
-
-    if(i > nMid) n->sum = Modify(i, number, n->cR) * segTree[n->cL].sum;
-    else n->sum = Modify(i, number, n->cL) * segTree[n->cR].sum;
-    
-    n->sum %= DIV;
-
-    return n->sum;
+    int minimum = numbers[l];
+    FOR(i, l+1, r) minimum = min(minimum, numbers[i]);
+    return minimum;
 }
 
-ll SetSegTree(ll l, ll r, ll nI)
+Pair Query(Node* node, int l, int r)
+{
+    if(r < node->left || l > node->right) return Pair(MAX, MIN);
+    if(l <= node->left && r >= node->right) return node->minmax;
+    Pair leftMinmax = Query(node->childL, l, r);
+    Pair rightMinmax = Query(node->childR, l, r);
+    int minimum = min(leftMinmax.minimum, rightMinmax.minimum);
+    int maximum = max(leftMinmax.maximum, rightMinmax.maximum);
+    return Pair(minimum, maximum);
+}
+
+Pair SetSegtree(int nodeIndex, int l, int r)
 {
     if(l == r)
     {
-        segTree[nI] = Node(numbers[l], l, r, -1, -1);
-        return numbers[l];
+        int num = numbers[l];
+        Pair p = Pair(num, num);
+        segtree[nodeIndex] = Node(p, l, r, segtree+nodeIndex, segtree+nodeIndex);
+        return p;
     }
 
-    ll mid = (l+r)/2;
-    ll cR = (nI+1)*2;
-    ll cL = cR - 1;
-    ll sum = (SetSegTree(l, mid, cL) * SetSegTree(mid+1, r, cR)) % DIV;
-    segTree[nI] = Node(sum, l, r, cL, cR);
-    return segTree[nI].sum;
-}
+    int mid = (l+r)/2;
+    int rIndex = (nodeIndex+1) * 2;
+    int lIndex = rIndex - 1;
+    Pair leftMinmax = SetSegtree(lIndex, l, mid);
+    Pair rightMinmax = SetSegtree(rIndex, mid+1, r);
+    int minimum = min(leftMinmax.minimum, rightMinmax.minimum);
+    int maximum = max(leftMinmax.maximum, rightMinmax.maximum);
 
-ll FindSize(ll N)
-{
-    ll ret = 1;
-    while(ret < N) ret *= 2;
-    return ret * 2;
+    Pair minmax = Pair(minimum, maximum);
+
+    segtree[nodeIndex] = Node(minmax, l, r, segtree+lIndex, segtree+rIndex);
+
+    return minmax;
 }
 
 int main()
@@ -71,39 +91,21 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    ll N, M, K; cin >> N >> M >> K;
-    ll treeSize = FindSize(N);
-    numbers = new ll[N];
-    segTree = new Node[treeSize];
-    
-    for(int i=0 ; i<N ; ++i) cin >> numbers[i];
+    int N, M;
+    cin >> N >> M;
+    numbers = new int[N];
+    segtree = new Node[FindSize(N)];
 
-    SetSegTree(0, N-1, 0);
+    FOR(i, 0, N) cin >> numbers[i];
 
-    while(M > 0 || K > 0)
+    SetSegtree(0, 0, N);
+
+    FOR(i, 0, M)
     {
-        short op;
-        ll a, b;
-        cin >> op >> a >> b;
-
-        if(op == 1)
-        {
-            M--;
-            Modify(a-1, b, 0);
-        }
-        else if(op == 2)
-        {
-            K--;
-            cout << Sum(a-1, b-1, 0) << "\n";
-        }
+        int l, r; cin >> l >> r; l--; r--;
+        Pair p = Query(segtree, l, r);
+        cout << p.minimum << ' ' << p.maximum << '\n';
     }
 
     return 0;
 }
-
-
-
-    //             0~4  
-    //     0~2             3~4
-    // 0~1     2           3 4
-    // 0 1
