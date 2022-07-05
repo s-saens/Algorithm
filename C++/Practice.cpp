@@ -8,13 +8,15 @@ int Y, X;
 int dx[4] = {-1, 1, 0, 0};
 int dy[4] = {0, 0, -1, 1};
 
+bool visited[10][10][10][10] = {false};
+
 enum Direction
 {
-    left,
-    right,
-    up,
-    down,
-    none
+    LEFT,
+    RIGHT,
+    UP,
+    DOWN,
+    NONE
 };
 
 struct Point
@@ -29,7 +31,7 @@ struct Point
 struct Snapshot
 {
     Point redPoint, bluePoint;
-    Direction last_dir = none;
+    Direction last_dir = NONE;
     int move_cnt = 0;
     bool redCompleted = false;
     bool blueCompleted = false;
@@ -81,8 +83,15 @@ Snapshot NewSnapshot(Snapshot snapshot, Direction d)
     }
 
     s.move_cnt++;
+    s.last_dir = d;
 
     return s;
+}
+
+void Pr(Snapshot s)
+{
+    FOR(i, 0, s.move_cnt) cout << ' ';
+    cout << '(' << s.redPoint.x << ',' << s.redPoint.y << ")(" << s.bluePoint.x << ',' << s.bluePoint.y << ")\n";
 }
 
 int main()
@@ -112,19 +121,21 @@ int main()
     while (!q.empty())
     {
         Snapshot f = q.front(); q.pop();
-        if(f.move_cnt > 10) continue;
+        visited[f.redPoint.x][f.redPoint.y][f.bluePoint.x][f.bluePoint.y] = true;
+        Pr(f);
 
         FOR(i, 0, 4)
         {
-            if(f.last_dir == i) continue;
+            if((f.last_dir == LEFT && i == RIGHT)
+            || (f.last_dir == RIGHT && i == LEFT)
+            || (f.last_dir == DOWN && i == UP)
+            || (f.last_dir == UP && i == DOWN) ) continue;
             Snapshot newSnapshot = NewSnapshot(f, (Direction)i);
 
             if(newSnapshot == f) continue;
+            if(visited[newSnapshot.redPoint.x][newSnapshot.redPoint.y][newSnapshot.bluePoint.x][newSnapshot.bluePoint.y]) continue;
             if(newSnapshot.blueCompleted) continue;
-
-            if(newSnapshot.move_cnt > 10) break;
-
-            if(newSnapshot.move_cnt <= 10 && newSnapshot.redCompleted)
+            if(newSnapshot.redCompleted)
             {
                 cout << newSnapshot.move_cnt;
                 return 0;
@@ -136,3 +147,17 @@ int main()
     cout << -1;
     return 0;
 }
+
+/*
+10 10
+##########
+#R#...##B#
+#...#.##.#
+#####.##.#
+#......#.#
+#.######.#
+#.#...##.#
+#.#.#.#..#
+#...#.O#.#
+##########
+*/
