@@ -1,89 +1,88 @@
 #include <iostream>
-#include <algorithm>
+#include <queue>
 #define FOR(i, s, e) for(int i=s ; i<e ; ++i)
-#define MIN 0
-#define MAX 1000000001
 using namespace std;
 
-struct Pair
+int Y, X;
+
+int dx[4] = {-1, 1, 0, 0};
+int dy[4] = {0, 0, -1, 1};
+
+enum Direction
 {
-    int minimum, maximum;
-    Pair() {}
-    Pair(int m, int M)
+    left,
+    right,
+    up,
+    down,
+    none
+};
+
+struct Point
+{
+    int x, y;
+    bool operator==(const Point& p)
     {
-        minimum = m;
-        maximum = M;
+        return (p.x == x) && (p.y == y);
     }
 };
 
-struct Node
+struct Snapshot
 {
-    Pair minmax;
-    int left, right;
-    Node *childL, *childR;
+    Point redPoint, bluePoint;
+    Direction last_dir = none;
+    int move_cnt = 0;
+    bool redCompleted = false;
+    bool blueCompleted = false;
 
-    Node() {}
-    Node(Pair p, int l, int r, Node* cL, Node* cR)
+    bool operator==(const Snapshot& s)
     {
-        minmax = p;
-        left = l;
-        right = r;
-        childL = cL;
-        childR = cR;
+        return (redPoint == s.redPoint) && (bluePoint == s.bluePoint);
     }
 };
 
-int* numbers;
-Node* segtree;
+char** blocks;
+Point goal;
 
-int FindSize(int N)
+Snapshot NewSnapshot(Snapshot snapshot, Direction d)
 {
-    int ret = 1;
-    while (ret < N) ret *= 2;
-    return ret * 2;
-}
-
-int FindMin(int l, int r)
-{
-    int minimum = numbers[l];
-    FOR(i, l+1, r) minimum = min(minimum, numbers[i]);
-    return minimum;
-}
-
-Pair Query(Node* node, int l, int r)
-{
-    if(r < node->left || l > node->right) return Pair(MAX, MIN);
-    if(l <= node->left && r >= node->right) return node->minmax;
-    Pair leftMinmax = Query(node->childL, l, r);
-    Pair rightMinmax = Query(node->childR, l, r);
-    int minimum = min(leftMinmax.minimum, rightMinmax.minimum);
-    int maximum = max(leftMinmax.maximum, rightMinmax.maximum);
-    return Pair(minimum, maximum);
-}
-
-Pair SetSegtree(int nodeIndex, int l, int r)
-{
-    if(l == r)
+    Snapshot s = snapshot;
+    // Red
+    while(blocks[s.redPoint.y][s.redPoint.x] == '.' && !(s.bluePoint == s.redPoint))
     {
-        int num = numbers[l];
-        Pair p = Pair(num, num);
-        segtree[nodeIndex] = Node(p, l, r, segtree+nodeIndex, segtree+nodeIndex);
-        return p;
+        s.redPoint.x += dx[d]; s.redPoint.y += dy[d];
+    }
+    s.redCompleted = (s.redPoint == goal);
+    if(!s.redCompleted)
+    {
+        s.redPoint.x -= dx[d]; s.redPoint.y -= dy[d];
     }
 
-    int mid = (l+r)/2;
-    int rIndex = (nodeIndex+1) * 2;
-    int lIndex = rIndex - 1;
-    Pair leftMinmax = SetSegtree(lIndex, l, mid);
-    Pair rightMinmax = SetSegtree(rIndex, mid+1, r);
-    int minimum = min(leftMinmax.minimum, rightMinmax.minimum);
-    int maximum = max(leftMinmax.maximum, rightMinmax.maximum);
+    // Blue
+    while(blocks[s.bluePoint.y][s.bluePoint.x] == '.' && !(s.bluePoint == s.redPoint))
+    {
+        s.bluePoint.x += dx[d]; s.bluePoint.y += dy[d];
+    }
+    s.blueCompleted = (s.bluePoint == goal);
+    if(!s.blueCompleted)
+    {
+        s.bluePoint.x -= dx[d]; s.bluePoint.y -= dy[d];
+    }
+    else return s;
 
-    Pair minmax = Pair(minimum, maximum);
+    // Red
+    while(blocks[s.redPoint.y][s.redPoint.x] == '.' && !(s.bluePoint == s.redPoint))
+    {
+        s.redPoint.x += dx[d]; s.redPoint.y += dy[d];
+    }
+    s.redCompleted = (s.redPoint == goal);
+    if(!s.redCompleted)
+    {
+        s.redPoint.x -= dx[d]; s.redPoint.y -= dy[d];
+    }
 
-    segtree[nodeIndex] = Node(minmax, l, r, segtree+lIndex, segtree+rIndex);
+    s.move_cnt++;
 
-    return minmax;
+    return s;
 }
 
 int main()
@@ -91,21 +90,49 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int N, M;
-    cin >> N >> M;
-    numbers = new int[N];
-    segtree = new Node[FindSize(N)];
+    cin >> Y >> X;
+    blocks = new char*[Y];
+    FOR(y, 0, Y) blocks[y] = new char[X];
 
-    FOR(i, 0, N) cin >> numbers[i];
+    Snapshot firstSnapshot;
 
-    SetSegtree(0, 0, N);
-
-    FOR(i, 0, M)
+    FOR(y, 0, Y) FOR(x, 0, X)
     {
-        int l, r; cin >> l >> r; l--; r--;
-        Pair p = Query(segtree, l, r);
-        cout << p.minimum << ' ' << p.maximum << '\n';
+        char input; cin >> input;
+        blocks[y][x] = input == 'R' || input == 'B' ? '.' : input;
+
+        Point p = (struct Point){x, y};
+        if(input == 'R') firstSnapshot.redPoint = p;
+        else if(input == 'B') firstSnapshot.bluePoint = p;
+        else if(input == 'O') goal = p;
     }
 
+    queue<Snapshot> q;
+    q.push(firstSnapshot);
+    while (!q.empty())
+    {
+        Snapshot f = q.front(); q.pop();
+        if(f.move_cnt > 10) continue;
+
+        FOR(i, 0, 4)
+        {
+            if(f.last_dir == i) continue;
+            Snapshot newSnapshot = NewSnapshot(f, (Direction)i);
+
+            if(newSnapshot == f) continue;
+            if(newSnapshot.blueCompleted) continue;
+
+            if(newSnapshot.move_cnt > 10) break;
+
+            if(newSnapshot.move_cnt <= 10 && newSnapshot.redCompleted)
+            {
+                cout << newSnapshot.move_cnt;
+                return 0;
+            }
+            q.push(newSnapshot);
+        }
+    }
+
+    cout << -1;
     return 0;
 }
