@@ -1,97 +1,33 @@
 #include <iostream>
-#include <queue>
+#include <cmath>
 #define FOR(i, s, e) for(int i=s ; i<e ; ++i)
 using namespace std;
 
-int dx[4] = {0, 0, 1, -1};
-int dy[4] = {-1, 1, 0, 0};
+int cnt = 0, N, *xOnY;
 
-struct Snapshot
+bool isValid(int y)
 {
-    int x, y;
-    int dist = 1;
-    bool destroy = false;
+    FOR(i, 0, y) if(xOnY[y] == xOnY[i] || y - i == abs(xOnY[y] - xOnY[i])) return false;
+    return true;
+}
 
-    Snapshot(int _x, int _y)
-    {
-        x = _x;
-        y = _y;
-    }
-};
+void find(int y)
+{
+    if(y == N) { cnt++; return; }
+    FOR(i, 0, N) { xOnY[y] = i; if(isValid(y)) find(y+1); }
+}
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int Y, X; cin >> Y >> X;
+    cin >> N;
+    xOnY = new int[N];
 
-    if(Y == 1 && X == 1)
-    {
-        cout << 1;
-        return 0;
-    }
+    find(0);
 
-    bool blocked[Y][X];
-    bool visited[Y][X];
-    bool visited_crashed[Y][X];
-
-    FOR(y, 0, Y)
-    {
-        string input;
-        cin >> input;
-        FOR(x, 0, X)
-        {
-            blocked[y][x] = input[x]-'0';
-            visited[y][x] = false;
-            visited_crashed[y][x] = false;
-        }
-    }
-
-    queue<Snapshot> q;
-    q.push(Snapshot(0, 0));
-
-    while(!q.empty())
-    {
-        Snapshot f = q.front(); q.pop();
-        if(!f.destroy) visited[f.y][f.x] = true;
-        if(f.destroy) visited_crashed[f.y][f.x] = true;
-
-        FOR(i, 0, 4)
-        {
-            int nx = f.x + dx[i];
-            int ny = f.y + dy[i];
-
-            if(ny < 0 || ny >= Y || nx < 0 || nx >= X) continue;
-
-            if(nx == X-1 && ny == Y-1)
-            {
-                cout << f.dist + 1;
-                return 0;
-            }
-
-            
-            if(!f.destroy && visited[ny][nx]) continue;
-            if(f.destroy && visited_crashed[ny][nx]) continue;
-
-            Snapshot snapshot = Snapshot(nx, ny);
-            snapshot.destroy = f.destroy;
-
-            if(blocked[ny][nx])
-            {
-                snapshot.destroy = true;
-                if(f.destroy) continue;
-            }
-            snapshot.dist = f.dist + 1;
-
-            if(!snapshot.destroy) visited[ny][nx] = true;
-            if(snapshot.destroy) visited_crashed[ny][nx] = true;
-
-            q.push(snapshot);
-        }
-    }
-
-    cout << -1;
+    cout << cnt;
 
     return 0;
 }
