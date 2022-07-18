@@ -1,65 +1,96 @@
 #include <iostream>
-#include <cmath>
-#include <vector>
+#include <queue>
 #define FOR(i, s, e) for(int i=s ; i<e ; ++i)
 using namespace std;
 
-bool** island;
-bool** visited;
-
-int X=1, Y=1;
-int dx[8] = {0, 0, -1, 1, 1, -1, 1, -1};
-int dy[8] = {-1, 1, 0, 0, 1, -1, -1, 1};
-
-void DFS(int x, int y)
+struct P
 {
-    visited[y][x] = 1;
-    FOR(i, 0, 8)
+    int x, y, cnt=0;
+    P() {}
+    P(int _x, int _y)
     {
-        int nx = x + dx[i];
-        int ny = y + dy[i];
-        if(nx < 0 || ny < 0 || nx >= X || ny >= Y || !island[ny][nx] || visited[ny][nx]) continue;
-        DFS(nx, ny);
+        x = _x;
+        y = _y;
     }
-}
+    P(int _x, int _y, int _c)
+    {
+        x = _x;
+        y = _y;
+        cnt = _c;
+    }
+    P operator+ (const P& p)
+    {
+        return P(p.x + x, p.y + y, cnt+1);
+    }
+    P operator- (const P& p)
+    {
+        return P(x - p.x, y - p.y, cnt);
+    }
+    bool operator== (const P& p)
+    {
+        return (p.x == x) && (p.y == y);
+    }
+};
+
+P dif[8] = {P(-2, 1), P(-1, 2), P(1, 2), P(2, 1), P(2, -1), P(1, -2), P(-1, -2), P(-2, -1)};
+bool** visited;
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    cin >> X >> Y;
-    vector<int> answers;
+    int T; cin >> T;
 
-    while(X != 0 && Y != 0)
+    int answers[T];
+
+    FOR(t, 0, T)
     {
-        int cnt = 0;
-        island = new bool*[Y];
-        visited = new bool*[Y];
-        FOR(y, 0, Y)
+        int minimumCnt = 0;
+        bool found = 0;
+        int I; cin >> I;
+        visited = new bool*[I];
+        FOR(i, 0, I)
         {
-            island[y] = new bool[X];
-            visited[y] = new bool[X];
-            FOR(x, 0, X) visited[y][x] = 0;
+            visited[i] = new bool[I];
+            FOR(j, 0, I) visited[i][j] = 0;
         }
 
-        FOR(y, 0, Y) FOR(x, 0, X) cin >> island[y][x];
+        P start, end;
+        cin >> start.x >> start.y >> end.x >> end.y;
 
-        FOR(y, 0, Y) FOR(x, 0, X)
+        queue<P> q;
+        q.push(start);
+        while(!q.empty())
         {
-            if(island[y][x] && !visited[y][x])
+            P f = q.front(); q.pop();
+            visited[f.y][f.x] = 1;
+
+            FOR(i, 0, 8)
             {
-                DFS(x, y);
-                cnt++;
+                P np = f + dif[i];
+                if(np.x < 0 || np.y < 0 || np.x >= I || np.y >= I) continue;
+                if(visited[np.y][np.x]) continue;
+
+                if(np == end)
+                {
+                    found = 1;
+                    minimumCnt = np.cnt;
+                    queue<P> emptyQ;
+                    q = emptyQ;
+                    break;
+                }
+
+                visited[np.y][np.x] = true;
+                q.push(np);
             }
+            if(found) break;
         }
 
-        answers.push_back(cnt);
-
-        cin >> X >> Y;
+        answers[t] = minimumCnt;
     }
 
-    FOR(i, 0, answers.size()) cout << answers[i] << '\n';
+    FOR(t, 0, T) cout << answers[t] << '\n';
 
     return 0;
 }
