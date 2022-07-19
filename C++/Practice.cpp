@@ -6,25 +6,14 @@ using namespace std;
 struct Point
 {
     int x, y;
-    Point(int _x, int _y) { x = _x; y = _y; }
+    Point(int _x, int _y) {x=_x; y=_y;}
 };
 
-int X, Y, L;
-char** MAP;
 short dx[4] = {0, 0, -1, 1};
 short dy[4] = {-1, 1, 0, 0};
 
-bool IsNextToIce(int x, int y)
-{
-    FOR(i, 0, 4)
-    {
-        int nx = x + dx[i];
-        int ny = y + dy[i];
-        if(nx < 0 || nx >= X || ny < 0 || ny >= Y) continue;
-        if(MAP[ny][nx] == 'X') return true;
-    }
-    return false;
-}
+int X, Y;
+int** blocks;
 
 int main()
 {
@@ -33,92 +22,63 @@ int main()
 
     cin >> Y >> X;
 
-    MAP = new char*[Y];
-
-    Point lastlp = Point(0, 0);
-
-    FOR(y, 0, Y)
+    blocks = new int*[Y];
+    queue<Point> blQ;
+    int blockCnt = 0;
+    FOR(y,0,Y)
     {
-        MAP[y] = new char[X];
+        blocks[y] = new int[X];
         string input; cin >> input;
-        FOR(x, 0, X)
+        FOR(x,0,X)
         {
-            MAP[y][x] = input[x];
-            if(input[x] == 'L')
+            blocks[y][x] = 0;
+            if(input[x] == '1')
             {
-                lastlp = Point(x, y);
-                L++;
+                blockCnt++;
+                blocks[y][x] = -blockCnt; // block들은 순차적으로 -1, -2로 저장됨.
+                blQ.push(Point(x, y));
             }
         }
     }
 
-    queue<Point> q, xQ, lQ, lxQ;
-    // q 초기화
-    FOR(y, 0, Y) FOR(x, 0, X)
+    while(!blQ.empty())
     {
-        if(MAP[y][x] == 'L' || MAP[y][x] == '.') if(IsNextToIce(x, y)) q.push(Point(x, y));
-    }
-    lQ.push(lastlp);
-    MAP[lastlp.y][lastlp.x] = 'O';
+        Point bp = blQ.front(); blQ.pop();
+        int cnt = 0;
 
-    int days = 0, swans = 1;
+        queue<Point> q;
+        q.push(bp);
 
-    while(!q.empty())
-    {
-        Point p = q.front(); q.pop();
-
-        FOR(i, 0, 4)
+        while(!q.empty())
         {
-            int nx = p.x + dx[i];
-            int ny = p.y + dy[i];
-            if(nx<0 || ny<0 || nx>=X || ny>=Y || MAP[ny][nx] != 'X') continue;
-
-            MAP[ny][nx] = '/';
-            xQ.push(Point(nx, ny));
-        }
-        
-        if(q.empty())
-        {
-            days++;
-            // cout << '\n';
-            // FOR(y, 0, Y)
-            // {
-            //     FOR(x, 0, X) cout << MAP[y][x];
-            //     cout << '\n';
-            // }
-            while(!lQ.empty())
+            Point p = q.front(); q.pop();
+            FOR(i, 0, 4)
             {
-                Point lp = lQ.front(); lQ.pop();
-                
-                FOR(i, 0, 4)
-                {
-                    int lnx = lp.x + dx[i];
-                    int lny = lp.y + dy[i];
-                    if(lnx<0 || lny<0 || lnx>=X || lny>=Y) continue;
-                    if(MAP[lny][lnx] == 'O') continue;
-                    if(MAP[lny][lnx] == 'X')
-                    {
-                        MAP[lny][lnx] = 'O';
-                        lxQ.push(Point(lnx, lny));
-                        continue;
-                    }
-                    if(MAP[lny][lnx] == 'L') swans++;
-                    if(swans == L)
-                    {
-                        cout << days;
-                        return 0;
-                    }
+                int nx = p.x + dx[i];
+                int ny = p.y + dy[i];
 
-                    MAP[lny][lnx] = 'O';
-                    lQ.push(Point(lnx, lny));
-                }
+                if(nx<0 || ny<0 || nx>=X || ny>=Y
+                || blocks[ny][nx] > 0
+                || blocks[ny][nx] <= blocks[bp.y][bp.x]) continue;
+
+                blocks[ny][nx] = blocks[bp.y][bp.x];
+                q.push(Point(nx, ny));
+                cnt++;
             }
-
-            while(!xQ.empty()) { q.push(xQ.front()); xQ.pop(); }
-            while(!lxQ.empty()) { lQ.push(lxQ.front()); lxQ.pop(); }
         }
+        blocks[bp.y][bp.x] = cnt;
     }
-    cout << days;
+
+    FOR(y,0,Y)
+    {
+        FOR(x,0,X)
+        {
+            int bc = (blocks[y][x] + 1) % 10;
+            if(bc < 0) bc = 0;
+            cout << bc;
+        }
+        cout << '\n';
+    }
 
     return 0;
 }
