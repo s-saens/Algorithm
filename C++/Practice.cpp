@@ -5,21 +5,14 @@ using namespace std;
 
 struct Point
 {
-    int x, y, d=0, s=0;
+    int x, y;
     Point(int _x, int _y) { x = _x; y = _y; }
-    Point(int _x, int _y, int _d) { x = _x; y = _y; d = _d; }
 };
 
 int X, Y, L;
 char** MAP;
-bool** visited;
 short dx[4] = {0, 0, -1, 1};
 short dy[4] = {-1, 1, 0, 0};
-
-void InitVisited()
-{
-    FOR(y, 0, Y) FOR(x, 0, X) visited[y][x] = 0;
-}
 
 bool IsNextToIce(int x, int y)
 {
@@ -41,14 +34,12 @@ int main()
     cin >> Y >> X;
 
     MAP = new char*[Y];
-    visited = new bool*[Y];
 
     Point lastlp = Point(0, 0);
 
     FOR(y, 0, Y)
     {
         MAP[y] = new char[X];
-        visited[y] = new bool[Y];
         string input; cin >> input;
         FOR(x, 0, X)
         {
@@ -68,7 +59,7 @@ int main()
         if(MAP[y][x] == 'L' || MAP[y][x] == '.') if(IsNextToIce(x, y)) q.push(Point(x, y));
     }
     lQ.push(lastlp);
-    MAP[lastlp.y][lastlp.x] = '_';
+    MAP[lastlp.y][lastlp.x] = 'O';
 
     int days = 0, swans = 1;
 
@@ -80,20 +71,21 @@ int main()
         {
             int nx = p.x + dx[i];
             int ny = p.y + dy[i];
-            if(nx<0 || ny<0 || nx>=X || ny>=Y || visited[ny][nx]) continue;
-            visited[ny][nx] = true;
+            if(nx<0 || ny<0 || nx>=X || ny>=Y || MAP[ny][nx] != 'X') continue;
 
-            if(MAP[ny][nx] == 'X')
-            {
-                MAP[ny][nx] = '/';
-                days = p.d+1;
-                xQ.push(Point(nx, ny, p.d+1));
-            }
+            MAP[ny][nx] = '/';
+            xQ.push(Point(nx, ny));
         }
         
-
         if(q.empty())
         {
+            days++;
+            // cout << '\n';
+            // FOR(y, 0, Y)
+            // {
+            //     FOR(x, 0, X) cout << MAP[y][x];
+            //     cout << '\n';
+            // }
             while(!lQ.empty())
             {
                 Point lp = lQ.front(); lQ.pop();
@@ -106,21 +98,21 @@ int main()
                     if(MAP[lny][lnx] == 'O') continue;
                     if(MAP[lny][lnx] == 'X')
                     {
+                        MAP[lny][lnx] = 'O';
                         lxQ.push(Point(lnx, lny));
                         continue;
                     }
                     if(MAP[lny][lnx] == 'L') swans++;
-
-                    MAP[lny][lnx] = 'O';
                     if(swans == L)
                     {
                         cout << days;
                         return 0;
                     }
+
+                    MAP[lny][lnx] = 'O';
                     lQ.push(Point(lnx, lny));
                 }
             }
-
 
             while(!xQ.empty()) { q.push(xQ.front()); xQ.pop(); }
             while(!lxQ.empty()) { lQ.push(lxQ.front()); lxQ.pop(); }
