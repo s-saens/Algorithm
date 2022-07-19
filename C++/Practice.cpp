@@ -9,59 +9,43 @@ struct Point
     Point(int _x, int _y) { x = _x; y = _y; }
 };
 
-int N, L, R;
-int** populations;
+int X, Y, L;
+char** MAP;
 bool** visited;
-
-int dx[4] = {0, 0, -1, 1};
-int dy[4] = {-1, 1, 0, 0};
-
-bool canMove(int x, int y, int nx, int ny)
-{
-    if(nx < 0 || nx >= N || ny < 0 || ny >= N || visited[ny][nx]) return false;
-    
-    int dif = abs(populations[ny][nx] - populations[y][x]);
-    if(L <= dif && dif <= R) return true;
-    return false;
-}
+short dx[4] = {0, 0, -1, 1};
+short dy[4] = {-1, 1, 0, 0};
 
 bool bfs(int x, int y)
 {
-    visited[y][x] = 1;
-    int sum = populations[y][x];
-    int cnt = 1;
-    queue<Point> q, tempQ;
+    int swans = 0;
+    queue<Point> q, xQ;
     q.push(Point(x, y));
+    visited[y][x] = 1;
 
     while(!q.empty())
     {
         Point p = q.front(); q.pop();
-        tempQ.push(p);
 
         FOR(i, 0, 4)
         {
-            int nx = p.x + dx[i], ny = p.y + dy[i];
-
-            if(!canMove(p.x, p.y, nx, ny)) continue;
-
+            int nx = p.x + dx[i];
+            int ny = p.y + dy[i];
+            if(nx<0 || ny<0 || nx>=X || ny>=Y || visited[ny][nx]) continue;
             visited[ny][nx] = true;
-            sum += populations[ny][nx];
-            cnt++;
-            q.push(Point(nx, ny));
+            switch (MAP[ny][nx])
+            {
+                case 'L': swans++; if(swans == L) return true;
+                case '.': q.push(Point(nx, ny)); break;
+                case 'X': MAP[ny][nx] = '.'; break;
+            }
         }
     }
+    return false;
+}
 
-    if(tempQ.size() == 1) return false;
-
-    sum /= cnt;
-
-    while(!tempQ.empty())
-    {
-        Point p = tempQ.front(); tempQ.pop();
-        populations[p.y][p.x] = sum;
-    }
-
-    return true;
+void InitVisited()
+{
+    FOR(y, 0, Y) FOR(x, 0, X) visited[y][x] = 0;
 }
 
 int main()
@@ -69,37 +53,34 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    cin >> N >> L >> R;
+    cin >> Y >> X;
 
-    populations = new int*[N];
-    visited = new bool*[N];
-    FOR(i, 0, N)
+    MAP = new char*[Y];
+    visited = new bool*[Y];
+    FOR(y, 0, Y)
     {
-        populations[i] = new int[N];
-        visited[i] = new bool[N];
-        FOR(j, 0, N)
+        MAP[y] = new char[X];
+        visited[y] = new bool[Y];
+        string input; cin >> input;
+        FOR(x, 0, X)
         {
-            cin >> populations[i][j];
-            visited[i][j] = 0;
+            MAP[y][x] = input[x];
+            if(input[x] == 'L') L++;
         }
     }
 
-    int cnt = 0;
-    bool found = true;
-    while(found)
+    int days = 0;
+    while(true)
     {
-        found = false;
+        InitVisited();
 
-        FOR(y, 0, N) FOR(x, 0, N) if(!visited[y][x] && bfs(x, y)) found = true;
-
-        if(found)
+        FOR(y, 0, Y) FOR(x, 0, X) if(!visited[y][x] && MAP[y][x] == '.' && bfs(x, y))
         {
-            FOR(y, 0, N) FOR(x, 0, N) visited[y][x] = 0;
-            cnt++;
+            cout << days;
+            return 0;
         }
+        days++;
     }
-    
-    cout << cnt;
-    
+
     return 0;
 }
