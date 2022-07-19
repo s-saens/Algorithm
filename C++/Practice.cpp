@@ -3,94 +3,103 @@
 #define FOR(i, s, e) for(int i=s ; i<e ; ++i)
 using namespace std;
 
-struct P
+struct Point
 {
-    int x, y, cnt=0;
-    P() {}
-    P(int _x, int _y)
-    {
-        x = _x;
-        y = _y;
-    }
-    P(int _x, int _y, int _c)
-    {
-        x = _x;
-        y = _y;
-        cnt = _c;
-    }
-    P operator+ (const P& p)
-    {
-        return P(p.x + x, p.y + y, cnt+1);
-    }
-    P operator- (const P& p)
-    {
-        return P(x - p.x, y - p.y, cnt);
-    }
-    bool operator== (const P& p)
-    {
-        return (p.x == x) && (p.y == y);
-    }
+    int x, y;
+    Point(int _x, int _y) { x = _x; y = _y; }
 };
 
-P dif[8] = {P(-2, 1), P(-1, 2), P(1, 2), P(2, 1), P(2, -1), P(1, -2), P(-1, -2), P(-2, -1)};
+int N, L, R;
+int** populations;
 bool** visited;
+
+int dx[4] = {0, 0, -1, 1};
+int dy[4] = {-1, 1, 0, 0};
+
+bool canMove(int x, int y, int nx, int ny)
+{
+    if(nx < 0 || nx >= N || ny < 0 || ny >= N || visited[ny][nx]) return false;
+    
+    int dif = abs(populations[ny][nx] - populations[y][x]);
+    if(L <= dif && dif <= R) return true;
+    return false;
+}
+
+bool bfs(int x, int y)
+{
+    visited[y][x] = 1;
+    int sum = populations[y][x];
+    int cnt = 1;
+    queue<Point> q, tempQ;
+    q.push(Point(x, y));
+
+    while(!q.empty())
+    {
+        Point p = q.front(); q.pop();
+        tempQ.push(p);
+
+        FOR(i, 0, 4)
+        {
+            int nx = p.x + dx[i], ny = p.y + dy[i];
+
+            if(!canMove(p.x, p.y, nx, ny)) continue;
+
+            visited[ny][nx] = true;
+            sum += populations[ny][nx];
+            cnt++;
+            q.push(Point(nx, ny));
+        }
+    }
+
+    if(tempQ.size() == 1) return false;
+
+    sum /= cnt;
+
+    while(!tempQ.empty())
+    {
+        Point p = tempQ.front(); tempQ.pop();
+        populations[p.y][p.x] = sum;
+    }
+
+    return true;
+}
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    int T; cin >> T;
+    cin >> N >> L >> R;
 
-    int answers[T];
-
-    FOR(t, 0, T)
+    populations = new int*[N];
+    visited = new bool*[N];
+    FOR(i, 0, N)
     {
-        int minimumCnt = 0;
-        bool found = 0;
-        int I; cin >> I;
-        visited = new bool*[I];
-        FOR(i, 0, I)
+        populations[i] = new int[N];
+        visited[i] = new bool[N];
+        FOR(j, 0, N)
         {
-            visited[i] = new bool[I];
-            FOR(j, 0, I) visited[i][j] = 0;
+            cin >> populations[i][j];
+            visited[i][j] = 0;
         }
-
-        P start, end;
-        cin >> start.x >> start.y >> end.x >> end.y;
-
-        queue<P> q;
-        q.push(start);
-        while(!q.empty())
-        {
-            P f = q.front(); q.pop();
-            visited[f.y][f.x] = 1;
-
-            FOR(i, 0, 8)
-            {
-                P np = f + dif[i];
-                if(np.x < 0 || np.y < 0 || np.x >= I || np.y >= I) continue;
-                if(visited[np.y][np.x]) continue;
-
-                if(np == end)
-                {
-                    found = 1;
-                    minimumCnt = np.cnt;
-                    queue<P> emptyQ;
-                    q = emptyQ;
-                    break;
-                }
-
-                visited[np.y][np.x] = true;
-                q.push(np);
-            }
-            if(found) break;
-        }
-
-        answers[t] = minimumCnt;
     }
 
-    FOR(t, 0, T) cout << answers[t] << '\n';
+    int cnt = 0;
+    bool found = true;
+    while(found)
+    {
+        found = false;
 
+        FOR(y, 0, N) FOR(x, 0, N) if(!visited[y][x] && bfs(x, y)) found = true;
+
+        if(found)
+        {
+            FOR(y, 0, N) FOR(x, 0, N) visited[y][x] = 0;
+            cnt++;
+        }
+    }
+    
+    cout << cnt;
+    
     return 0;
 }
