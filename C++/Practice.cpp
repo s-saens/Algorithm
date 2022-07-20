@@ -24,56 +24,67 @@ int main()
 
     blocks = new int*[Y];
     queue<Point> blQ;
-    int blockCnt = 0;
     FOR(y,0,Y)
     {
         blocks[y] = new int[X];
         string input; cin >> input;
         FOR(x,0,X)
         {
-            blocks[y][x] = 0;
-            if(input[x] == '1')
-            {
-                blockCnt++;
-                blocks[y][x] = -blockCnt; // block들은 순차적으로 -1, -2로 저장됨.
-                blQ.push(Point(x, y));
-            }
+            blocks[y][x] = input[x] - '0';
+            if(blocks[y][x] == 0) blQ.push(Point(x, y));
         }
     }
 
-    while(!blQ.empty())
+    while(!blQ.empty()) // 0인 부분 빼기
     {
-        Point bp = blQ.front(); blQ.pop();
-        int cnt = 0;
+        Point blp = blQ.front(); blQ.pop();
+        if(blocks[blp.y][blp.x] < 0) continue;
 
         queue<Point> q;
-        q.push(bp);
+        queue<Point> q2;
+        q.push(blp);
+
+        int cnt0 = 0;
 
         while(!q.empty())
         {
             Point p = q.front(); q.pop();
+            blocks[p.y][p.x] = -1;
+            cnt0++;
+            
             FOR(i, 0, 4)
             {
                 int nx = p.x + dx[i];
                 int ny = p.y + dy[i];
+                if(nx<0 || ny<0 || nx>=X || ny>=Y) continue;
+                Point np = Point(nx, ny);
 
-                if(nx<0 || ny<0 || nx>=X || ny>=Y
-                || blocks[ny][nx] > 0
-                || blocks[ny][nx] <= blocks[bp.y][bp.x]) continue;
-
-                blocks[ny][nx] = blocks[bp.y][bp.x];
-                q.push(Point(nx, ny));
-                cnt++;
+                if(blocks[ny][nx] > 0)
+                {
+                    blocks[ny][nx] *= -1;
+                    q2.push(np);
+                }
+                else if(blocks[ny][nx] == 0)
+                {
+                    blocks[ny][nx] = -1;
+                    q.push(np);
+                }
             }
         }
-        blocks[bp.y][bp.x] = cnt;
+
+        while(!q2.empty())
+        {
+            Point p2 = q2.front(); q2.pop();
+            blocks[p2.y][p2.x] *= -1;
+            blocks[p2.y][p2.x] += cnt0;
+        }
     }
 
     FOR(y,0,Y)
     {
         FOR(x,0,X)
         {
-            int bc = (blocks[y][x] + 1) % 10;
+            int bc = blocks[y][x] % 10;
             if(bc < 0) bc = 0;
             cout << bc;
         }
