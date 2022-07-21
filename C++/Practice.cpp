@@ -1,95 +1,78 @@
 #include <iostream>
 #include <queue>
-#define FOR(i, s, e) for(int i=s ; i<e ; ++i)
+#include <set>
+#define FOR(i,s,e) for(int i=s;i<e;++i)
 using namespace std;
 
-struct Point
+short d[4] = {-1, 1, -3, 3};
+
+struct Snapshot
 {
-    int x, y;
-    Point(int _x, int _y) {x=_x; y=_y;}
+    string snapshot;
+    short index = -1;
+    short lastDir = -1;
+    int cnt = 0;
+    Snapshot(string s, short i, short l, int c){snapshot = s;index = i;lastDir = l;cnt = c;}
 };
 
-short dx[4] = {0, 0, -1, 1};
-short dy[4] = {-1, 1, 0, 0};
 
-int X, Y;
-int** blocks;
+string Swap(string _s, short i1, short i2)
+{
+    string s = _s;
+    char temp = s[i1];
+    s[i1] = s[i2];
+    s[i2] = temp;
+    return s;
+}
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    cin >> Y >> X;
+    string input = "123456780";
+    string answer = "123456780";
+    set<string> visitedStrings;
 
-    blocks = new int*[Y];
-    queue<Point> blQ;
-    FOR(y,0,Y)
+    short zeroIndex = -1;
+    FOR(i,0,9)
     {
-        blocks[y] = new int[X];
-        string input; cin >> input;
-        FOR(x,0,X)
-        {
-            blocks[y][x] = input[x] - '0';
-            if(blocks[y][x] == 0) blQ.push(Point(x, y));
-        }
+        cin >> input[i];
+        if(input[i] == '0') zeroIndex = i;
     }
 
-    while(!blQ.empty()) // 0인 부분 빼기
+    queue<Snapshot> q;
+    Snapshot fs = Snapshot(input, zeroIndex, -1, 0);
+
+    q.push(fs);
+
+    bool found = false;
+    while(!q.empty())
     {
-        Point blp = blQ.front(); blQ.pop();
-        if(blocks[blp.y][blp.x] < 0) continue;
-
-        queue<Point> q;
-        queue<Point> q2;
-        q.push(blp);
-
-        int cnt0 = 0;
-
-        while(!q.empty())
+        Snapshot s = q.front(); q.pop();
+        if(s.snapshot == answer)
         {
-            Point p = q.front(); q.pop();
-            blocks[p.y][p.x] = -1;
-            cnt0++;
-            
-            FOR(i, 0, 4)
+            cout << s.cnt;
+            return 0;
+        }
+        FOR(i,0,4)
+        {
+            int ni = s.index + d[i];
+            if(ni<0 || ni>=9 || d[i] * (ni % 3 - s.index % 3) < 0) continue;
+            if(s.lastDir > 0)
             {
-                int nx = p.x + dx[i];
-                int ny = p.y + dy[i];
-                if(nx<0 || ny<0 || nx>=X || ny>=Y) continue;
-                Point np = Point(nx, ny);
-
-                if(blocks[ny][nx] > 0)
-                {
-                    blocks[ny][nx] *= -1;
-                    q2.push(np);
-                }
-                else if(blocks[ny][nx] == 0)
-                {
-                    blocks[ny][nx] = -1;
-                    q.push(np);
-                }
+                short m = d[ni] * d[s.lastDir];
+                if (m == -1 || m == -9) continue;
             }
-        }
-
-        while(!q2.empty())
-        {
-            Point p2 = q2.front(); q2.pop();
-            blocks[p2.y][p2.x] *= -1;
-            blocks[p2.y][p2.x] += cnt0;
+            string sw = Swap(s.snapshot, s.index, ni);
+            if (visitedStrings.find(sw) != visitedStrings.end()) continue;
+            
+            visitedStrings.insert(sw);
+            q.push(Snapshot(sw, ni, i, s.cnt + 1));
         }
     }
 
-    FOR(y,0,Y)
-    {
-        FOR(x,0,X)
-        {
-            int bc = blocks[y][x] % 10;
-            if(bc < 0) bc = 0;
-            cout << bc;
-        }
-        cout << '\n';
-    }
+    cout << -1;
 
     return 0;
 }
