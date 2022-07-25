@@ -1,74 +1,72 @@
 #include <iostream>
 #include <queue>
-#include <set>
 #define FOR(i,s,e) for(int i=s;i<e;++i)
 using namespace std;
 
-short d[4] = {-1, 1, -3, 3};
+short dx[4] = {0, 0, -1, 1};
+short dy[4] = {-1, 1, 0, 0};
 
-struct Snapshot
+struct Point
 {
-    string snapshot;
-    short index = -1;
-    short lastDir = -1;
-    int cnt = 0;
-    Snapshot(string s, short i, short l, int c){snapshot = s;index = i;lastDir = l;cnt = c;}
+    int x, y, d = 0;
+    bool brokeAlready = false;
+    Point(int _x, int _y){x = _x;y = _y;}
+    Point(int _x, int _y, int _d, bool br)
+    {
+        x = _x; y = _y; d = _d;  brokeAlready = br;
+    }
 };
 
-
-string Swap(string _s, short i1, short i2)
-{
-    string s = _s;
-    char temp = s[i1];
-    s[i1] = s[i2];
-    s[i2] = temp;
-    return s;
-}
 
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    string input = "123456780";
-    string answer = "123456780";
-    set<string> visitedStrings;
+    int Y, X;
+    cin >> Y >> X;
 
-    short zeroIndex = -1;
-    FOR(i,0,9)
+    int startX, startY, endX, endY;
+    cin >> startY >> startX >> endY >> endX;
+    startX--; startY--; endX--; endY--;
+
+    bool maze[Y][X];
+    bool visited[Y][X][2];
+    FOR(y, 0, Y) FOR(x, 0, X)
     {
-        cin >> input[i];
-        if(input[i] == '0') zeroIndex = i;
+        visited[y][x][0] = 0;
+        visited[y][x][1] = 0;
+        cin >> maze[y][x];
     }
 
-    queue<Snapshot> q;
-    Snapshot fs = Snapshot(input, zeroIndex, -1, 0);
+    queue<Point> q;
+    q.push(Point(startX, startY));
+    visited[startY][startX][0] = true;
+    if(startY == endY && startX == endX)
+    {
+        cout << 0;
+        return 0;
+    }
 
-    q.push(fs);
-
-    bool found = false;
     while(!q.empty())
     {
-        Snapshot s = q.front(); q.pop();
-        if(s.snapshot == answer)
+        Point p = q.front(); q.pop();
+
+        FOR(i, 0, 4)
         {
-            cout << s.cnt;
-            return 0;
-        }
-        FOR(i,0,4)
-        {
-            int ni = s.index + d[i];
-            if(ni<0 || ni>=9 || d[i] * (ni % 3 - s.index % 3) < 0) continue;
-            if(s.lastDir > 0)
+            int nx = p.x + dx[i];
+            int ny = p.y + dy[i];
+            if(nx<0||ny<0||nx>=X||ny>=Y||visited[ny][nx][p.brokeAlready]) continue;
+            if(ny == endY && nx == endX)
             {
-                short m = d[ni] * d[s.lastDir];
-                if (m == -1 || m == -9) continue;
+                cout << p.d + 1;
+                return 0;
             }
-            string sw = Swap(s.snapshot, s.index, ni);
-            if (visitedStrings.find(sw) != visitedStrings.end()) continue;
-            
-            visitedStrings.insert(sw);
-            q.push(Snapshot(sw, ni, i, s.cnt + 1));
+            if(maze[ny][nx] && p.brokeAlready) continue;
+            visited[ny][nx][p.brokeAlready] = true;
+            bool br = p.brokeAlready;
+            if(maze[ny][nx]) br = true;
+            q.push(Point(nx, ny, p.d+1, br));
         }
     }
 
