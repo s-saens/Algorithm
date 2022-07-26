@@ -1,76 +1,43 @@
 #include <iostream>
 #include <queue>
-#define FOR(i,s,e) for(int i=s;i<e;++i)
+#define MAX 100004
 using namespace std;
 
-short dx[4] = {0, 0, -1, 1};
-short dy[4] = {-1, 1, 0, 0};
-
-struct Point
-{
-    int x, y, d = 0;
-    bool brokeAlready = false;
-    Point(int _x, int _y){x = _x;y = _y;}
-    Point(int _x, int _y, int _d, bool br)
-    {
-        x = _x; y = _y; d = _d;  brokeAlready = br;
-    }
+struct Pos {
+	int cur, cnt;
 };
 
+int n, k, shortest = 200000000, methods;
+bool vis[MAX] = {0};
+queue<Pos> q;
 
 int main()
 {
-    ios::sync_with_stdio(false);
-    cin.tie(NULL);
+	ios::sync_with_stdio(0); cin.tie(0);
+	cin >> n >> k;
+	q.push((Pos){n, 0});
 
-    int Y, X;
-    cin >> Y >> X;
+	while(!q.empty()) {
+		auto node = q.front(); q.pop();
+		int cur = node.cur, cnt = node.cnt;
 
-    int startX, startY, endX, endY;
-    cin >> startY >> startX >> endY >> endX;
-    startX--; startY--; endX--; endY--;
+		vis[cur] = 1;
 
-    bool maze[Y][X];
-    bool visited[Y][X][2];
-    FOR(y, 0, Y) FOR(x, 0, X)
-    {
-        visited[y][x][0] = 0;
-        visited[y][x][1] = 0;
-        cin >> maze[y][x];
+		if (shortest < cnt) break;
+
+		if (cur == k) {
+			shortest = cnt;
+			methods++;
+			continue;
+		}
+
+		if (cur + 1 <= MAX && !vis[cur + 1])
+            q.push((Pos){cur + 1, cnt + 1});
+        if (cur - 1 >= 0 && !vis[cur - 1])
+            q.push((Pos){cur - 1, cnt + 1});
+        if (cur * 2 <= MAX && !vis[cur * 2])
+            q.push((Pos){cur * 2, cnt + 1});
     }
-
-    queue<Point> q;
-    q.push(Point(startX, startY));
-    visited[startY][startX][0] = true;
-    if(startY == endY && startX == endX)
-    {
-        cout << 0;
-        return 0;
-    }
-
-    while(!q.empty())
-    {
-        Point p = q.front(); q.pop();
-
-        FOR(i, 0, 4)
-        {
-            int nx = p.x + dx[i];
-            int ny = p.y + dy[i];
-            if(nx<0||ny<0||nx>=X||ny>=Y||visited[ny][nx][p.brokeAlready]) continue;
-            if(ny == endY && nx == endX)
-            {
-                cout << p.d + 1;
-                return 0;
-            }
-            if(maze[ny][nx] && p.brokeAlready) continue;
-            visited[ny][nx][p.brokeAlready] = true;
-            bool br = p.brokeAlready;
-            if(maze[ny][nx]) br = true;
-            q.push(Point(nx, ny, p.d+1, br));
-        }
-    }
-
-    cout << -1;
-
-    return 0;
+	
+	cout << shortest << '\n' << methods;
 }
