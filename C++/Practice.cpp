@@ -1,43 +1,65 @@
 #include <iostream>
 #include <queue>
-#define MAX 100004
+#define FOR(i,s,e) for(int i=s;i<e;++i)
+#define MAX 100002
 using namespace std;
 
-struct Pos {
-	int cur, cnt;
+struct Snapshot
+{
+    int x, t=0;
+    Snapshot(int _x, int _t)
+    {
+        x = _x; t = _t;
+    }
 };
 
-int n, k, shortest = 200000000, methods;
-bool vis[MAX] = {0};
-queue<Pos> q;
+int N, K;
+bool visited[MAX] = { 0 };
+short dx[3] = {1, -1, 2};
+
 
 int main()
 {
-	ios::sync_with_stdio(0); cin.tie(0);
-	cin >> n >> k;
-	q.push((Pos){n, 0});
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
 
-	while(!q.empty()) {
-		auto node = q.front(); q.pop();
-		int cur = node.cur, cnt = node.cnt;
+    cin >> N >> K;
 
-		vis[cur] = 1;
-
-		if (shortest < cnt) break;
-
-		if (cur == k) {
-			shortest = cnt;
-			methods++;
-			continue;
-		}
-
-		if (cur + 1 <= MAX && !vis[cur + 1])
-            q.push((Pos){cur + 1, cnt + 1});
-        if (cur - 1 >= 0 && !vis[cur - 1])
-            q.push((Pos){cur - 1, cnt + 1});
-        if (cur * 2 <= MAX && !vis[cur * 2])
-            q.push((Pos){cur * 2, cnt + 1});
+    if(N >= K)
+    {
+        cout << N-K << '\n' << 1;
+        return 0;
     }
-	
-	cout << shortest << '\n' << methods;
+
+    int minTime = MAX;
+    int answerCnt = 0;
+
+    queue<Snapshot> q;
+    q.push(Snapshot(N, 0));
+
+    while(!q.empty())
+    {
+        Snapshot s = q.front(); q.pop();
+        if(answerCnt > 0 && minTime <= s.t) break;
+        visited[s.x] = 1;
+
+        FOR(i, 0, 3)
+        {
+            int nx = i<2 ? s.x + dx[i] : s.x * 2;
+            if(nx == K)
+            {
+                answerCnt++;
+                minTime = s.t + 1;
+                continue;
+            }
+
+            if(nx < 0 || nx >= MAX || visited[nx]) continue;
+
+            q.push(Snapshot(nx, s.t+1));
+        }
+    }
+
+    cout << minTime << '\n' << answerCnt;
+
+    return 0;
 }
