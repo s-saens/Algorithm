@@ -1,41 +1,89 @@
 #include <iostream>
-#include <cmath>
+#include <queue>
 #define FOR(i, e) for (int i=0; i<e; ++i)
 using namespace std;
 
-int _x1, _y1, r1, _x2, _y2, _r2;
-
-int Solve()
+struct Point
 {
-    if(_x1==_x2 && _y1==_y2 && r1==_r2) return -1;
+    int x, y, turn=0, lastDir=-1;
+    Point(int _x, int _y, int _t, int _l)
+    {
+        x = _x; y = _y, turn = _t;
+        lastDir = _l;
+    }
+};
 
-    int dx=_x2-_x1, dy=_y2-_y1, dd=dx*dx+dy*dy, rp=_r2+r1, rn=_r2-r1;
-    rp*=rp; rn*=rn;
-    if(rp == dd) return 1; // 외접
-    if(rp < dd) return 0; // 원 밖에서 안만남
+int dx[4] = {0, 0, -1, 1};
+int dy[4] = {-1, 1, 0, 0};
 
-    double minR=(double)min(r1, _r2), maxR=(double)max(r1, _r2);
-    double d = sqrt(dd);
-    if(d + minR == maxR) return 1;
-    if(d + minR < maxR) return 0;
-
-    return 2;
-}
+int X, Y;
+string* board;
 
 int main()
 {
     ios::sync_with_stdio(0);
     cin.tie(0);
 
-    int T; cin >> T;
-    short answers[T];
-    FOR(t, T)
+    cin >> X >> Y;
+    board = new string[Y];
+    int turnCnt[Y][X];
+
+    int startX, startY, endX, endY;
+    bool started = 0;
+
+    FOR(y,Y)
     {
-        cin >> _x1 >> _y1 >> r1 >> _x2 >> _y2 >> _r2;
-        answers[t] = Solve();
+        cin >> board[y];
+        FOR(x, X)
+        {
+            if(board[y][x] == 'C')
+            {
+                if(!started)
+                {
+                    startX = x;
+                    startY = y;
+                    started = 1;
+                }
+                else
+                {
+                    endX = x;
+                    endY = y;
+                }
+            }
+            turnCnt[y][x] = 98754321;
+        }
     }
 
-    FOR(t, T) cout << answers[t] << '\n';
+    queue<Point> q;
+    q.push(Point(startX, startY, 0, -1));
+    board[startY][startX] = '*';
+
+    while(!q.empty())
+    {
+        Point p = q.front(); q.pop();
+
+        FOR(i, 4)
+        {
+            int nx = p.x + dx[i];
+            int ny = p.y + dy[i];
+            int nt = p.turn;
+            Point np = Point(nx, ny, nt, i);
+
+            if (nx < 0 || ny < 0 || nx >= X || ny >= Y || board[ny][nx] == '*') continue;
+            if(i != p.lastDir) np.turn++;
+
+            if(turnCnt[ny][nx] >= np.turn)
+            {
+                turnCnt[ny][nx] = np.turn;
+                q.push(np);
+            }
+        }
+    }
+
+    cout << turnCnt[endY][endX] - 1;
+
+
+
 
     return 0;
 }
