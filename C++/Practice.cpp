@@ -1,89 +1,78 @@
 #include <iostream>
+#include <set>
 #include <queue>
 #define FOR(i, e) for (int i=0; i<e; ++i)
 using namespace std;
 
-struct Point
+struct Node
 {
-    int x, y, turn=0, lastDir=-1;
-    Point(int _x, int _y, int _t, int _l)
+    int level = 0;
+    int parent = -1;
+    set<int> childrenIndexes;
+
+    bool IsLeaf()
     {
-        x = _x; y = _y, turn = _t;
-        lastDir = _l;
+        return childrenIndexes.size() == 0;
     }
 };
 
-int dx[4] = {0, 0, -1, 1};
-int dy[4] = {-1, 1, 0, 0};
-
-int X, Y;
-string* board;
+Node* nodes;
 
 int main()
 {
     ios::sync_with_stdio(0);
     cin.tie(0);
 
-    cin >> X >> Y;
-    board = new string[Y];
-    int turnCnt[Y][X];
+    int N; cin >> N;
+    nodes = new Node[N];
+    int rootIndex = 0;
 
-    int startX, startY, endX, endY;
-    bool started = 0;
-
-    FOR(y,Y)
+    FOR(i, N)
     {
-        cin >> board[y];
-        FOR(x, X)
+        int parentIndex; cin >> parentIndex;
+        if(parentIndex < 0)
         {
-            if(board[y][x] == 'C')
-            {
-                if(!started)
-                {
-                    startX = x;
-                    startY = y;
-                    started = 1;
-                }
-                else
-                {
-                    endX = x;
-                    endY = y;
-                }
-            }
-            turnCnt[y][x] = 98754321;
+            rootIndex = i;
+            nodes[i].level = 0;
+            continue;
         }
+        nodes[i].level = nodes[parentIndex].level + 1;
+        nodes[i].parent = parentIndex;
+        nodes[parentIndex].childrenIndexes.insert(i);
     }
 
-    queue<Point> q;
-    q.push(Point(startX, startY, 0, -1));
-    board[startY][startX] = '*';
+    int removing; cin >> removing;
+
+    if(removing == rootIndex)
+    {
+        cout << 0;
+        return 0;
+    }
+
+    nodes[nodes[removing].parent].childrenIndexes.erase(removing);
+
+    queue<int> q;
+    q.push(rootIndex);
+
+    int answer = 0;
 
     while(!q.empty())
     {
-        Point p = q.front(); q.pop();
+        int f = q.front(); q.pop();
 
-        FOR(i, 4)
+        if(nodes[f].IsLeaf())
         {
-            int nx = p.x + dx[i];
-            int ny = p.y + dy[i];
-            int nt = p.turn;
-            Point np = Point(nx, ny, nt, i);
-
-            if (nx < 0 || ny < 0 || nx >= X || ny >= Y || board[ny][nx] == '*') continue;
-            if(i != p.lastDir) np.turn++;
-
-            if(turnCnt[ny][nx] >= np.turn)
-            {
-                turnCnt[ny][nx] = np.turn;
-                q.push(np);
-            }
+            answer++;
+            continue;
         }
+
+        set<int> &children = nodes[f].childrenIndexes;
+        set<int>::iterator itr;
+
+        for(itr = children.begin(); itr != children.end() ; itr++) q.push(*itr);
     }
 
-    cout << turnCnt[endY][endX] - 1;
-
-
-
+    cout << answer;
 
     return 0;
 }
