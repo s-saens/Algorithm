@@ -1,78 +1,70 @@
 #include <iostream>
-#include <set>
+#include <vector>
 #include <queue>
 #define FOR(i, e) for (int i=0; i<e; ++i)
 using namespace std;
 
 struct Node
 {
-    int level = 0;
-    int parent = -1;
-    set<int> childrenIndexes;
+    char visited = -1;
+    bool checked = false;
 
-    bool IsLeaf()
-    {
-        return childrenIndexes.size() == 0;
-    }
+    vector<int> links;
 };
 
-Node* nodes;
+struct Snapshot
+{
+    int n, d;
+    Snapshot(int _n, int _d) { n = _n; d = _d; }
+};
 
 int main()
 {
     ios::sync_with_stdio(0);
     cin.tie(0);
 
-    int N; cin >> N;
-    nodes = new Node[N];
-    int rootIndex = 0;
+    int N, M; cin >> N >> M;
+    Node nodes[N];
 
-    FOR(i, N)
+    FOR(i, M)
     {
-        int parentIndex; cin >> parentIndex;
-        if(parentIndex < 0)
-        {
-            rootIndex = i;
-            nodes[i].level = 0;
-            continue;
-        }
-        nodes[i].level = nodes[parentIndex].level + 1;
-        nodes[i].parent = parentIndex;
-        nodes[parentIndex].childrenIndexes.insert(i);
+        int a, b; cin >> a >> b; a--; b--;
+        nodes[a].links.push_back(b);
+        nodes[b].links.push_back(a);
     }
+    
+    int sum = 0;
+    char nowSign = 1;
 
-    int removing; cin >> removing;
-
-    if(removing == rootIndex)
+    FOR(k, N)
     {
-        cout << 0;
-        return 0;
-    }
+        queue<Snapshot> q;
+        q.push(Snapshot(k, 1));
 
-    nodes[nodes[removing].parent].childrenIndexes.erase(removing);
+        if(nodes[k].checked) continue;
 
-    queue<int> q;
-    q.push(rootIndex);
+        nodes[k].checked = true;
+        nodes[k].visited = nowSign;
 
-    int answer = 0;
-
-    while(!q.empty())
-    {
-        int f = q.front(); q.pop();
-
-        if(nodes[f].IsLeaf())
+        while(!q.empty())
         {
-            answer++;
-            continue;
+            Snapshot s = q.front(); q.pop();
+
+            vector<int>& links = nodes[s.n].links;
+
+            FOR(i, links.size())
+            {
+                if(nodes[links[i]].visited == nowSign) continue;
+                if(!nodes[links[i]].checked) sum += s.d;
+                nodes[links[i]].visited = nowSign;
+                q.push(Snapshot(links[i], s.d+1));
+            }
         }
 
-        set<int> &children = nodes[f].childrenIndexes;
-        set<int>::iterator itr;
-
-        for(itr = children.begin(); itr != children.end() ; itr++) q.push(*itr);
+        nowSign *= -1;
     }
 
-    cout << answer;
+    cout << sum;
 
     return 0;
 }
