@@ -1,70 +1,45 @@
 #include <iostream>
-#include <vector>
-#include <queue>
-#define FOR(i, e) for (int i=0; i<e; ++i)
+#include <set>
 using namespace std;
-
-struct Node
-{
-    char visited = -1;
-    bool checked = false;
-
-    vector<int> links;
-};
-
-struct Snapshot
-{
-    int n, d;
-    Snapshot(int _n, int _d) { n = _n; d = _d; }
-};
-
 int main()
 {
-    ios::sync_with_stdio(0);
-    cin.tie(0);
+    int N, score, P;
+    cin >> N >> score >> P;
 
-    int N, M; cin >> N >> M;
-    Node nodes[N];
-
-    FOR(i, M)
+    if(N == 0)
     {
-        int a, b; cin >> a >> b; a--; b--;
-        nodes[a].links.push_back(b);
-        nodes[b].links.push_back(a);
+        cout << 1;
+        return 0;
     }
-    
-    int sum = 0;
-    char nowSign = 1;
 
-    FOR(k, N)
+    int firstIndex = -2;
+    int i = 0;
+    for (i = 0; i < P && i < N; ++i)
     {
-        queue<Snapshot> q;
-        q.push(Snapshot(k, 1));
-
-        if(nodes[k].checked) continue;
-
-        nodes[k].checked = true;
-        nodes[k].visited = nowSign;
-
-        while(!q.empty())
+        int n; cin >> n;
+        if(firstIndex < 0)
         {
-            Snapshot s = q.front(); q.pop();
-
-            vector<int>& links = nodes[s.n].links;
-
-            FOR(i, links.size())
+            if(n < score)
             {
-                if(nodes[links[i]].visited == nowSign) continue;
-                if(!nodes[links[i]].checked) sum += s.d;
-                nodes[links[i]].visited = nowSign;
-                q.push(Snapshot(links[i], s.d+1));
+                firstIndex = i;
+                break;
+            }
+            if(n == score)
+            {
+                firstIndex = i;
             }
         }
 
-        nowSign *= -1;
+        if (n == score)
+        {
+            if (i == P - 1)
+            {
+                cout << -1;
+                return 0;
+            }
+        }
     }
-
-    cout << sum;
-
+    if(firstIndex < 0 && N < P) firstIndex = i;
+    cout << firstIndex + 1;
     return 0;
 }
