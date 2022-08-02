@@ -1,29 +1,69 @@
 #include <iostream>
-#define FOR(i,s,e)for(int i=s;i<e;++i)
+#include <cmath>
+#define FOR(i,e)for(int i=0;i<e;++i)
 #define MAX 1001
 using namespace std;
 
-long long dp[MAX];
-
-void Init()
+struct V2
 {
-    dp[0] = 0, dp[1] = 1, dp[2] = 4;
-    FOR(i, 3, MAX) dp[i] = dp[i-1] + (i*(i+1)/2);
-}
+    int x, y;
+
+    V2 operator-(V2 v)
+    {
+        V2 newV;
+        newV.x = x - v.x;
+        newV.y = y - v.y;
+        return newV;
+    }
+
+    short operator>>(V2 v) // 외적. +시계 -반시계
+    {
+        int c = (x * v.y) - (y * v.x);
+        if (c < 0) return -1;
+        if (c > 0) return 1;
+        else return 0;
+    }
+};
 
 int main()
 {
     ios::sync_with_stdio(0);
     cin.tie(0);
     
-    Init();
+    V2 p[3];
+    FOR(i,3) cin >> p[i].x >> p[i].y;
 
-    int T; cin >> T;
-    FOR(t, 0, T)
+    short ccw = (p[1]-p[0]) >> (p[2]-p[0]);
+
+    double area = 0;
+    FOR(i, 3) area += p[i].x * (p[(i+1)%3].y - p[(i+2)%3].y);
+    area /= 2;
+
+    int N, cnt=0; cin >> N;
+    
+    FOR(i, N)
     {
-        int n; cin >> n;
-        printf("%d: %d %lld\n", t+1, n, dp[n]);
+        V2 t;
+        cin >> t.x >> t.y;
+
+        bool yes = 1;
+
+        FOR(j, 3)
+        {
+            V2 a=p[j], b=p[(j+1)%3];
+            V2 ab = b-a;
+            V2 at = t-a;
+
+            short c = ab >> at;
+
+            if (c != ccw && c != 0) yes = 0;
+        }
+
+        if(yes) cnt++;
     }
+
+    printf("%.1f\n%d", abs(area), cnt);
+
 
     return 0;
 }
