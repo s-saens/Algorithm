@@ -1,59 +1,43 @@
 #include <iostream>
-#include <map>
 #include <vector>
-#define FOR(i,e)for(int i=0;i<e;++i)
+#define FOR(i,s,e)for(int i=s;i<e;++i)
+#define ll
 using namespace std;
 
 struct Node
 {
-    int level = 0;
-    map<string, Node> children;
+    int praised=0, parent=-2;
 };
 
-Node start;
-
-void Print(Node& node, string lastString)
-{
-    map<string, Node>::iterator itr;
-    if(lastString.length() > 0)
-    {
-        FOR(i, node.level) cout << "--";
-        cout << lastString << '\n';
-    }
-    for(itr = node.children.begin() ; itr != node.children.end() ; itr++)
-    {
-        Print(itr->second, itr->first);
-    }
-}
+int N, M;
+Node* nodes;
 
 int main()
 {
     ios::sync_with_stdio(0);
     cin.tie(0);
-    
-    int N, K;
-    cin >> N;
 
-    FOR(i, N)
+    cin >> N >> M;
+    nodes = new Node[N];
+
+    FOR(i,0,N)
     {
-        Node* now = &start;
-
-        cin >> K;
-
-        FOR(j, K)
-        {
-            string input; cin >> input;
-            if(now->children.find(input) == now->children.end()) // 자식 중에 없으면 추가하기
-            {
-                Node newNode;
-                newNode.level = j;
-                now->children[input] = newNode;
-            }
-            now = &now->children[input];
-        }
+        int u; cin >> u; u--;
+        nodes[i].parent = u;
     }
 
-    Print(start, "");
+    FOR(i,0,M)
+    {
+        int n, p; cin >> n >> p; n--;
+        nodes[n].praised += p;
+    }
+
+    cout << nodes[0].praised << ' ';
+    FOR(i,1,N)
+    {
+        nodes[i].praised = nodes[i].praised + nodes[nodes[i].parent].praised;
+        cout << nodes[i].praised << ' ';
+    }
 
     return 0;
 }
