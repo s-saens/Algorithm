@@ -1,43 +1,85 @@
 #include <iostream>
-#include <vector>
+#include <queue>
 #define FOR(i,s,e)for(int i=s;i<e;++i)
 #define ll
 using namespace std;
 
-struct Node
-{
-    int praised=0, parent=-2;
-};
+int dx[4] = {0, 0, -1, 1};
+int dy[4] = {-1, 1, 0, 0};
 
-int N, M;
-Node* nodes;
+struct Point
+{
+    int x, y;
+    Point(int _x, int _y)
+    {
+        x = _x; y = _y;
+    }
+};
 
 int main()
 {
     ios::sync_with_stdio(0);
     cin.tie(0);
 
-    cin >> N >> M;
-    nodes = new Node[N];
+    int Y, X;
+    cin >> Y >> X;
 
-    FOR(i,0,N)
+    bool cheese[Y][X];
+    bool visited[Y][X];
+
+    int remainCheese = Y*X;
+    int lastRemianCheese = -1;
+
+    FOR(y,0,Y) FOR(x,0,X)
     {
-        int u; cin >> u; u--;
-        nodes[i].parent = u;
+        cin >> cheese[y][x];
+        remainCheese -= !cheese[y][x];
+        visited[y][x] = false;
+    }
+    
+    queue<Point> q;
+    q.push(Point(0,0));
+    visited[0][0] = true;
+
+    queue<Point> q2;
+
+    int d = 0;
+
+    while(remainCheese > 0)
+    {
+        while(!q.empty())
+        {
+            Point p = q.front(); q.pop();
+
+
+            FOR(i, 0, 4)
+            {
+                int nx = p.x + dx[i];
+                int ny = p.y + dy[i];
+
+                if(nx < 0 || ny < 0 || nx >= X || ny >= Y || visited[ny][nx]) continue;
+                visited[ny][nx] = true;
+
+                if(cheese[ny][nx]) q2.push(Point(nx, ny));
+                else q.push(Point(nx, ny));
+
+                cheese[ny][nx] = 0;
+            }
+        }
+
+        lastRemianCheese = remainCheese;
+        d++;
+
+        while(!q2.empty())
+        {
+            Point p2 = q2.front(); q2.pop();
+            remainCheese--;
+            q.push(p2);
+        }
     }
 
-    FOR(i,0,M)
-    {
-        int n, p; cin >> n >> p; n--;
-        nodes[n].praised += p;
-    }
+    cout << d << '\n' << lastRemianCheese;
 
-    cout << nodes[0].praised << ' ';
-    FOR(i,1,N)
-    {
-        nodes[i].praised = nodes[i].praised + nodes[nodes[i].parent].praised;
-        cout << nodes[i].praised << ' ';
-    }
 
     return 0;
 }
