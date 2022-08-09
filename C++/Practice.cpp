@@ -1,85 +1,99 @@
 #include <iostream>
 #include <queue>
-#define FOR(i,s,e)for(int i=s;i<e;++i)
-#define ll
+#include <algorithm>
+#define FOR(i,e)for(int i=0;i<e;++i)
+#define ll long long int
 using namespace std;
 
-int dx[4] = {0, 0, -1, 1};
-int dy[4] = {-1, 1, 0, 0};
+// s, e : 점
+// l, r : 구간
 
-struct Point
+struct Node
 {
-    int x, y;
-    Point(int _x, int _y)
-    {
-        x = _x; y = _y;
-    }
+    ll sum, l, r, cL, cR;
+    Node() {}
+    Node(ll _s, ll _l, ll _r, ll _cL, ll _cR)
+    { sum = _s; l = _l; r = _r; cL = _cL; cR = _cR; }
 };
+
+Node *segTree;
+ll *numbers, *answers, N, Q;
+
+ll Sum(ll l, ll r, ll nI)
+{
+    Node *n = &segTree[nI];
+    if(r < n->l || l > n->r) return 0;
+    if(l <= n->l && r >= n->r) return n->sum;
+    return Sum(l, r, n->cL) + Sum(l, r, n->cR);
+}
+
+ll Modify(ll i, ll number, ll nI) // 변화량 반환
+{
+    Node *n = &segTree[nI];
+    if(n->l == n->r)
+    {
+        ll lastNumber = n->sum;
+        n->sum = number;
+        return number - lastNumber; // 변화량
+    }
+
+    ll nMid = (n->l + n->r)/2;
+    ll delta = 0;
+    if(i > nMid) delta = Modify(i, number, n->cR);
+    else delta = Modify(i, number, n->cL);
+    n->sum += delta;
+    return delta;
+}
+
+ll SetSegTree(ll l, ll r, ll nI)
+{
+    if(l == r)
+    {
+        segTree[nI] = Node(numbers[l], l, r, -1, -1);
+        return numbers[l];
+    }
+
+    ll mid = (l+r)/2;
+    ll cR = (nI+1)*2;
+    ll cL = cR - 1;
+    ll sum = SetSegTree(l, mid, cL) + SetSegTree(mid+1, r, cR);
+    segTree[nI] = Node(sum, l, r, cL, cR);
+    return segTree[nI].sum;
+}
+
+ll FindSize(ll N)
+{
+    ll ret = 1;
+    while(ret < N) ret *= 2;
+    return ret * 2;
+}
 
 int main()
 {
     ios::sync_with_stdio(0);
     cin.tie(0);
 
-    int Y, X;
-    cin >> Y >> X;
+    cin >> N >> Q;
+    segTree = new Node[FindSize(N)];
+    numbers = new ll[N];
+    answers = new ll[N];
 
-    bool cheese[Y][X];
-    bool visited[Y][X];
+    FOR(i, N) cin >> numbers[i];
 
-    int remainCheese = Y*X;
-    int lastRemianCheese = -1;
+    SetSegTree(0, N-1, 0);
 
-    FOR(y,0,Y) FOR(x,0,X)
+    FOR(k, Q)
     {
-        cin >> cheese[y][x];
-        remainCheese -= !cheese[y][x];
-        visited[y][x] = false;
-    }
-    
-    queue<Point> q;
-    q.push(Point(0,0));
-    visited[0][0] = true;
-
-    queue<Point> q2;
-
-    int d = 0;
-
-    while(remainCheese > 0)
-    {
-        while(!q.empty())
-        {
-            Point p = q.front(); q.pop();
+        ll s, e; cin >> s >> e; s--; e--;
+        if(s > e) swap(s, e);
+        answers[k] = Sum(s, e, 0);
 
 
-            FOR(i, 0, 4)
-            {
-                int nx = p.x + dx[i];
-                int ny = p.y + dy[i];
-
-                if(nx < 0 || ny < 0 || nx >= X || ny >= Y || visited[ny][nx]) continue;
-                visited[ny][nx] = true;
-
-                if(cheese[ny][nx]) q2.push(Point(nx, ny));
-                else q.push(Point(nx, ny));
-
-                cheese[ny][nx] = 0;
-            }
-        }
-
-        lastRemianCheese = remainCheese;
-        d++;
-
-        while(!q2.empty())
-        {
-            Point p2 = q2.front(); q2.pop();
-            remainCheese--;
-            q.push(p2);
-        }
+        ll c, v; cin >> c >> v; c--;
+        Modify(c, v, 0);
     }
 
-    cout << d << '\n' << lastRemianCheese;
-
+    FOR(i, Q) cout << answers[i] << '\n';
 
     return 0;
 }
