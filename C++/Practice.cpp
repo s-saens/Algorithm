@@ -1,26 +1,63 @@
 #include <iostream>
+#include <vector>
+#include <algorithm>
 #define FOR(i,e)for(int i=0;i<e;++i)
 #define ll long long int
 using namespace std;
 
-int N, *heights, *segtree;
+ll N=1, *heights, *segtree;
 
-void SetSegTree()
+int SetSegTree(int ni, int l, int r)
 {
-    // set segtree
+    if(l == r)
+    {
+        segtree[ni] = l;
+        return l;
+    }
+
+    int m = (l+r)/2;
+    int cr = (ni+1)*2;
+    int cl = cr - 1;
+
+    int leftShortestIndex = SetSegTree(cr, m+1, r);
+    int rightShortestIndex = SetSegTree(cl, l, m);
+
+    int ret;
+    if(heights[leftShortestIndex] < heights[rightShortestIndex]) ret = leftShortestIndex;
+    else ret = rightShortestIndex;
+
+    segtree[ni] = ret;
+    return ret;
 }
 
-int H(int m)
+int FindShortestIndex(int ni, int l, int r, int nl, int nr)
 {
-    // 인덱스 m부터 양쪽으로 퍼져나가며 인덱스 m을 포함하는 가장 큰 직사각형 찾아서 return
+    int m = (nl+nr)/2;
+    int cr = (ni+1)*2;
+    int cl = cr-1;
+    if(l > nr || r < nl) return -2;
+    if(l <= nl && nr <= r) return segtree[ni];
+    int shortestL = FindShortestIndex(cl, l, r, nl, m);
+    int shortestR = FindShortestIndex(cr, l, r, m+1, nr);
+
+    if((shortestL+1) * (shortestR+1) < 0)
+    {
+        if(shortestL < 0) return shortestR;
+        if(shortestR < 0) return shortestL;
+    }
+    if(heights[shortestL] <= heights[shortestR]) return shortestL;
+    else return shortestR;
 }
 
-int F(int l, int r)
+ll F(int l, int r)
 {
-    // int m = 구간에서 가장 높이 작은 막대의 인덱스;
-    // int ret = max(F(l, m), F(m+1, r));
-    // ret = max(ret, H(m));
-    // return ret;
+    if(l == r) return heights[l];
+    if(l > r) return -1;
+
+    int m = FindShortestIndex(0, l, r, 0, N-1);
+    ll ret = max(F(l, m-1), F(m+1, r));
+    ret = max(ret, heights[m] * (r-l+1));
+    return ret;
 }
 
 int main()
@@ -28,19 +65,23 @@ int main()
     ios::sync_with_stdio(0);
     cin.tie(0);
 
-    int N;
+    vector<ll> answers;
 
     cin >> N;
 
-    while(N != 0)
+    while(N > 0)
     {
-        heights = new int[N];
-        segtree = new int[4*N];
-        // SetSegTree();
+        heights = new ll[N];
+        segtree = new ll[4*N];
         FOR(i, N) cin >> heights[i];
+        SetSegTree(0, 0, N-1);
 
-        cout << F(0, N-1) << '\n';
+        answers.push_back(F(0, N - 1));
+
+        cin >> N;
     }
+
+    FOR(i, answers.size()) cout << answers[i] << '\n';
 
     return 0;
 }
