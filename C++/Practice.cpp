@@ -1,63 +1,53 @@
 #include <iostream>
-#include <vector>
 #include <algorithm>
 #define FOR(i,e)for(int i=0;i<e;++i)
+#define MAX 1000000000
 #define ll long long int
 using namespace std;
 
-ll N=1, *heights, *segtree;
+ll N, M, *numbers, *segtree, *answers;
 
-int SetSegTree(int ni, int l, int r)
+int SetSegtree(int ni, int nl, int nr)
 {
-    if(l == r)
+    if(nl == nr)
     {
-        segtree[ni] = l;
-        return l;
+        segtree[ni] = numbers[nl];
+        return numbers[nl];
     }
 
-    int m = (l+r)/2;
+    int nm = (nl+nr)/2;
     int cr = (ni+1)*2;
     int cl = cr - 1;
 
-    int leftShortestIndex = SetSegTree(cr, m+1, r);
-    int rightShortestIndex = SetSegTree(cl, l, m);
+    segtree[ni] = min(SetSegtree(cl, nl, nm), SetSegtree(cr, nm+1, nr));
 
-    int ret;
-    if(heights[leftShortestIndex] < heights[rightShortestIndex]) ret = leftShortestIndex;
-    else ret = rightShortestIndex;
-
-    segtree[ni] = ret;
-    return ret;
+    return segtree[ni];
 }
 
-int FindShortestIndex(int ni, int l, int r, int nl, int nr)
+int FindMinimum(int ni, int l, int r, int nl, int nr)
 {
-    int m = (nl+nr)/2;
+    int nm = (nl+nr)/2;
     int cr = (ni+1)*2;
-    int cl = cr-1;
-    if(l > nr || r < nl) return -2;
+    int cl = cr - 1;
+    if(l > nr || r < nl) return MAX;
     if(l <= nl && nr <= r) return segtree[ni];
-    int shortestL = FindShortestIndex(cl, l, r, nl, m);
-    int shortestR = FindShortestIndex(cr, l, r, m+1, nr);
-
-    if((shortestL+1) * (shortestR+1) < 0)
-    {
-        if(shortestL < 0) return shortestR;
-        if(shortestR < 0) return shortestL;
-    }
-    if(heights[shortestL] <= heights[shortestR]) return shortestL;
-    else return shortestR;
+    return min(FindMinimum(cl, l, r, nl, nm), FindMinimum(cr, l, r, nm+1, nr));
 }
 
-ll F(int l, int r)
+void Print()
 {
-    if(l == r) return heights[l];
-    if(l > r) return -1;
-
-    int m = FindShortestIndex(0, l, r, 0, N-1);
-    ll ret = max(F(l, m-1), F(m+1, r));
-    ret = max(ret, heights[m] * (r-l+1));
-    return ret;
+    int s = 0;
+    int r = 1;
+    while(s < 4*N-1)
+    {
+        FOR(i, r)
+        {
+            cout << segtree[s] << ' ';
+            s++;
+        }
+        cout << '\n';
+        r *= 2;
+    }
 }
 
 int main()
@@ -65,23 +55,23 @@ int main()
     ios::sync_with_stdio(0);
     cin.tie(0);
 
-    vector<ll> answers;
+    cin >> N >> M;
+    numbers = new ll[N];
+    segtree = new ll[4*N];
+    answers = new ll[M];
 
-    cin >> N;
+    FOR(i, N) cin >> numbers[i];
 
-    while(N > 0)
+    SetSegtree(0, 0, N-1);
+
+    FOR(i, M)
     {
-        heights = new ll[N];
-        segtree = new ll[4*N];
-        FOR(i, N) cin >> heights[i];
-        SetSegTree(0, 0, N-1);
-
-        answers.push_back(F(0, N - 1));
-
-        cin >> N;
+        int l, r; cin >> l >> r; l--; r--;
+        if(l > r) swap(l, r);
+        answers[i] = FindMinimum(0, l, r, 0, N-1);
     }
 
-    FOR(i, answers.size()) cout << answers[i] << '\n';
+    FOR(i, M) cout << answers[i] << '\n';
 
     return 0;
 }
