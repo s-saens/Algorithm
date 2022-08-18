@@ -1,22 +1,8 @@
-def f(w):
-    if w==1:
-        return 1
-    return 2*f(w-1) + f(1);
-
-q = []
-
-def F(w, s, e):
-    if w==1:
-        q.append((s, e))
-        return 1
-    r = 6-s-e
-    return F(w-1, s, r) + F(1, s, e) + F(w-1, r, e)
-
+fib = [0, 1]
 N = int(input())
+i = 2
+while i <= N :
+    fib.append(fib[i-1] + fib[i-2])
+    i += 1
 
-if N > 20:
-    print(2**N - 1)
-else:
-    print(F(N, 1, 3))
-    for (f, s) in q:
-        print(f, s, sep=' ')
+print(fib[N])
