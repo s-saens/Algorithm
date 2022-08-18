@@ -1,24 +1,21 @@
 #include <iostream>
-#define FOR(i,s,e) for(int i=s; i<e ; ++i)
 using namespace std;
+
+int F(int n)
+{
+    return n%2 ? n/2 : n/2 - 1;
+}
 
 int main()
 {
-    ios::sync_with_stdio(0);
-    cin.tie(0);
-
-    int ca[46], cb[46];
-    ca[1] = 0;
-    cb[1] = 1;
-
-    int K; cin >> K;
-    FOR(i,2,K+1)
+    int t = 0;
+    while(1)
     {
-        ca[i] = cb[i-1];
-        cb[i] = cb[i-1] + ca[i-1];
+        t++;
+        long long T, cnt = 0;
+        cin >> T;
+        if(!T) return 0;
+        for(int i=T-3 ; i>0 ; i-=3) cnt += F(i);
+        cout << "Case #" << t << ": " << T << ':' << cnt << '\n';
     }
-
-    cout << ca[K] << ' ' << cb[K];
-
-    return 0;
 }
