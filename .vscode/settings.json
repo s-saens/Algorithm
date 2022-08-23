@@ -65,6 +65,10 @@
         "__functional_base_03": "cpp",
         "version": "cpp",
         "cstdio": "cpp",
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "cstdlib": "cpp",
+        "cstring": "cpp",
+        "cwchar": "cpp",
+        "sstream": "cpp"
     }
 }
