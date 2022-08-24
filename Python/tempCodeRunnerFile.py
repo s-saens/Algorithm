@@ -1,14 +1,9 @@
 n = int(input())
 A = input().split()
 B = input().split()
-A = [int(i) for i in A]
-B = [int(i) for i in B]
 
 A.sort()
 B.sort()
-
-print(A)
-print(B)
 
 answer = 0
 
