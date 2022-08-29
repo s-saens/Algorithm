@@ -7,9 +7,6 @@ B = [int(i) for i in B]
 A.sort()
 B.sort()
 
-print(A)
-print(B)
-
 answer = 0
 
 for k in range(n) :
