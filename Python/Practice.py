@@ -1,15 +1,13 @@
-n = int(input())
-A = input().split()
-B = input().split()
-A = [int(i) for i in A]
-B = [int(i) for i in B]
+n = 1000 - int(input())
+now = 500
+d = 5
+cnt = 0
+while n > 0:
+    if n >= now:
+        n -= now
+        cnt += 1
+    else:
+        now /= d
+        d = 2 if d == 5 else 5
 
-A.sort()
-B.sort()
-
-answer = 0
-
-for k in range(n) :
-    answer = answer + int(A[k]) * int(B[n-k-1])
-
-print(answer)
+print(cnt)
