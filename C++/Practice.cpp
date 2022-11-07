@@ -1,77 +1,155 @@
 #include <iostream>
-#include <algorithm>
-#define FOR(i,e)for(int i=0;i<e;++i)
-#define ll long long int
+#include <stack>
+#include <vector>
 using namespace std;
 
-ll N=1, *heights, *segtree;
-
-int SetSegTree(int ni, int l, int r)
+bool isOperator(char c)
 {
-    if(l == r)
+    return (c == '+' || c == '-' || c == '/' || c == '*');
+}
+bool isOperator(string s)
+{
+    return (s == "+" || s == "-" || s == "/" || s == "*");
+}
+bool isBracket(char c)
+{
+    return (c == '(' || c == ')');
+}
+string ctos(char c)
+{
+    string t = "";
+    t += c;
+    return t;
+}
+char stoc(string s)
+{
+    return s[0];
+}
+
+vector<string> separate(const string& line)
+{
+    vector<string> st;
+
+    string item = "";
+
+    int len = line.size();
+    for(int i=0 ; i<len ; ++i)
     {
-        segtree[ni] = l;
-        return l;
+        char c = line[i];
+        if(isOperator(c) || isBracket(c))
+        {
+            if (item != "") st.push_back(item);
+            item = "";
+
+            st.push_back(ctos(c));
+        }
+        else
+        {
+            item += c;
+            if(i == len-1) st.push_back(item);
+        }
+    }
+    return st;
+}
+
+int prec(string op)
+{
+    if (op == "/" || op == "*") return 2;
+    else if (op == "+" || op == "-") return 1;
+    else return 0;
+}
+
+vector<string> getPostfix(vector<string>& infixVector)
+{
+    vector<string> ret; // 후위표기식 반환값
+    stack<string> st; // 연산자 담는 스택
+
+    int len = infixVector.size();
+    for (int i = 0; i < len; ++i)
+    {
+        string item = infixVector[i];
+
+        // 1. 연산자면, 자기보다 우선순위가 낮은 것을 만나기 직전 까지 pop하면서 출력한다.(즉, 자기보다 우선순위가 같거나 높은 것들만 출력된다.)
+        //    그 이후에 자기 자신을 스택에 추가.
+        if (isOperator(item))
+        {
+            while (!st.empty() && prec(item) <= prec(st.top()))
+            {
+                ret.push_back(st.top());
+                st.pop();
+            }
+            st.push(item);
+        }
+        // 2. ( 만나면 스택에 추가
+        else if (item == "(") st.push(item);
+        // 3. ) 만나면, (를 만날때까지 돌리면서 만나는 모든 친구들을 그대로 출력
+        else if (item == ")")
+        {
+            while (st.top() != "(")
+            {
+                ret.push_back(st.top());
+                st.pop();
+            }
+            st.pop();
+        }
+        // 4. 숫자를 만나면 바로 출력
+        else ret.push_back(item);
     }
 
-    int m = (l+r)/2;
-    int cr = (ni+1)*2;
-    int cl = cr - 1;
+    // 스택에 남아있는 모든 연산자를 출력
+    while (!st.empty())
+    {
+        ret.push_back(st.top());
+        st.pop();
+    }
 
-    int leftShortestIndex = SetSegTree(cr, m+1, r);
-    int rightShortestIndex = SetSegTree(cl, l, m);
+    len = ret.size();
+    cout << len << "\n";
+    for(int i=0 ; i<len ; ++i) cout <<'('<< ret[i] << ')' << ' ';
+    cout << '\n';
 
-    int ret;
-    if(heights[leftShortestIndex] < heights[rightShortestIndex]) ret = leftShortestIndex;
-    else ret = rightShortestIndex;
-
-    segtree[ni] = ret;
     return ret;
 }
 
-int FindShortestIndex(int ni, int l, int r, int nl, int nr)
+string calculatePostFix(const string &line)
 {
-    int m = (nl+nr)/2;
-    int cr = (ni+1)*2;
-    int cl = cr-1;
-    if(l > nr || r < nl) return -2;
-    if(l <= nl && nr <= r) return segtree[ni];
-    int shortestL = FindShortestIndex(cl, l, r, nl, m);
-    int shortestR = FindShortestIndex(cr, l, r, m+1, nr);
+    vector<string> infixVector = separate(line);
+    vector<string> postfixVector = getPostfix(infixVector);
+    
+    stack<float> st;
 
-    if((shortestL+1) * (shortestR+1) < 0)
+    int len = postfixVector.size();
+    for(int i=0 ; i<len ; ++i)
     {
-        if(shortestL < 0) return shortestR;
-        if(shortestR < 0) return shortestL;
+        string item = postfixVector[i];
+        if(isOperator(item))
+        {
+            float n1 = st.top(); st.pop();
+            float n2 = 0;
+            if(!st.empty())
+            {
+                n2 = st.top();
+                st.pop();
+            }
+            cout << n1 << '\t' << n2 << '\n';
+
+            float value;
+            if(item == "+") value = n2 + n1;
+            if(item == "-") value = n2 - n1;
+            if(item == "/") value = n2 / n1;
+            if(item == "*") value = n2 * n1;
+            st.push(value);
+        }
+        else st.push(stof(item));
     }
-    if(heights[shortestL] <= heights[shortestR]) return shortestL;
-    else return shortestR;
-}
-
-ll F(int l, int r)
-{
-    if(l == r) return heights[l];
-    if(l > r) return -1;
-
-    int m = FindShortestIndex(0, l, r, 0, N-1);
-    ll ret = max(F(l, m-1), F(m+1, r));
-    ret = max(ret, heights[m] * (r-l+1));
-    return ret;
+    
+    return to_string(st.top());
 }
 
 int main()
 {
-    ios::sync_with_stdio(0);
-    cin.tie(0);
+    string exp = "+/3";
 
-    cin >> N;
-
-    heights = new ll[N];
-    segtree = new ll[4*N];
-    FOR(i, N) cin >> heights[i];
-    SetSegTree(0, 0, N-1);
-
-    cout << F(0, N - 1);
-
+    cout << calculatePostFix(exp);
     return 0;
 }
