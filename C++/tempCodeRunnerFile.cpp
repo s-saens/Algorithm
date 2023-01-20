@@ -23,16 +23,18 @@ int main()
     sort(numbers, numbers+N);
 
     int j = 0;
+    int borderIndex = 0;
 
     while(j < N-1 && numbers[j] < 0 && numbers[j+1] < 0)
     {
-        numbers[j] *= numbers[j+1];
-        numbers[j+1] = 0;
+        numbers[j+1] *= numbers[j];
+        numbers[j] = 0;
+        borderIndex = j+1;
         j+=2;
     }
 
     j = N-1;
-    while(j > 0 && numbers[j] > 1 && numbers[j-1] > 1)
+    while(j > borderIndex+1 && numbers[j] > 1 && numbers[j-1] > 1)
     {
         numbers[j-1] *= numbers[j];
         numbers[j] = 0;
