@@ -1,53 +1,36 @@
 #include <iostream>
 #include <algorithm>
+#include <queue>
+
 #define FOR(i,s,e) for(int i=s ; i<e ; ++i)
-#define MAX 1000
 using namespace std;
 
-int dx[4] = {0, 0, 1, -1};
-int dy[4] = {1, -1, 0, 0};
+int Y, X;
+int** blocks;
+queue<int> q; // BFS 큐 - 1차원 위치 저장
 
-int **blocks;
+int dx[4] = {0, 0, 1, -1}, dy[4] = {-1, 1, 0, 0};
 
-int find12(int x, int y, int lastDir, int turnCnt, int moveCnt)
+int bfs()
 {
-    if(turnCnt == 0 && moveCnt == 2) return blocks[y][x];
-    if(turnCnt == 2) return blocks[y][x];
+    int vcnt = 0;
 
-    blocks[y][x] = 0;
-
-    FOR(i, 0, 4)
+    while(!q.empty())
     {
-        int nx = x + dx[i], ny = y + dy[i];
-        if(nx>=6 || nx<0 || ny>=6 || ny<0 || blocks[ny][nx] == 0) continue;
+        vcnt++;
+        int pos1d = q.front(); q.pop();
+        int x = pos1d % X; int y = pos1d / X;
 
-        int value = find12(nx, ny, i, (lastDir == -1 || lastDir == i) ? turnCnt : turnCnt+1, moveCnt+1);
-        if(value != 0) return value;
-    }
-    return 0;
-}
-
-bool check()
-{
-    int floor[6];
-
-    FOR(y, 0, 6)
-    {
-        floor[y] = 0;
-        FOR(x, 0, 6) if(blocks[y][x] != 0) floor[y]++;
+        FOR(i, 0, 4)
+        {
+            int nx = x + dx[i]; int ny = y + dy[i];
+            if(nx < 0 || nx >= X || ny < 0 || ny >= Y || blocks[ny][nx] != 0) continue;
+            q.push(nx + X*ny);
+            blocks[ny][nx] = -1; // 방문 표시
+        }
     }
 
-    FOR(i, 0, 6) if(floor[i] == 3) return true;
-
-    FOR(y, 0, 6)
-    {
-        floor[y] = 0;
-        FOR(x, 0, 6) if (blocks[x][y] != 0) floor[y]++;
-    }
-
-    FOR(i, 0, 6) if(floor[i] == 3) return true;
-
-    return false;
+    return vcnt;
 }
 
 int main()
@@ -55,47 +38,61 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    blocks = new int*[6];
+    cin >> Y >> X;
+    int size1d = X * Y;
 
-    int fx = 0, fy = 0;
-    int maxX = -1, minX = MAX, maxY = -1, minY = MAX;
+    blocks = new int *[Y];
+    FOR(y, 0, Y) blocks[y] = new int[X];
 
-    FOR(y,0,6)
+    int wallCnt = 3; // 세워야 할 벽 세 개를 미리 포함시키기
+    vector<int> viruses; // 바이러스 위치 1차원으로 저장
+
+    FOR(y, 0, Y) FOR(x, 0, X)
     {
-        blocks[y] = new int[6];
-        FOR(x,0,6)
+        cin >> blocks[y][x];
+        switch (blocks[y][x])
         {
-            int n; cin >> n;
-            blocks[y][x] = n;
-            if(n > 0)
-            {
-                maxX = max(maxX, x); minX = min(minX, x);
-                maxY = max(maxY, y); minY = min(minY, y);
-                if(n == 1)
-                {
-                    fx = x;
-                    fy = y;
-                }
-            }
+            case 1: wallCnt++; break; // 벽
+            case 2: viruses.push_back(x + X*y); break; // 바이러스
         }
     }
 
-    int w = maxX - minX + 1;
-    int h = maxY - minY + 1;
+    int virusCnt = viruses.size();
 
-    if(w * h == 10 && check()) // 5 x 2
+    int minimumViruses = 65;
+
+    // 벽 위치 조합. i, j, k는 1차원 좌표.
+    FOR(i, 0, size1d)
     {
-        cout << find12(fx, fy, -1, 0, 0);
-        return 0;
+        int x1 = i % X; int y1 = i / X; // i를 2차원 좌표로 변환
+        if(blocks[y1][x1] != 0) continue; // 빈공간 아니면 패스
+        blocks[y1][x1] = 1; // 벽 1 세우기
+
+        FOR(j, i+1, size1d)
+        {
+            int x2 = j % X; int y2 = j / X; // j를 2차원 좌표로 변환
+            if(blocks[y2][x2] != 0) continue; // 빈공간 아니면 패스
+            blocks[y2][x2] = 1; // 벽 2 세우기
+
+            FOR(k, j+1, size1d)
+            {
+                int x3 = k % X; int y3 = k / X; // k를 2차원 좌표로 변환
+                if(blocks[y3][x3] != 0) continue; // 빈공간 아니면 패스
+                blocks[y3][x3] = 1; // 벽 3 세우기
+
+                    // BFS
+                    FOR(p, 0, virusCnt) q.push(viruses[p]); // 바이러스를 큐에 추가
+                    minimumViruses = min(minimumViruses, bfs()); // BFS 수행
+                    FOR(y, 0, Y) FOR(x, 0, X) if(blocks[y][x] < 0) blocks[y][x] = 0; // 방문표시 없애기
+
+                blocks[y3][x3] = 0; // 벽 3 없애기
+            }
+            blocks[y2][x2] = 0; // 벽 2 없애기
+        }
+        blocks[y1][x1] = 0; // 벽 1 없애기
     }
 
-    if(w * h != 12)
-    {
-        cout << 0;
-        return 0;
-    }
-
-    cout << find12(fx, fy, -1, 0, 0);
+    cout << size1d - minimumViruses - wallCnt;
 
     return 0;
 }
