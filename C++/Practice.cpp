@@ -1,56 +1,43 @@
 #include <iostream>
 #include <algorithm>
+#define FOR(i, s, e) for(int i=s ; i<e; ++i)
 
 using namespace std;
 
-string to_suffix(string e)
+int N;
+
+int arr[101][101];
+bool flooded[101][101];
+bool visited[101][101];
+
+int dx[4] = {-1, 1, 0, 0};
+int dy[4] = {0, 0, -1, 1};
+
+
+void init()
 {
-    string result = "";
-    string op = "";
-    for(int i=0 ; i<e.length() ; i++)
+    FOR(i, 0, N) FOR(j, 0, N)
     {
-        switch (e[i])
-        {
-            case '(':
-                op += e[i];
-                break;
-            case ')':
-                while(op.back() != '(')
-                {
-                    result += op.back();
-                    op.pop_back();
-                }
-                op.pop_back();
-                break;
-            case '*':
-            case '/':
-                while(op.length() > 0 && op.back() == '*' || op.back() == '/')
-                {
-                    result += op.back();
-                    op.pop_back();
-                }
-                op += e[i];
-                break;
-            case '+':
-            case '-':
-                while(op.length() > 0 && op.back() != '(')
-                {
-                    result += op.back();
-                    op.pop_back();
-                }
-                op += e[i];
-                break;
-            default:
-                result += e[i];
-                break;
-        }
+        flooded[i][j] = false;
+        visited[i][j] = false;
     }
-    while(op.length() > 0)
+}
+
+void dfs(int y, int x)
+{
+    visited[y][x] = true;
+
+    FOR(i, 0, 4)
     {
-        result += op.back();
-        op.pop_back();
+        int ny = y + dy[i];
+        int nx = x + dx[i];
+
+        if(ny < 0 || ny >= N || nx < 0 || nx >= N) continue;
+        if(visited[ny][nx]) continue;
+        if(flooded[ny][nx]) continue;
+
+        dfs(ny, nx);
     }
-    return result;
 }
 
 int main()
@@ -58,9 +45,41 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    string e; cin >> e;
+    cin >> N;
 
-    cout << to_suffix(e);
+    int maxH = 0, minH = 101;
+
+    FOR(y, 0, N) FOR(x, 0, N)
+    {
+        cin >> arr[y][x];
+        int h = arr[y][x];
+        maxH = max(maxH, h);
+        minH = min(minH, h);
+    }
+
+    int answer = 0;
+
+    FOR(h, minH-1, maxH)
+    {
+        int cnt = 0;
+        init();
+
+        // 일단 각각 물에 잠가
+        FOR(y, 0, N) FOR(x, 0, N) if(arr[y][x] <= h) flooded[y][x] = true;
+
+        FOR(y, 0, N) FOR(x, 0, N)
+        {
+            if(visited[y][x]) continue;
+            if(flooded[y][x]) continue;
+
+            dfs(y, x);
+            cnt++;
+        }
+
+        answer = max(answer, cnt);
+    }
+
+    cout << answer;
 
     return 0;
 }
