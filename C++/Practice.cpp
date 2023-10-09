@@ -1,54 +1,134 @@
 #include <iostream>
-#include <algorithm>
 #include <vector>
+#include <algorithm>
+
 #define FOR(i, s, e) for(int i=s ; i<e; ++i)
+
+// n = number
+// s = segtree
+// i = index
+// l = left
+// r = right
+// c_ = child
+// m = middle
+
+// ex1: nir = number index right
+// ex2: c_sil = child segtree index left
 
 using namespace std;
 
-struct Link
-{
-    Link(int t, int l)
-    {
-        to = t;
-        length = l;
-    }
+int MAX = 1000000001;
 
-    int to;
-    int length;
-};
+int N;
 
 struct Node
 {
-    vector<Link> links;
+    int value, nil, nir;
+    Node() {}
+    Node(int v, int l, int r)
+    { value = v; nil = l; nir = r; }
 };
 
-Node* nodes;
-bool* visited;
-int N;
+// segtree data-oriented properties
+Node* segtree;
+int* numbers;
 
-int dfs(int nIndex)
+int initSegtree(int si, int nil, int nir)
 {
-    int len = 0;
-    visited[nIndex] = true;
-
-    vector<Link> &links = nodes[nIndex].links;
-
-    FOR(i, 0, links.size())
+    if(nil == nir)
     {
-        Link l = links[i];
-        if(!visited[l.to])
-        {
-            len = max(len, dfs(l.to) + l.length);
-            visited[l.to] = true;
-        }
+        int number = numbers[nil];
+        segtree[si] = Node(number, nil, nir);
+        return number;
     }
 
-    return len;
+    int nim = (nil+nir) / 2;
+
+    int c_sir = (si+1) * 2;
+    int c_sil = c_sir - 1; // child index left
+
+    int ret = min(initSegtree(c_sil, nil, nim), initSegtree(c_sir, nim+1, nir));
+
+    segtree[si] = Node(ret, nil, nir);
+
+    return ret;
+}
+int query(int si, int qnil, int qnir) // segtree index, index left, index right
+{
+    if(qnil == qnir) return numbers[qnir];
+
+    Node* seg = segtree + si;
+    int sm = (seg->nil + seg->nir) / 2;
+
+    int c_sir = (si+1) * 2;
+    int c_sil = c_sir - 1; // child index left
+    
+    if(seg->nir < qnil || seg->nil > qnir) return MAX; // 쿼리범위가 세그먼트 범위를 벗어난 경우
+    if(qnil <= seg->nil && seg->nir <= qnir) return seg->value; // 쿼리범위가 세그먼트 범위를 포함하는 경우
+
+    return min(query(c_sil, qnil, qnir), query(c_sir, qnil, qnir));
 }
 
-void init()
+// int query(int si, int qnil, int qnir) // segtree index, index left, index right
+// {
+//     if(qnil == qnir) return numbers[qnir];
+
+//     int ret = MAX;
+
+//     Node seg = segtree[si];
+//     int sm = (seg.nil + seg.nir) / 2;
+
+//     int c_sir = (si+1) * 2;
+//     int c_sil = c_sir - 1; // child index left
+    
+
+//     if(qnil <= sm) ret = min(ret, query(c_sil, qnil, min(sm, qnir)));
+//     if(qnir > sm) ret = min(ret, query(c_sir, max(sm+1, qnil), qnir));
+
+//     return ret;
+// }
+
+int update(int si, int ni, int nv)
 {
-    FOR(i, 0, N) visited[i] = false;
+    Node* seg = segtree + si;
+
+    if(seg->nil == seg->nir)
+    {
+        seg->value = nv;
+        numbers[ni] = nv;
+        return nv;
+    }
+
+    int sm = (seg->nil + seg->nir) / 2;
+
+    int c_sir = (si+1) * 2;
+    int c_sil = c_sir - 1; // child index left
+
+    int ret;
+
+    if(ni <= sm) ret = min(update(c_sil, ni, nv), query(c_sir, sm+1, seg->nir));
+    else ret = min(update(c_sir, ni, nv), query(c_sil, seg->nil, sm));
+
+    seg->value = ret;
+    return ret;
+}
+
+void printSegtree()
+{
+    cout << '\n';
+    int k = 1, j = 1;
+    FOR(i, 0, 4*N)
+    {
+        cout << segtree[i].value << ' ';
+        if(j == k)
+        {
+            cout << '\n',
+            j = 1;
+            k *= 2;
+        }
+        else j++;
+    }
+    cout << "\n\n";
 }
 
 int main()
@@ -57,31 +137,37 @@ int main()
     cin.tie(NULL);
 
     cin >> N;
-    nodes = new Node[N];
-    visited = new bool[N];
+    numbers = new int[N];
 
-    FOR(i, 0, N-1)
-    {
-        int s, t, l; cin >> s >> t >> l;
-        nodes[s-1].links.push_back(Link(t-1, l));
-        nodes[t-1].links.push_back(Link(s-1, l));
-    }
+    FOR(i, 0, N) cin >> numbers[i];
     
-    int answer = 0;
 
-    vector<int> leafNodes;
+    segtree = new Node[4*N];
 
-    FOR(i, 0, N) if(nodes[i].links.size() == 1) leafNodes.push_back(i);
+    initSegtree(0, 0, N-1);
 
-    FOR(i, 0, leafNodes.size())
+    int K; cin >> K;
+
+    vector<int> answers;
+
+    // printSegtree();
+
+    FOR(i, 0, K)
     {
-        int ni = leafNodes[i];
-        init();
-        
-        answer = max(answer, dfs(ni));
+        int op, a, b;
+        cin >> op >> a >> b; a--;
+
+        if(op == 1)
+        {
+            update(0, a, b);
+            // printSegtree();
+        }
+        if(op == 2) answers.push_back(query(0, a, b-1));
+
     }
 
-    cout << answer << endl;
+    int len = answers.size();
+    FOR(i, 0, len) cout << answers[i] << '\n';
 
     return 0;
 }
