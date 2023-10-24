@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/sanghunsong/DEV/Algorithm/Algorithm.csproj": {}
+    "/Users/sanghunsong/DEV/Algorithm/C#/Algorithm.csproj": {}
   },
   "projects": {
-    "/Users/sanghunsong/DEV/Algorithm/Algorithm.csproj": {
+    "/Users/sanghunsong/DEV/Algorithm/C#/Algorithm.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/sanghunsong/DEV/Algorithm/Algorithm.csproj",
+        "projectUniqueName": "/Users/sanghunsong/DEV/Algorithm/C#/Algorithm.csproj",
         "projectName": "Algorithm",
-        "projectPath": "/Users/sanghunsong/DEV/Algorithm/Algorithm.csproj",
+        "projectPath": "/Users/sanghunsong/DEV/Algorithm/C#/Algorithm.csproj",
         "packagesPath": "/Users/sanghunsong/.nuget/packages/",
-        "outputPath": "/Users/sanghunsong/DEV/Algorithm/obj/",
+        "outputPath": "/Users/sanghunsong/DEV/Algorithm/C#/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/sanghunsong/.nuget/NuGet/NuGet.Config"
@@ -43,16 +43,27 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.NETCore.App.Host.osx-x64",
+              "version": "[5.0.17, 5.0.17]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[5.0.0, 5.0.0]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.301/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.400/RuntimeIdentifierGraph.json"
         }
       }
     }

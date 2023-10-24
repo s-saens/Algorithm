@@ -1,8 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "GzIRjFoNO4TBp8jq8n6XDEUNaNsGLc8En0RAo11xkixXDAJoYXOLNyGMJDpuZKsg2f7vERc5VZDo+eVNyPTM0Q==",
+  "dgSpecHash": "Dzyc6bKiQvRgsMtJUJb+jBr0b4p+Jy902NsCsOjPwfj2KYaK/NJoHXBoliK4cuwfEtofXF/5EcZQXb22zzhf9g==",
   "success": true,
-  "projectFilePath": "/Users/sanghunsong/DEV/Algorithm/Algorithm.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "/Users/sanghunsong/DEV/Algorithm/C#/Algorithm.csproj",
+  "expectedPackageFiles": [
+    "/Users/sanghunsong/.nuget/packages/microsoft.netcore.app.ref/5.0.0/microsoft.netcore.app.ref.5.0.0.nupkg.sha512",
+    "/Users/sanghunsong/.nuget/packages/microsoft.netcore.app.host.osx-x64/5.0.17/microsoft.netcore.app.host.osx-x64.5.0.17.nupkg.sha512"
+  ],
   "logs": []
 }
