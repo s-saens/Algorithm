@@ -1,63 +1,35 @@
 #include <iostream>
-#include <algorithm>
-#include <unordered_set>
 #define FOR(i,e) for(int i=0 ; i<e; ++i)
 
 using namespace std;
 
-struct Point
-{
-    int x, y;
-    Point(int _x, int _y)
-    {
-        x = _x; y = _y;
-    }
-
-    bool operator == (const Point& other) const
-    {
-        return x == other.x && y == other.y;
-    }
-};
-
-struct PointHash
-{
-    size_t operator()(const Point& p) const
-    {
-        hash<string> hash_func;
-        return hash_func(to_string(p.x) + "," + to_string(p.y));
-    }
-};
-
 int Y, X;
 int h[501][501];
+int dp[501][501];
 int dx[4] = {0, 0, -1, 1};
 int dy[4] = {-1, 1, 0, 0};
 
-int cnt;
-
-void dfs(int x, int y, unordered_set<Point, PointHash> visited)
+int dfs(int x, int y)
 {
-    visited.insert(Point(x, y));
+    if(x == X-1 && y == Y-1)
+    {
+        return 1;
+    }
+    if(dp[y][x] > -1) return dp[y][x];
 
-    int nowH = h[y][x];
+    dp[y][x] = 0;
 
     FOR(i, 4)
     {
         int nx = x + dx[i];
         int ny = y + dy[i];
 
-        if (nx < 0 || nx >= X || ny < 0 || ny >= Y) continue;
-        if (h[ny][nx] >= nowH) continue;
-        if (visited.find(Point(nx, ny)) != visited.end()) continue;
-        
-        if (nx == X-1 && ny == Y-1)
-        {
-            cnt++;
-            continue;
-        }
+        if (nx < 0 || nx >= X || ny < 0 || ny <= Y && h[ny][nx] >= h[y][x]) continue;
 
-        dfs(nx, ny, visited);
+        dp[y][x] = dp[y][x] + dfs(nx, ny);
     }
+
+    return dp[y][x];
 }
 
 int main()
@@ -67,9 +39,11 @@ int main()
 
     cin >> Y >> X;
 
-    FOR(y, Y) FOR(x, X) cin >> h[y][x];
+    FOR(y, Y) FOR(x, X)
+    {
+        cin >> h[y][x];
+        dp[y][x] = -1;
+    }
 
-    dfs(0, 0, unordered_set<Point, PointHash>());
-
-    cout << cnt;
+    cout << dfs(0, 0);
 }
