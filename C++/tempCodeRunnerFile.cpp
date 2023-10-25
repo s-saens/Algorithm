@@ -6,7 +6,7 @@
 using namespace std;
 
 int Y, X;
-int h[501][501];
+int bamboo[501][501];
 int answer[501][501];
 int dx[4] = {0, 0, -1, 1};
 int dy[4] = {-1, 1, 0, 0};
@@ -16,7 +16,7 @@ int dfs(int x, int y)
     if(x == X-1 && y == Y-1) return 1;
     if(answer[y][x] != -1) return answer[y][x];
 
-    int nowH = h[y][x];
+    int nowH = bamboo[y][x];
 
     answer[y][x] = 0;
 
@@ -26,7 +26,7 @@ int dfs(int x, int y)
         int ny = dy[i];
 
         if (nx < 0 || nx >= X || ny < 0 || ny >= Y
-                || h[ny][nx] >= nowH)
+                || bamboo[ny][nx] >= nowH)
                 continue;
 
         answer[y][x] += dfs(nx, ny);
@@ -44,7 +44,7 @@ int main()
 
     FOR(y, Y) FOR(x, X)
     {
-        cin >> h[y][x];
+        cin >> bamboo[y][x];
         answer[y][x] = -1;
     }
 

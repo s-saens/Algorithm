@@ -1,32 +1,29 @@
 #include <iostream>
+#include <algorithm>
 #define FOR(i,e) for(int i=0 ; i<e; ++i)
 
 using namespace std;
 
-int Y, X;
-int h[501][501];
+int N;
+int bamboo[501][501];
 int dp[501][501];
 int dx[4] = {0, 0, -1, 1};
 int dy[4] = {-1, 1, 0, 0};
 
 int dfs(int x, int y)
 {
-    if(x == X-1 && y == Y-1)
-    {
-        return 1;
-    }
     if(dp[y][x] > -1) return dp[y][x];
 
-    dp[y][x] = 0;
+    dp[y][x] = 1;
 
     FOR(i, 4)
     {
         int nx = x + dx[i];
         int ny = y + dy[i];
 
-        if (nx < 0 || nx >= X || ny < 0 || ny <= Y && h[ny][nx] >= h[y][x]) continue;
+        if (nx < 0 || nx >= N || ny < 0 || ny >= N || bamboo[ny][nx] <= bamboo[y][x]) continue;
 
-        dp[y][x] = dp[y][x] + dfs(nx, ny);
+        dp[y][x] = max(dp[y][x], dfs(nx, ny) + 1);
     }
 
     return dp[y][x];
@@ -37,13 +34,22 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    cin >> Y >> X;
+    cin >> N;
 
-    FOR(y, Y) FOR(x, X)
+    FOR(y, N) FOR(x, N)
     {
-        cin >> h[y][x];
+        cin >> bamboo[y][x];
         dp[y][x] = -1;
     }
+    
+    int answer = 0;
+    FOR(y, N)
+    {
+        FOR(x, N)
+        {
+            answer = max(answer, dfs(x, y));
+        }
+    }
 
-    cout << dfs(0, 0);
+    cout << answer;
 }
