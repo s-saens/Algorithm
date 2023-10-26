@@ -1,32 +1,27 @@
 #include <iostream>
-#include <algorithm>
+#include <vector>
 #define FOR(i,e) for(int i=0 ; i<e; ++i)
 
 using namespace std;
 
-int N;
-int bamboo[501][501];
-int dp[501][501];
-int dx[4] = {0, 0, -1, 1};
-int dy[4] = {-1, 1, 0, 0};
+vector<int> tree[100001];
+int dp[100001];
 
-int dfs(int x, int y)
+int dfs(int n)
 {
-    if(dp[y][x] > -1) return dp[y][x];
+    if(dp[n] > -1) return dp[n];
 
-    dp[y][x] = 1;
+    dp[n] = 1;
 
-    FOR(i, 4)
+    vector<int> &v = tree[n];
+
+    FOR(i, v.size())
     {
-        int nx = x + dx[i];
-        int ny = y + dy[i];
-
-        if (nx < 0 || nx >= N || ny < 0 || ny >= N || bamboo[ny][nx] <= bamboo[y][x]) continue;
-
-        dp[y][x] = max(dp[y][x], dfs(nx, ny) + 1);
+        int l = v[i];
+        if(dp[l] == -1) dp[n] += dfs(l);
     }
 
-    return dp[y][x];
+    return dp[n];
 }
 
 int main()
@@ -34,22 +29,23 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(NULL);
 
-    cin >> N;
+    int N, R, Q;
+    cin >> N >> R >> Q;
 
-    FOR(y, N) FOR(x, N)
+    FOR(i, N-1)
     {
-        cin >> bamboo[y][x];
-        dp[y][x] = -1;
+        int u, v; cin >> u >> v;
+        tree[u-1].push_back(v-1);
+        tree[v-1].push_back(u-1);
     }
-    
-    int answer = 0;
-    FOR(y, N)
-    {
-        FOR(x, N)
-        {
-            answer = max(answer, dfs(x, y));
-        }
-    }
+    FOR(i, N) dp[i] = -1;
 
-    cout << answer;
+    R--;
+    dfs(R);
+
+    FOR(i, Q)
+    {
+        int q; cin >> q; q--;
+        cout << dp[q] << '\n';
+    }
 }
