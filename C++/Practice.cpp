@@ -1,51 +1,94 @@
-#include <iostream>
+#include <string>
 #include <vector>
-#define FOR(i,e) for(int i=0 ; i<e; ++i)
+#include <iostream>
 
 using namespace std;
 
-vector<int> tree[100001];
-int dp[100001];
-
-int dfs(int n)
+vector<vector<int>> rotate(vector<vector<int>> shape) // left, 90 degree
 {
-    if(dp[n] > -1) return dp[n];
+    vector<vector<int>> newShape;
 
-    dp[n] = 1;
+    int X = shape[0].size();
+    int Y = shape.size();
 
-    vector<int> &v = tree[n];
-
-    FOR(i, v.size())
+    for (int x = 0; x < X; ++x)
     {
-        int l = v[i];
-        if(dp[l] == -1) dp[n] += dfs(l);
+        vector<int> v;
+
+        for (int y = 0; y < Y; ++y)
+        {
+            v.push_back(shape[y][X - 1 - x]);
+        }
+
+        newShape.push_back(v);
     }
 
-    return dp[n];
+    return newShape;
 }
 
-int main()
+void print_shape(vector<vector<int>> shape)
 {
-    ios::sync_with_stdio(false);
-    cin.tie(NULL);
+    int X = shape[0].size();
+    int Y = shape.size();
 
-    int N, R, Q;
-    cin >> N >> R >> Q;
-
-    FOR(i, N-1)
+    for (int y = 0; y < Y; ++y)
     {
-        int u, v; cin >> u >> v;
-        tree[u-1].push_back(v-1);
-        tree[v-1].push_back(u-1);
+        for (int x = 0; x < X; ++x)
+        {
+            cout << shape[y][x] << ' ';
+        }
+        cout << '\n';
     }
-    FOR(i, N) dp[i] = -1;
+}
 
-    R--;
-    dfs(R);
+bool equals_raw(vector<vector<int>> s1, vector<vector<int>> s2)
+{
+    int X1 = s1[0].size();
+    int Y1 = s1.size();
 
-    FOR(i, Q)
+    int X2 = s2[0].size();
+    int Y2 = s2.size();
+
+    if (X1 == X2 && Y1 == Y2)
     {
-        int q; cin >> q; q--;
-        cout << dp[q] << '\n';
+        for (int y = 0; y < Y1; ++y)
+        {
+            for (int x = 0; x < X1; ++x)
+            {
+                if (s1[y][x] != s2[y][x])
+                    return false;
+            }
+        }
     }
+    else
+        return false;
+
+    return true;
+}
+
+bool equals(vector<vector<int>> s1, vector<vector<int>> s2)
+{
+    vector<vector<int>> r;
+
+    if (equals_raw(s1, s2))
+        return true;
+
+    for (int i = 0; i < 3; ++i)
+    {
+        r = rotate(s2);
+        if (equals_raw(s1, r))
+            return true;
+    }
+
+    return false;
+}
+
+unordered_set
+
+    int
+    solution(vector<vector<int>> game_board, vector<vector<int>> table)
+{
+    int answer = -1;
+
+    return answer;
 }
