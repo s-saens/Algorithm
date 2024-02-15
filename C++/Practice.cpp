@@ -1,94 +1,91 @@
-#include <string>
-#include <vector>
 #include <iostream>
-
+#include <vector>
 using namespace std;
 
-vector<vector<int>> rotate(vector<vector<int>> shape) // left, 90 degree
+#define FOR(i, e) for(int i=0 ; i<e ; ++i)
+
+int dx[4] = {0, 1, 0, -1};
+int dy[4] = {-1, 0, 1, 0};
+
+int getDirection(char c)
 {
-    vector<vector<int>> newShape;
-
-    int X = shape[0].size();
-    int Y = shape.size();
-
-    for (int x = 0; x < X; ++x)
-    {
-        vector<int> v;
-
-        for (int y = 0; y < Y; ++y)
-        {
-            v.push_back(shape[y][X - 1 - x]);
-        }
-
-        newShape.push_back(v);
-    }
-
-    return newShape;
+    if(c == 'N') return 0;
+    if(c == 'E') return 1;
+    if(c == 'S') return 2;
+    if(c == 'W') return 3;
+    return -1;
 }
 
-void print_shape(vector<vector<int>> shape)
+char directions[4] = {'N', 'E', 'S', 'W'};
+
+struct Element
 {
-    int X = shape[0].size();
-    int Y = shape.size();
+    int x, y, d;
+};
 
-    for (int y = 0; y < Y; ++y)
-    {
-        for (int x = 0; x < X; ++x)
-        {
-            cout << shape[y][x] << ' ';
-        }
-        cout << '\n';
-    }
-}
-
-bool equals_raw(vector<vector<int>> s1, vector<vector<int>> s2)
+int main()
 {
-    int X1 = s1[0].size();
-    int Y1 = s1.size();
+    int Y=1, X=1;
+    unsigned long long moves=1;
 
-    int X2 = s2[0].size();
-    int Y2 = s2.size();
-
-    if (X1 == X2 && Y1 == Y2)
+    while(Y > 0 && X > 0)
     {
-        for (int y = 0; y < Y1; ++y)
+        cin >> Y >> X >> moves;
+
+        char map[Y][X];
+        short visited[Y][X][4];
+        FOR(y, Y) FOR(x, X) FOR(i, 4) visited[y][x][i] = -1;
+
+        int sx = 0, sy = 0, dir = 0; // 0, 1, 2, 3 : N, E, S, W
+        FOR(y, Y) FOR(x, X)
         {
-            for (int x = 0; x < X1; ++x)
+            cin >> map[y][x];
+
+            int d = getDirection(map[y][x]);
+            if(d >= 0)
             {
-                if (s1[y][x] != s2[y][x])
-                    return false;
+                sx = x; sy = y; dir = d;
             }
         }
+
+        vector<Element> dp;
+        while(moves > 0)
+        {
+            visited[sy][sx][dir]++;
+            if(visited[sy][sx][dir] == 1)
+            {
+                dp.push_back({sx, sy, dir});
+            }
+            else if(visited[sy][sx][dir] == 2)
+            {
+                moves %= dp.size();
+                sy = dp[moves].y;
+                sx = dp[moves].x;
+                dir = dp[moves].d;
+                break;
+            }
+
+            for(int i=0 ; i<4 ; ++i)
+            {
+                int nextDir = (i + dir) % 4;
+                int nx = sx + dx[nextDir];
+                int ny = sy + dy[nextDir];
+
+                if(nx < 0 || ny < 0 || nx >= X || ny >= Y || map[ny][nx] == '#') continue;
+
+                dir = nextDir;
+                break;
+            }
+
+            sx += dx[dir];
+            sy += dy[dir];
+
+            moves--;
+        }
+
+        if(Y > 0 && X > 0) cout << sy + 1 << ' ' << sx + 1 << ' ' << directions[dir] << '\n';
+        else break;
     }
-    else
-        return false;
-
-    return true;
-}
-
-bool equals(vector<vector<int>> s1, vector<vector<int>> s2)
-{
-    vector<vector<int>> r;
-
-    if (equals_raw(s1, s2))
-        return true;
-
-    for (int i = 0; i < 3; ++i)
-    {
-        r = rotate(s2);
-        if (equals_raw(s1, r))
-            return true;
-    }
-
-    return false;
-}
-
-unordered_set
-
-    int
-    solution(vector<vector<int>> game_board, vector<vector<int>> table)
-{
-    int answer = -1;
-
-    return answer;
+    
+    return 0;
 }
