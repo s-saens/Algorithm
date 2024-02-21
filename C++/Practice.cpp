@@ -1,49 +1,71 @@
-#include <string>
+#include <iostream>
 #include <algorithm>
-#include <vector>
-#define FOR(i,e) for(int i=0 ; i<e ; ++i)
-
+#define FOR(i, e) for(int i=0 ; i<e ; ++i)
 using namespace std;
 
-struct Element
+// 1. vector: List 구현
+template <typename T> class List
 {
-    int priority;
-    int index;
+private:
+    T* container;
+    size_t capacity;
+    size_t size;
+
+    void UpdateCapacity(size_t newCapacity)
+    {
+        T* newContainer = new T[newCapacity];
+
+        for(size_t i = 0; i < size; ++i)
+        {
+            newContainer[i] = container[i];
+        }
+
+        capacity = newCapacity;
+        delete[] container;
+
+        container = newContainer;
+        cout << "cop: "<< capacity << '\n';
+    }
+
+public:
+    List() : container(nullptr), capacity(0), size(0) {}
+    ~List() { delete[] container; }
+
+    int Size()
+    {
+        return size;
+    }
+
+    void Add(T element)
+    {
+        if(size >= capacity) UpdateCapacity(capacity == 0 ? 1 : capacity * 2 );
+        container[size] = element;
+        size++;
+    }
+
+    T& operator[](size_t index) 
+    {
+        return container[index];
+    }
 };
 
-bool sortByPriority(const Element& e1, const Element& e2)
+struct A
 {
-    return e1.priority > e2.priority;
-}
+    int a;
+    double b;
+};
 
-int solution(vector<int> priorities, int location)
+int main()
 {
-    vector<Element> sorted;
+    List<int> list;
 
-    int len = priorities.size();
-
-    FOR(i,len)
+    for(int i=0 ; i<100 ; ++i)
     {
-        sorted.push_back({priorities[i], i});
+        list.Add(i);
     }
 
-    sort(sorted.begin(), sorted.end(), sortByPriority);
 
-    int maxIndex = 0;
-    int cnt = 0;
-    int i = 0;
-    while(cnt < len)
-    {
-        int max = sorted[maxIndex].priority;
-        if(priorities[i] == max)
-        {
-            cnt++;
-            if(location == i) break;
+    for(int i=0 ; i<list.Size() ; ++i) cout << list[i] << '\n';
 
-            maxIndex++;
-        }
-        i = (i+1) % len;
-    }
-
-    return cnt;
+    return 0;
 }
