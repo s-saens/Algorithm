@@ -1,71 +1,70 @@
-#include <iostream>
-#include <algorithm>
-#define FOR(i, e) for(int i=0 ; i<e ; ++i)
+#include <string>
+#include <vector>
+#include <queue>
+#define FOR(i,s,e) for(int i=s ; i<e ; ++i)
+
 using namespace std;
 
-// 1. vector: List 구현
-template <typename T> class List
+int dx[4] = { 0, 0, -1, 1 };
+int dy[4] = { -1, 1, 0, 0 };
+
+bool map[102][102];
+bool visited[102][102];
+bool isInRect[102][102];
+
+void init()
 {
-private:
-    T* container;
-    size_t capacity;
-    size_t size;
-
-    void UpdateCapacity(size_t newCapacity)
+    FOR(i, 0, 102) FOR(j, 0, 102)
     {
-        T* newContainer = new T[newCapacity];
+        map[i][j] = false;
+        visited[i][j] = false;
+        isInRect[i][j] = false;
+    }
+}
 
-        for(size_t i = 0; i < size; ++i)
+struct Point {int x, y, cnt;};
+
+int solution(vector<vector<int>> rectangle, int sx, int sy, int ex, int ey)
+{
+    int answer = 0;
+    
+    // init map
+    for(const auto& r : rectangle)
+    {
+        int x1 = r[0] * 2, y1 = r[1] * 2, x2 = r[2] * 2, y2 = r[3] * 2;
+        
+        FOR(y, y1, y2+1) FOR(x, x1, x2+1)
         {
-            newContainer[i] = container[i];
+            if(y == y1 || y == y2 || x == x1 || x == x2) map[y][x] = true;
+            else isInRect[y][x] = true;
         }
-
-        capacity = newCapacity;
-        delete[] container;
-
-        container = newContainer;
-        cout << "cop: "<< capacity << '\n';
+        
     }
-
-public:
-    List() : container(nullptr), capacity(0), size(0) {}
-    ~List() { delete[] container; }
-
-    int Size()
+    
+    sy *= 2; sx *= 2; ey *= 2; ex *= 2;
+    
+    queue<Point> q;
+    q.push({sx, sy, 0});
+    
+    int cnt = 0;
+    
+    while(!q.empty())
     {
-        return size;
+        Point p = q.front(); q.pop();
+        visited[p.y][p.x] = true;
+        
+        FOR(i, 0, 4)
+        {
+            int nx = p.x + dx[i];
+            int ny = p.y + dy[i];
+            
+            if(nx < 1 || nx > 101 || ny <1 || ny > 101 || !map[ny][nx] || visited[ny][nx] || isInRect[ny][nx]) continue;
+            if(ny == ey && nx == ex) return (p.cnt + 1) / 2;
+            
+            cnt = p.cnt + 1;
+            q.push({nx, ny, p.cnt + 1});
+        }
     }
-
-    void Add(T element)
-    {
-        if(size >= capacity) UpdateCapacity(capacity == 0 ? 1 : capacity * 2 );
-        container[size] = element;
-        size++;
-    }
-
-    T& operator[](size_t index) 
-    {
-        return container[index];
-    }
-};
-
-struct A
-{
-    int a;
-    double b;
-};
-
-int main()
-{
-    List<int> list;
-
-    for(int i=0 ; i<100 ; ++i)
-    {
-        list.Add(i);
-    }
-
-
-    for(int i=0 ; i<list.Size() ; ++i) cout << list[i] << '\n';
-
-    return 0;
+    
+    return cnt / 2;
 }
