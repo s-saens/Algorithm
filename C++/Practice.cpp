@@ -1,21 +1,24 @@
 #include <iostream>
-#include <cmath>
+#include <unordered_set>
+#define ll long long
 using namespace std;
 
 int main()
 {
-    int a, b, c, d, e, f, x, y; cin >> a >> b >> c >> d >> e >> f;
+    unordered_set<ll> set;
+    ll a, b, ab;
+    cin >> a >> b; ab = a * b;
 
-    int bottom = (b*d - a*e);
-    if(bottom == 0) x = 0, y = 0;
-    else
-    {
-        y = (c*d - a*f) / bottom;
-        if(a == 0) x = (f - e*y) / d;
-        else x = (c - b*y) / a;
-    }
+    for(ll i=1 ; i*a<ab ; ++i) set.insert(i*a);
 
-    cout << x << ' ' << y;
+    for(ll i=1 ; i*b<ab ; ++i)
+        if(set.find(i*b) != set.end()) // 없음
+        {
+            ab = i*b;
+            break;
+        }
+
+    cout << ab;
 
     return 0;
 }
