@@ -1,24 +1,50 @@
 #include <iostream>
-#include <unordered_set>
-#define ll long long
+#include <queue>
+#include <stack>
+#include <algorithm>
 using namespace std;
 
 int main()
 {
-    unordered_set<ll> set;
-    ll a, b, ab;
-    cin >> a >> b; ab = a * b;
+    int N; cin >> N;
+    queue<int> q;
+    stack<int> s;
 
-    for(ll i=1 ; i*a<ab ; ++i) set.insert(i*a);
+    int M = 0;
 
-    for(ll i=1 ; i*b<ab ; ++i)
-        if(set.find(i*b) != set.end()) // 없음
+    while(N--) { int n; cin >> n; M = max(M, n); q.push(n); }
+
+    int a = 1;
+    while(!q.empty())
+    {
+        int n = q.front();
+
+        if(n == a)
         {
-            ab = i*b;
-            break;
+            q.pop();
+            a++;
         }
+        else if(!s.empty() && s.top() == a)
+        {
+            s.pop();
+            a++;
+        }
+        else
+        {
+            q.pop();
+            s.push(n);
+        }
+    }
 
-    cout << ab;
+    while(!s.empty())
+    {
+        int n = s.top();
+        if(n != a) break;
+        s.pop();
+        a++;
+    }
+
+    cout << (s.empty() ? "Nice" : "Sad");
 
     return 0;
 }
