@@ -19,12 +19,13 @@ int main()
     cin >> head;
 
     int n;
-    cout << "enter total requets" << endl;
+    cout << "enter total requets\n";
     cin >> n;
     Track queue1[n];
     bool done[n];
+    int dists[n-1];
 
-    printf("enter requests\n");
+    cout << "enter requests\n";
     for (int i = 0; i < n; i++)
     {
         int v; cin >> v;
@@ -81,14 +82,25 @@ int main()
         int position = queue1[k].pos;
 
         sum += dist;
-        cout << "  -(" << dist << ")->  ";
+        cout << "->";
         cout << position;
         done[k] = 1;
 
         cur = k;
 
+        dists[count1] = dist;
         count1++;
     }
-    cout << endl;
-    cout << "total head movement is=" << sum << endl;
+
+    cout << "\nmovements: ";
+
+    for (int i = 0; i < n - 1; ++i)
+    {
+        cout << dists[i];
+        if(i < n-2) cout << "+";
+    }
+
+    cout << '\n';
+
+    cout << "total head movement is = " << sum << endl;
 }

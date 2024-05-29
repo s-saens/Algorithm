@@ -26,9 +26,9 @@ int main()
 
    for (j = 0; j <= n - 1; j++)
    {
-      diff = abs(queue[j + 1] - queue[j]);
-      seek += diff;
-      printf("move is from %d to %d with seek %d\n", queue[j], queue[j + 1], diff);
+diff = abs(queue[j + 1] - queue[j]);
+seek += diff;
+printf("move is from %d to %d with seek %d\n", queue[j], queue[j + 1], diff);
    }
 
    printf("total seek time is%d\n", seek);

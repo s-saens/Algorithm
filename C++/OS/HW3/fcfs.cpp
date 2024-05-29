@@ -23,15 +23,16 @@ int main()
    scanf("%d", &head);
    queue[0] = head;
 
-   for (j = 0; j <= n - 1; j++)
+   for (j = 1; j <= n - 1; j++)
    {
-      diff = abs(queue[j + 1] - queue[j]);
+      int now = queue[j], next = queue[j+1];
+      diff = abs(next - now);
       seek += diff;
-      printf("move is from %d to %d with seek %d\n", queue[j], queue[j + 1], diff);
+      printf("move is from %d to %d with seek %d\n", now, next, diff);
    }
 
-   printf("total seek time is%d\n", seek);
-   avg = seek / (float)n;
+   printf("total seek time is %d\n", seek);
+   avg = seek / (float)(n-1);
 
    printf("avrage seek time is %f\n", avg);
 
