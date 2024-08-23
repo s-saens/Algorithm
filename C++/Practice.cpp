@@ -1,64 +1,44 @@
 #include <bits/stdc++.h>
-#define F(i, e) for (int i = 0; i < e; ++i)
-using namespace std;
-
-struct Tomato
-{
-    int i = 0, state = 0, days = 0;
-};
 
 int main()
 {
-    int rippedCnt = 0, emptyCnt = 0, totalCnt = 1, answer = 0;
-    int s[11]; // 각 차원축의 크기
-    int d[11] = {1}; // d[i] = 인접 인덱스 접근시 더하거나 뺄 값.
-    // d[0] = 1, d[1] = s[0], d[2] = s[0] * s[1], ...
-
-    F(i, 11) cin >> s[i];
-
-    F(i, 11) if (i) d[i] = s[i - 1] * d[i - 1];
-
-    Tomato tomatoes[totalCnt];
-
-    queue<Tomato> q;
-
-    F(i, totalCnt)
+    int r, p, c = 0, h = 0, a = 1, s[11], d[11] = {1}, g, i;
+    for (i = 0; i < 11; ++i)
     {
-        int state;
-        cin >> state;
-        tomatoes[i] = {i, state, 0};
-        if (state > 0) q.push(tomatoes[i]);
-        else if (state < 0) emptyCnt++;
+        std::cin >> s[i];
+        a *= s[i];
+        if (i)
+            d[i] = s[i - 1] * d[i - 1];
     }
 
-    while (!q.empty())
+    int t[a], q[a];
+    for (i = 0; i < a; ++i)
     {
-        Tomato t = q.front();
-        q.pop();
-        rippedCnt++;
-        answer = t.days;
-
-        F(i, 22)
+        std::cin >> g;
+        t[i] = g;
+        if (g>0) q[h++] = i;
+        if (g < 0) r++;
+    }
+    while (c < h)
+    {
+        g = q[c++];
+        r++;
+        p = t[g] - 1;
+        for (i = 0; i < 22; ++i)
         {
-            int k = i / 2;
-            int positive = 1 - 2 * (i % 2); // i가 짝수면 1, 홀수면 -1
-            int ni = t.i + positive * d[k]; // 다음 인덱스
-            int nd = d[k] * s[k]; // = d[k+1]
+            int k = i / 2, m = i % 2 ? -1 : 1,
+                n = g + m * d[k],
+                v = d[k] * s[k],
+                x = g % v, y = n % v;
 
-            int m = t.i % nd;
-            int nm = ni % nd;
-
-            if (ni >= 0 && ni < totalCnt
-            && positive * (nm - m) > 0
-            && !tomatoes[ni].state)
+            if (n >= 0 && n < a && m * y > m * x && !t[n])
             {
-                tomatoes[ni] = {ni, 1, t.days + 1};
-                q.push(tomatoes[ni]);
+                q[h++] = n;
+                t[n] = t[g] + 1;
             }
         }
     }
-
-    if (rippedCnt + emptyCnt - totalCnt || rippedCnt <= 0) answer = -1;
-
-    cout << answer;
+    if (r < a)
+        p = -1;
+    std::cout << p;
 }
