@@ -8,19 +8,19 @@
     "net5.0": []
   },
   "packageFolders": {
-    "C:\\Users\\squarelab\\.nuget\\packages\\": {}
+    "/Users/sanghunsong/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\DEV\\Algorithm\\C#\\Algorithm.csproj",
+      "projectUniqueName": "/Users/sanghunsong/DEV/Algorithm/C#/Algorithm.csproj",
       "projectName": "Algorithm",
-      "projectPath": "C:\\DEV\\Algorithm\\C#\\Algorithm.csproj",
-      "packagesPath": "C:\\Users\\squarelab\\.nuget\\packages\\",
-      "outputPath": "C:\\DEV\\Algorithm\\C#\\obj\\",
+      "projectPath": "/Users/sanghunsong/DEV/Algorithm/C#/Algorithm.csproj",
+      "packagesPath": "/Users/sanghunsong/.nuget/packages/",
+      "outputPath": "/Users/sanghunsong/DEV/Algorithm/C#/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\squarelab\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "/Users/sanghunsong/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net5.0"
@@ -38,11 +38,6 @@
         "warnAsError": [
           "NU1605"
         ]
-      },
-      "restoreAuditProperties": {
-        "enableAudit": "true",
-        "auditLevel": "low",
-        "auditMode": "direct"
       }
     },
     "frameworks": {
@@ -61,19 +56,11 @@
         "warn": true,
         "downloadDependencies": [
           {
-            "name": "Microsoft.AspNetCore.App.Ref",
-            "version": "[5.0.0, 5.0.0]"
-          },
-          {
-            "name": "Microsoft.NETCore.App.Host.win-x64",
+            "name": "Microsoft.NETCore.App.Host.osx-x64",
             "version": "[5.0.17, 5.0.17]"
           },
           {
             "name": "Microsoft.NETCore.App.Ref",
-            "version": "[5.0.0, 5.0.0]"
-          },
-          {
-            "name": "Microsoft.WindowsDesktop.App.Ref",
             "version": "[5.0.0, 5.0.0]"
           }
         ],
@@ -82,7 +69,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.302\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.400/RuntimeIdentifierGraph.json"
       }
     }
   }
