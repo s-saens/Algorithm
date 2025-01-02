@@ -1,42 +1,33 @@
 #include <iostream>
 #include <algorithm>
-#define FOR(i,e) for(int i=0 ; i<e; ++i)
+#define FOR(i,s,e) for(int i=s ; i<e; ++i)
 
 using namespace std;
 
-int Y, X, cnt;
-char arr[51][51];
+int numbers[5];
+
+bool checkDivision(int a, int b, int c, int num)
+{
+    return num % a == 0 && num % b == 0 && num % c == 0;
+}
 
 int main()
 {
-    cin >> Y >> X;
-    cnt = Y * X;
+    FOR(i,0,5) cin >> numbers[i];
 
-    bool vY[Y], vX[X];
-    FOR(y, Y) vY[y] = false;
-    FOR(x, X) vX[x] = false;
+    sort(numbers, numbers+5);
 
-    int cY = Y, cX = X;
-
-    FOR(y, Y) FOR(x, X)
+    FOR(num, numbers[0], 1000000)
     {
-        cin >> arr[y][x];
-        if(arr[y][x] == 'X')
+        FOR(i, 0, 5) FOR(j, i+1, 5) FOR(k, j+1, 5)
         {
-            if(!vY[y])
+            if(checkDivision(numbers[i], numbers[j], numbers[k], num))
             {
-                vY[y] = true;
-                cY--;
-            }
-            if(!vX[x])
-            {
-                vX[x] = true;
-                cX--;
+                cout << num;
+                return 0;
             }
         }
     }
-
-    cout << max(cY, cX);
 
     return 0;
 }
