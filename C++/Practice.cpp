@@ -4,29 +4,30 @@
 
 using namespace std;
 
-int numbers[5];
-
-bool checkDivision(int a, int b, int c, int num)
-{
-    return num % a == 0 && num % b == 0 && num % c == 0;
-}
-
 int main()
 {
-    FOR(i,0,5) cin >> numbers[i];
+    int N; cin >> N;
+    string arr[N];
 
-    sort(numbers, numbers+5);
-
-    FOR(num, numbers[0], 1000000)
+    FOR(i,0,N)
     {
-        FOR(i, 0, 5) FOR(j, i+1, 5) FOR(k, j+1, 5)
+        cin >> arr[i];
+    }
+
+    int len = arr[0].length();
+
+    FOR(i,0,len)
+    {
+        char c = arr[0][i];
+        FOR(j,1,N)
         {
-            if(checkDivision(numbers[i], numbers[j], numbers[k], num))
+            if(arr[j][i] != c)
             {
-                cout << num;
-                return 0;
+                c = '?';
+                break;
             }
         }
+        cout << c;
     }
 
     return 0;
