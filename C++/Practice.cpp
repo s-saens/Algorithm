@@ -1,34 +1,56 @@
 #include <iostream>
-#include <algorithm>
 #define FOR(i,s,e) for(int i=s ; i<e; ++i)
 
 using namespace std;
 
 int main()
 {
-    int N; cin >> N;
-    string arr[N];
-
-    FOR(i,0,N)
+    int l = 0, o = 0, v = 0, e = 0;
+    string name; cin >> name;
+    FOR(i, 0, name.size())
     {
-        cin >> arr[i];
+        switch(name[i])
+        {
+            case 'L': l++; break;
+            case 'O': o++; break;
+            case 'V': v++; break;
+            case 'E': e++; break;
+        }
     }
 
-    int len = arr[0].length();
+    int maximum = -1;
+    string answer = "";
 
-    FOR(i,0,len)
+    int N; cin >> N;
+    FOR(i, 0, N)
     {
-        char c = arr[0][i];
-        FOR(j,1,N)
+        int L=l, O=o, V=v, E=e;
+        string teamName; cin >> teamName;
+
+        FOR(i, 0, teamName.size())
         {
-            if(arr[j][i] != c)
+            switch(teamName[i])
             {
-                c = '?';
-                break;
+                case 'L': L++; break;
+                case 'O': O++; break;
+                case 'V': V++; break;
+                case 'E': E++; break;
             }
         }
-        cout << c;
+
+        int k = ((L + O) * (L + V) * (L + E) * (O + V) * (O + E) * (V + E)) % 100;
+
+        if (k > maximum)
+        {
+            maximum = k;
+            answer = teamName;
+        }
+        else if (k == maximum && answer > teamName)
+        {
+            answer = teamName;
+        }
     }
 
+    cout << answer;
     return 0;
 }
