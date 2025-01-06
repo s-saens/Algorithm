@@ -1,56 +1,59 @@
 #include <iostream>
+#include <algorithm>
+#define ll long long
 #define FOR(i,s,e) for(int i=s ; i<e; ++i)
-#define K 51
 using namespace std;
 
-int Y, X, answer = 0;
-bool A[K][K], B[K][K];
-
-void flip(int x, int y)
+char sign(ll a)
 {
-    answer++;
-    FOR(i, 0, 3) FOR(j, 0, 3)
-    {
-        A[y + i][x + j] = !A[y + i][x + j];
-    }
+    return a == 0 ? '0' : a < 0 ? '-' : '+';
 }
 
-void set(bool a)
+bool sameSign(ll a, ll b)
 {
-    FOR(y, 0, Y)
-    {
-        string k; cin >> k;
-        FOR(x, 0, X) if(a) A[y][x] = k[x] - '0'; else B[y][x] = k[x] - '0';
-    }
+    return sign(a) == sign(b);
 }
 
 int main()
 {
-    cin >> Y >> X;
-
-    set(true);
-    set(false);
-
-    if(Y < 3 || X < 3)
+    int T = 3;
+    while(T--)
     {
-        FOR(y,0,Y) FOR(x,0,X) if(A[y][x]!=B[y][x]) answer = -1;
-        cout << answer;
-        return 0;
-    }
+        int N; cin >> N;
+        ll num[N];
+        FOR(i, 0, N) cin >> num[i];
 
-    FOR(y, 0, Y) FOR(x, 0, X)
-    {
-        if(A[y][x] != B[y][x]) 
+        sort(num, num+N);
+
+        int l=0, r=N-1;
+
+        char lastSign = sign(num[l]);
+        bool broken = false;
+
+        while (l < r && !sameSign(num[l], num[r]))
         {
-            if (x < X-2 && y < Y-2) flip(x,y);
+            ll sum = num[l] + num[r];
+            if(sum < 0)
+            {
+                num[l] = sum;
+                r--;
+            }
+            else if (sum > 0)
+            {
+                num[r] = sum;
+                l++;
+            }
             else
             {
-                cout << -1;
-                return 0;
+                r--; l++;
             }
-        }
-    }
 
-    cout << answer;
+            lastSign = sign(sum);
+        }
+
+        if(l == r) lastSign = sign(num[l]);
+
+        cout << lastSign << '\n';
+    }
     return 0;
 }
