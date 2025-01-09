@@ -1,33 +1,19 @@
 #include <iostream>
-#include <algorithm>
-#define ll long long
-#define FOR(i,s,e) for(int i=s ; i<e; ++i)
 using namespace std;
-
-string s;
-
-void change(char &c)
-{
-    if(c >= 'a' && c <= 'z')
-    {
-        c = (c - 'a' + 13) % 26 + 'a';
-    }
-    else if (c >= 'A' && c <= 'Z')
-    {
-        c = (c - 'A' + 13) % 26 + 'A';
-    }
-}
 
 int main()
 {
-    getline(cin, s);
+    string L, R; cin >> L >> R;
+    int sl = L.length(), sr = R.length();
 
-    for(auto &c : s)
+    int sum = 0;
+    if(sl == sr) for(int i=0 ; i<sl ; ++i)
     {
-        change(c);
+        int l = sl-1-i;
+        if(L[l] == '8' && R[l] == '8') sum++;
+        else if(L[l] != R[l]) sum = 0;
     }
 
-    cout << s;
-
+    cout << sum;
     return 0;
 }
