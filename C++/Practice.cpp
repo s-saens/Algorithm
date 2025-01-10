@@ -1,19 +1,26 @@
 #include <iostream>
+#include <algorithm>
 using namespace std;
 
 int main()
 {
-    string L, R; cin >> L >> R;
-    int sl = L.length(), sr = R.length();
+    int N; cin >> N;
+    unsigned long long sum = 0;
+    int cnt[N], m = 0;
 
-    int sum = 0;
-    if(sl == sr) for(int i=0 ; i<sl ; ++i)
+    for(int i=0 ; i<N ; ++i)
     {
-        int l = sl-1-i;
-        if(L[l] == '8' && R[l] == '8') sum++;
-        else if(L[l] != R[l]) sum = 0;
+        cin >> cnt[i];
+        sum += cnt[i];
+        m = max(m, cnt[i]);
     }
 
-    cout << sum;
+    string answer = "Happy";
+
+    if(sum/2 < m) answer = "Unhappy";
+    if(N == 1 && sum == 1) answer = "Happy";
+
+    cout << answer;
+
     return 0;
 }
