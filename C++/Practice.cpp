@@ -1,26 +1,39 @@
 #include <iostream>
 #include <algorithm>
+#define FOR(i,s,e) for(int i=s ; i<e ; ++i)
 using namespace std;
+
+int *num, *sum;
 
 int main()
 {
     int N; cin >> N;
-    unsigned long long sum = 0;
-    int cnt[N], m = 0;
+    num = new int[N];
+    sum = new int[N];
 
-    for(int i=0 ; i<N ; ++i)
+    FOR(i,0,N)
     {
-        cin >> cnt[i];
-        sum += cnt[i];
-        m = max(m, cnt[i]);
+        cin >> num[i];
+        sum[i] = num[i];
+        if (i > 0) sum[i] += sum[i-1];
+    }
+    int l=0, r=N-1, m=0, M=0;
+    
+    while(++m < r)
+    {
+        // S**S**D
+        int a = (sum[m] - num[l] - num[m]) + (sum[r] - sum[m]) * 2;
+        // S**D**S
+        int b = sum[r] - num[l] - num[r] + num[m];
+        // D**S**S
+        int c = (sum[r] - sum[m] - num[r]) + (sum[m] - num[m]) * 2;
+
+        M = max(a, M);
+        M = max(b, M);
+        M = max(c, M);
     }
 
-    string answer = "Happy";
-
-    if(sum/2 < m) answer = "Unhappy";
-    if(N == 1 && sum == 1) answer = "Happy";
-
-    cout << answer;
+    cout << M;
 
     return 0;
 }
